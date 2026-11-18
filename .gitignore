@@ -46,3 +46,25 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# React PWA
+node_modules/
+dist/client/
+playwright-report/
+test-results/
+.env*
+*.local
+legacy-settings.export.json
+.openai/artifacts/
+*.tsbuildinfo
+# Keep the full generated visual matrix local; retain a small review set in Git.
+docs/pwa/screenshots/**/*.png
+!docs/pwa/screenshots/chromium/menu-390.png
+!docs/pwa/screenshots/chromium/menu-820.png
+!docs/pwa/screenshots/chromium/menu-live-1920.png
+!docs/pwa/screenshots/chromium/roulette-390.png
+!docs/pwa/screenshots/chromium/challenge-taboo-375.png
+!docs/pwa/screenshots/chromium/result-375.png
+!docs/pwa/screenshots/chromium/setup-390.png
+!docs/pwa/screenshots/chromium/settings-375.png
+!docs/pwa/screenshots/webkit/menu-390.png
