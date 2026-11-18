@@ -4,203 +4,226 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useReducer,
   useRef,
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
 import { useReducedMotion } from 'motion/react';
 import {
-  generateChallenge,
-  getChallenge,
-  newSession,
-  nextRound,
-  recordRound,
-  retryRound,
-  selectChampion,
+  advanceRound,
+  chooseCharacter,
+  createSession,
+  emptyStatistics,
+  parseCharacters,
+  placeholders,
+  recordStatistics,
+  roundKey,
+  settleRound,
 } from '../domain/game';
-import type { Champion, GameSession, Screen } from '../domain/game';
+import type {
+  Character,
+  GameSession,
+  Outcome,
+  Screen,
+  SelectionMethod,
+  Statistics,
+} from '../domain/game';
 import { defaults, loadSettings, SETTINGS_KEY, validateSettings } from '../domain/settings';
 import type { Settings } from '../domain/settings';
-export type GameAction =
-  | { type: 'start' }
-  | { type: 'select'; champion: Champion; challenge: GameSession['challenge']; restriction: number }
-  | { type: 'finish'; success: boolean; remaining: number }
-  | { type: 'next'; players: number }
-  | { type: 'retry' }
-  | { type: 'elapsed'; value: number };
-export function gameReducer(s: GameSession, a: GameAction): GameSession {
-  switch (a.type) {
-    case 'start':
-      return newSession();
-    case 'select':
-      return {
-        ...s,
-        champion: a.champion,
-        challenge: a.challenge,
-        restriction: a.restriction,
-        elapsed: 0,
-      };
-    case 'finish':
-      return recordRound(s, a.success, a.remaining);
-    case 'next':
-      return nextRound(s, a.players);
-    case 'retry':
-      return retryRound(s);
-    case 'elapsed':
-      return { ...s, elapsed: a.value };
-  }
-}
-const screens: Screen[] = ['menu', 'setup', 'roulette', 'challenge', 'result', 'settings'];
-const readScreen = (): Screen => {
-  const raw = location.hash.replace('#/', '') as Screen;
-  return screens.includes(raw) ? raw : 'menu';
-};
-function recover(): GameSession {
+const SESSION_KEY = 'roulette.session.v3',
+  STATS_KEY = 'roulette.stats.v3';
+function recoverSession(): GameSession | null {
   try {
-    const raw = sessionStorage.getItem('roulette.session.v2');
-    if (!raw) return newSession();
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
     const s = JSON.parse(raw) as GameSession;
     if (
+      typeof s.sessionId !== 'string' ||
       !Number.isInteger(s.round) ||
       s.round < 1 ||
-      !Number.isInteger(s.player) ||
-      s.player < 1 ||
-      s.player > 10 ||
-      !Array.isArray(s.history) ||
+      ![15, 30, 45, 60, 90, 120].includes(s.duration) ||
+      ![0, 5, 10, 15, 20].includes(s.rounds) ||
+      !Number.isFinite(s.remaining) ||
+      !Array.isArray(s.records) ||
       !Number.isFinite(s.elapsed) ||
-      s.elapsed < 0
+      s.elapsed < 0 ||
+      !['selecting', 'revealed', 'guessing', 'settled', 'finished'].includes(s.phase) ||
+      !['card', 'roulette'].includes(s.method)
     )
-      throw Error();
-    if (
-      s.champion &&
-      (!Number.isInteger(s.champion.id) || s.champion.id < 1 || s.champion.id > 120)
-    )
-      throw Error();
-    if (s.challenge && !getChallenge(s.challenge)) throw Error();
-    for (const r of s.history)
-      if (
-        !r.champion ||
-        !getChallenge(r.challenge) ||
-        !Number.isFinite(r.score) ||
-        !Number.isFinite(r.remaining)
-      )
-        throw Error();
+      return null;
+    if (s.character) parseCharacters([{ ...s.character, enabled: true }]);
     return s;
   } catch {
-    return newSession();
+    return null;
   }
 }
-export type Modal = 'how' | 'install' | 'leave' | 'camera' | 'reset' | null;
+function recoverStats(): Statistics {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STATS_KEY) ?? 'null');
+    if (!raw) return emptyStatistics;
+    const s = { ...emptyStatistics };
+    for (const k of Object.keys(s) as (keyof Statistics)[])
+      if (typeof raw[k] === 'number' && Number.isFinite(raw[k]))
+        s[k] = Math.max(0, Math.floor(raw[k]));
+    return s;
+  } catch {
+    return emptyStatistics;
+  }
+}
+function readScreen(session: GameSession | null): Screen {
+  const key = location.hash.replace('#/', ''),
+    aliases: Record<string, Screen> = {
+      menu: 'home',
+      setup: 'modes',
+      roulette: 'draw',
+      challenge: 'guess',
+      result: 'summary',
+    };
+  const candidate = aliases[key] ?? key;
+  const valid = ['home', 'modes', 'draw', 'guess', 'settings', 'stats', 'summary'];
+  if (!valid.includes(candidate)) return 'home';
+  if (['guess', 'summary'].includes(candidate) && !session?.character) return 'home';
+  if (candidate === 'draw' && !session) return 'modes';
+  if (candidate === 'draw' && session?.phase === 'finished') return 'summary';
+  if (candidate === 'draw' && session && ['guessing', 'settled'].includes(session.phase))
+    return 'guess';
+  if (candidate === 'guess' && session && ['selecting', 'revealed'].includes(session.phase))
+    return 'draw';
+  return candidate as Screen;
+}
+export type Modal = 'install' | 'help' | 'leave' | 'reset' | 'camera' | null;
 interface Store {
   settings: Settings;
   update: (patch: Partial<Settings>) => void;
   importSettings: (data: unknown) => void;
-  session: GameSession;
+  session: GameSession | null;
+  statistics: Statistics;
+  characters: Character[];
+  catalogReady: boolean;
   screen: Screen;
-  navigate: (screen: Screen) => void;
-  openSettings: () => void;
+  navigate: (s: Screen) => void;
   back: () => void;
-  start: () => void;
-  select: () => Champion;
-  finish: (success: boolean, remaining: number) => void;
-  next: () => void;
-  retry: () => void;
-  saveElapsed: (value: number) => void;
+  openSettings: () => void;
+  start: (m: SelectionMethod) => void;
+  prepare: () => Character;
+  reveal: () => void;
+  enterGuess: () => void;
+  settle: (outcome: Outcome, remaining: number, key?: string) => boolean;
+  advance: (outcome?: Outcome, remaining?: number) => void;
+  saveElapsed: (value: number, key?: string) => void;
+  resetStatistics: () => void;
   modal: Modal;
-  setModal: (value: Modal) => void;
+  setModal: (m: Modal) => void;
   toast: string | null;
-  setToast: (value: string | null) => void;
+  setToast: (s: string | null) => void;
   motion: boolean;
   active: boolean;
-  stream: boolean;
   t: (en: string, ru: string) => string;
-  languageIndex: 0 | 1;
-  score: number;
-  finished: boolean;
 }
 const Context = createContext<Store | null>(null);
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [loaded] = useState(() => loadSettings());
-  const [settings, setSettings] = useState(loaded.settings);
-  const [session, dispatch] = useReducer(gameReducer, undefined, recover);
-  const sessionRef = useRef(session);
+  const [loaded] = useState(() => loadSettings()),
+    [settings, setSettings] = useState(loaded.settings),
+    [session, setSession] = useState(recoverSession),
+    [statistics, setStatistics] = useState(recoverStats),
+    [characters, setCharacters] = useState<Character[]>(placeholders),
+    [catalogReady, setCatalogReady] = useState(false),
+    [screen, setScreen] = useState<Screen>(() => readScreen(recoverSession())),
+    [settingsReturn, setSettingsReturn] = useState<Screen>('home'),
+    [modal, setModal] = useState<Modal>(null),
+    [toast, setToast] = useState<string | null>(loaded.error),
+    [active, setActive] = useState(!document.hidden);
+  const sessionRef = useRef(session),
+    statsRef = useRef(statistics),
+    settingsRef = useRef(settings);
   sessionRef.current = session;
-  const [screen, setScreen] = useState<Screen>(() => {
-    const p = readScreen(),
-      s = recover();
-    return p === 'challenge' && !s.champion
-      ? 'menu'
-      : p === 'result' && !s.history.length
-        ? 'menu'
-        : p;
-  });
-  const [settingsReturn, setSettingsReturn] = useState<Screen>('menu');
-  const [modal, setModal] = useState<Modal>(null);
-  const [toast, setToast] = useState<string | null>(loaded.error);
-  const [active, setActive] = useState(!document.hidden);
-  const systemReduced = useReducedMotion();
+  statsRef.current = statistics;
+  settingsRef.current = settings;
+  const reduced = useReducedMotion(),
+    motion = !reduced && !settings.reducedMotion && settings.intensity > 0;
   const t = useCallback(
     (en: string, ru: string) => (settings.language === 'ru' ? ru : en),
     [settings.language],
   );
+  const commit = useCallback((next: GameSession | null) => {
+    sessionRef.current = next;
+    setSession(next);
+    try {
+      if (next) sessionStorage.setItem(SESSION_KEY, JSON.stringify(next));
+      else sessionStorage.removeItem(SESSION_KEY);
+    } catch {
+      /* Storage is optional. */
+    }
+  }, []);
   const navigate = useCallback((next: Screen) => {
     setScreen(next);
     history.pushState(null, '', `#/${next}`);
     window.scrollTo({ top: 0, behavior: 'instant' });
   }, []);
   useEffect(() => {
-    function pop() {
-      const next = readScreen();
-      setScreen(
-        next === 'challenge' && !session.champion
-          ? 'menu'
-          : next === 'result' && !session.history.length
-            ? 'menu'
-            : next,
-      );
-    }
+    const pop = () => {
+      window.dispatchEvent(new Event('roulette:pause'));
+      setScreen(readScreen(sessionRef.current));
+    };
     window.addEventListener('popstate', pop);
     return () => window.removeEventListener('popstate', pop);
-  }, [session]);
+  }, []);
+  useEffect(() => {
+    const abort = new AbortController();
+    fetch('/characters/manifest.json', { signal: abort.signal })
+      .then((r) => {
+        if (!r.ok) throw Error();
+        return r.json();
+      })
+      .then((data) => {
+        setCharacters(parseCharacters(data));
+        setCatalogReady(true);
+      })
+      .catch((e) => {
+        if (e.name !== 'AbortError') {
+          setCatalogReady(true);
+          setToast(
+            t(
+              'The local character catalog is unavailable. Placeholder entries are ready.',
+              'Локальный каталог недоступен. Используются герои-заглушки.',
+            ),
+          );
+        }
+      });
+    return () => abort.abort();
+  }, [t]);
   useEffect(() => {
     try {
       localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
     } catch {
       setToast(
         t(
-          'Preferences cannot be saved in this browser. This session still works.',
-          'Не удалось сохранить настройки. Текущая игра работает.',
+          'Preferences cannot be saved in this browser.',
+          'В этом браузере настройки не сохраняются.',
         ),
       );
     }
-  }, [settings, t]);
-  useEffect(() => {
-    try {
-      sessionStorage.setItem('roulette.session.v2', JSON.stringify(session));
-    } catch {
-      /* Private sessions may have no writable storage. */
-    }
-  }, [session]);
-  useEffect(() => {
     document.documentElement.lang = settings.language;
+    document.documentElement.dataset.motion = String(motion);
+    const lowPower =
+      navigator.hardwareConcurrency <= 4 ||
+      ((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8) <= 4;
+    document.documentElement.dataset.quality =
+      settings.quality === 'auto' ? (lowPower || reduced ? 'low' : 'high') : settings.quality;
     document.documentElement.dataset.contrast = String(settings.highContrast);
-    document.documentElement.dataset.motion = String(
-      !(systemReduced || settings.reducedMotion || settings.intensity === 0),
-    );
     document.documentElement.style.setProperty(
-      '--text-scale',
+      '--ui-text-scale',
       String(settings.scale * (settings.largerText ? 1.12 : 1)),
     );
-  }, [settings, systemReduced]);
+  }, [settings, motion, reduced, t]);
   useEffect(() => {
-    const onVisibility = () => setActive(!document.hidden);
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => document.removeEventListener('visibilitychange', onVisibility);
+    const change = () => setActive(!document.hidden);
+    document.addEventListener('visibilitychange', change);
+    return () => document.removeEventListener('visibilitychange', change);
   }, []);
   useEffect(() => {
     if (!toast) return;
-    const id = setTimeout(() => setToast(null), 6500);
+    const id = setTimeout(() => setToast(null), 5500);
     return () => clearTimeout(id);
   }, [toast]);
   const update = useCallback(
@@ -208,79 +231,107 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [],
   );
   const importSettings = useCallback(
-    (data: unknown) => {
-      setSettings(validateSettings(data));
-      setToast(
-        t('Preferences imported. Your stage is ready.', 'Настройки импортированы. Сцена готова.'),
-      );
+    (raw: unknown) => {
+      setSettings(validateSettings(raw));
+      setToast(t('Preferences imported.', 'Настройки импортированы.'));
     },
     [t],
   );
+  const openSettings = useCallback(() => {
+    if (screen === 'settings') return;
+    window.dispatchEvent(new Event('roulette:pause'));
+    setSettingsReturn(screen);
+    navigate('settings');
+  }, [screen, navigate]);
   const back = useCallback(() => {
     if (modal) {
       setModal(null);
       return;
     }
-    if (settings.stream && ['roulette', 'challenge', 'result'].includes(screen)) {
-      update({ stream: false });
-      return;
-    }
     if (screen === 'settings') {
       navigate(settingsReturn);
-    } else if (screen === 'setup') {
-      navigate('menu');
-    } else if (screen !== 'menu') {
+      return;
+    }
+    if (screen === 'stats' || screen === 'modes' || screen === 'summary') {
+      navigate('home');
+      return;
+    }
+    if (screen !== 'home') {
       window.dispatchEvent(new Event('roulette:pause'));
       setModal('leave');
     }
-  }, [modal, settings.stream, screen, settingsReturn, navigate, update]);
-  const openSettings = useCallback(() => {
-    if (screen === 'settings') return;
-    setSettingsReturn(screen);
-    navigate('settings');
-  }, [screen, navigate]);
-  const start = useCallback(() => {
-    dispatch({ type: 'start' });
-    navigate('roulette');
-  }, [navigate]);
-  const select = useCallback(() => {
-    const champion = selectChampion(
-      undefined,
-      session.champion?.id ?? session.history.at(-1)?.champion.id,
-    );
-    dispatch({
-      type: 'select',
-      champion,
-      challenge: generateChallenge(settings.mode),
-      restriction: Math.floor(Math.random() * 4),
-    });
-    return champion;
-  }, [session.champion, session.history, settings.mode]);
-  const finish = useCallback(
-    (success: boolean, remaining: number) => {
-      dispatch({ type: 'finish', success, remaining });
-      navigate('result');
+  }, [modal, screen, settingsReturn, navigate]);
+  const start = useCallback(
+    (method: SelectionMethod) => {
+      update({ method });
+      commit(createSession(method, settingsRef.current.rounds, settingsRef.current.duration));
+      navigate('draw');
     },
-    [navigate],
+    [commit, navigate, update],
   );
-  const next = useCallback(() => {
-    dispatch({ type: 'next', players: settings.players });
-    navigate('roulette');
-  }, [settings.players, navigate]);
-  const retry = useCallback(() => {
-    dispatch({ type: 'retry' });
-    navigate('challenge');
-  }, [navigate]);
-  const saveElapsed = useCallback((value: number) => {
-    dispatch({ type: 'elapsed', value });
-    // pagehide/update must not wait for React's next passive effect to preserve the clock.
+  const prepare = useCallback(() => {
+    const s = sessionRef.current;
+    if (!s) throw Error('Start a session first.');
+    if (s.character) return s.character;
+    const character = chooseCharacter(characters, s.records.at(-1)?.character.id);
+    commit({ ...s, character, phase: 'selecting' });
+    return character;
+  }, [characters, commit]);
+  const reveal = useCallback(() => {
+    const s = sessionRef.current;
+    if (s?.character && s.phase === 'selecting') commit({ ...s, phase: 'revealed' });
+  }, [commit]);
+  const enterGuess = useCallback(() => {
+    const s = sessionRef.current;
+    if (!s?.character) return;
+    if (s.phase === 'revealed') commit({ ...s, phase: 'guessing', elapsed: 0 });
+    navigate('guess');
+  }, [commit, navigate]);
+  const settle = useCallback(
+    (outcome: Outcome, remaining: number, key?: string) => {
+      const s = sessionRef.current;
+      if (!s) return false;
+      const next = settleRound(s, key ?? roundKey(s), outcome, remaining);
+      if (next === s) return false;
+      const stats = recordStatistics(statsRef.current, next.records.at(-1)!);
+      statsRef.current = stats;
+      setStatistics(stats);
+      try {
+        localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+      } catch {
+        /* Current session remains functional. */
+      }
+      commit(next);
+      return true;
+    },
+    [commit],
+  );
+  const advance = useCallback(
+    (outcome: Outcome = 'passed', remaining = 0) => {
+      let s = sessionRef.current;
+      if (!s || !['guessing', 'settled'].includes(s.phase)) return;
+      if (s.phase === 'guessing') settle(outcome, remaining, roundKey(s));
+      s = sessionRef.current!;
+      const next = advanceRound(s, settingsRef.current.duration);
+      commit(next);
+      navigate(next.phase === 'finished' ? 'summary' : 'draw');
+    },
+    [commit, navigate, settle],
+  );
+  const saveElapsed = useCallback(
+    (elapsed: number, key?: string) => {
+      const s = sessionRef.current;
+      if (s?.phase === 'guessing' && (!key || roundKey(s) === key)) commit({ ...s, elapsed });
+    },
+    [commit],
+  );
+  const resetStatistics = useCallback(() => {
+    statsRef.current = emptyStatistics;
+    setStatistics(emptyStatistics);
     try {
-      sessionStorage.setItem(
-        'roulette.session.v2',
-        JSON.stringify({ ...sessionRef.current, elapsed: value }),
-      );
+      localStorage.removeItem(STATS_KEY);
     } catch {
-      /* Storage can be unavailable in a private session. */
+      /* optional */
     }
   }, []);
   const value = useMemo<Store>(
@@ -289,46 +340,52 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       update,
       importSettings,
       session,
+      statistics,
+      characters,
+      catalogReady,
       screen,
       navigate,
-      openSettings,
       back,
+      openSettings,
       start,
-      select,
-      finish,
-      next,
-      retry,
+      prepare,
+      reveal,
+      enterGuess,
+      settle,
+      advance,
       saveElapsed,
+      resetStatistics,
       modal,
       setModal,
       toast,
       setToast,
-      motion: !systemReduced && !settings.reducedMotion && settings.intensity > 0,
+      motion,
       active,
-      stream: settings.stream && ['roulette', 'challenge', 'result'].includes(screen),
       t,
-      languageIndex: settings.language === 'en' ? 0 : 1,
-      score: session.history.reduce((a, r) => a + r.score, 0),
-      finished: settings.rounds !== 0 && session.round >= settings.rounds,
     }),
     [
       settings,
       update,
       importSettings,
       session,
+      statistics,
+      characters,
+      catalogReady,
       screen,
       navigate,
-      openSettings,
       back,
+      openSettings,
       start,
-      select,
-      finish,
-      next,
-      retry,
+      prepare,
+      reveal,
+      enterGuess,
+      settle,
+      advance,
       saveElapsed,
+      resetStatistics,
       modal,
       toast,
-      systemReduced,
+      motion,
       active,
       t,
     ],
@@ -336,8 +393,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }
 export function useGame() {
-  const value = useContext(Context);
-  if (!value) throw new Error('Game context is missing');
-  return value;
+  const s = useContext(Context);
+  if (!s) throw Error('Game context is unavailable.');
+  return s;
 }
 export { defaults };

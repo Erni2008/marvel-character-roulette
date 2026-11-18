@@ -1,93 +1,134 @@
 import { describe, expect, it } from 'vitest';
 import {
-  generateChallenge,
-  newSession,
-  nextRound,
-  placeholderRepository,
-  recordRound,
-  retryRound,
-  selectChampion,
-  challenges,
+  advanceRound,
+  chooseCharacter,
+  createSession,
+  emptyStatistics,
+  parseCharacters,
+  placeholders,
+  recordStatistics,
+  roundKey,
+  selectionProgress,
+  settleRound,
+  wheelIndexAtPointer,
+  wheelStopAngle,
 } from '../src/domain/game';
 import { defaults, loadSettings, SETTINGS_KEY, validateSettings } from '../src/domain/settings';
-describe('Preserved game semantics', () => {
-  it('selects only valid placeholder IDs and excludes the previous selection', () => {
-    for (let i = 0; i < 1000; i++) {
-      const next = selectChampion(placeholderRepository, 23, () => i / 1000);
-      expect(next.id).toBeGreaterThanOrEqual(1);
-      expect(next.id).toBeLessThanOrEqual(120);
-      expect(next.id).not.toBe(23);
-      expect(next.identifier).toMatch(/^CHAMPION_\d{3}$/);
-    }
+const guessing = () => ({
+  ...createSession('card', 5, 60, 'test'),
+  character: placeholders[0],
+  phase: 'guessing' as const,
+});
+describe('selection and catalog', () => {
+  it('selects enabled entries before animation, excludes immediate repeats, supports a single entry', () => {
+    const entries = [{ ...placeholders[0], enabled: false }, placeholders[1], placeholders[2]];
+    expect(chooseCharacter(entries, placeholders[1].id, () => 0).id).toBe(placeholders[2].id);
+    expect(chooseCharacter([placeholders[0]], placeholders[0].id).id).toBe(placeholders[0].id);
+    expect(() => chooseCharacter([])).toThrow();
   });
-  it('keeps the original mode pools and all eight chaos formats', () => {
-    const chaos = new Set(
-      Array.from({ length: 80 }, (_, i) => generateChallenge('chaos', () => i / 80)),
-    );
-    expect(chaos.size).toBe(8);
-    expect(challenges).toHaveLength(8);
-    for (let i = 0; i < 80; i++) {
-      expect(generateChallenge('party', () => i / 80)).not.toBe('clues');
-      expect(['taboo', 'clues', 'word', 'reverse', 'speed']).toContain(
-        generateChallenge('knowledge', () => i / 80),
-      );
-    }
+  it('validates local PNGs, unique IDs and a usable catalog', () => {
+    expect(
+      parseCharacters([{ ...placeholders[0], imagePath: '/characters/local-hero.png' }])[0].name,
+    ).toBe('CHAMPION 001');
+    for (const imagePath of [
+      'https://example.com/a.png',
+      '/characters/../a.png',
+      '/characters/a.jpg',
+    ])
+      expect(() => parseCharacters([{ ...placeholders[0], imagePath }])).toThrow();
+    expect(() => parseCharacters([placeholders[0], placeholders[0]])).toThrow();
+    expect(() => parseCharacters([{ ...placeholders[0], enabled: false }])).toThrow();
   });
-  it('scores successes, replaces retries, and rotates players', () => {
-    const s = {
-      ...newSession(),
-      champion: selectChampion(undefined, undefined, () => 0),
-      challenge: 'mime' as const,
-    };
-    const recorded = recordRound(s, true, 12);
-    expect(recorded.history[0].score).toBe(160);
-    expect(recordRound(s, false, 12).history[0].score).toBe(0);
-    expect(retryRound(recorded).history).toEqual([]);
-    const next = nextRound(recorded, 2);
-    expect(next.player).toBe(2);
-    expect(next.round).toBe(2);
-    expect(next.champion).toBeNull();
-    expect(nextRound(next, 2).player).toBe(1);
-    expect(next.history).toHaveLength(1);
+  it('stops the physical wheel at exactly the selected segment for every catalog entry', () => {
+    for (const count of [1, 2, 7, 120])
+      for (let index = 0; index < count; index++)
+        expect(wheelIndexAtPointer(wheelStopAngle(index, count), count)).toBe(index);
+  });
+  it('has monotonic acceleration and deceleration and a complete timeline', () => {
+    expect(selectionProgress(0)).toBe(0);
+    expect(selectionProgress(1)).toBe(1);
+    const samples = Array.from({ length: 101 }, (_, i) => selectionProgress(i / 100));
+    expect(samples.every((x, i) => i === 0 || x >= samples[i - 1])).toBe(true);
+    expect(samples[99] - samples[98]).toBeLessThan(samples[50] - samples[49]);
   });
 });
-describe('Portable preferences', () => {
-  it('imports original numeric Flutter settings and validates every boundary', () => {
-    const migrated = validateSettings({
-      mode: 2,
-      difficulty: 3,
-      players: 12,
-      duration: 90,
-      language: 'ru',
-      scale: 4,
-      reducedMotion: true,
-    });
-    expect(migrated).toMatchObject({
-      mode: 'chaos',
-      difficulty: 'expert',
-      players: 10,
-      duration: 90,
-      language: 'ru',
-      scale: 1.2,
-      reducedMotion: true,
-    });
-    expect(validateSettings({ duration: 17, rounds: 2, master: NaN }).duration).toBe(45);
-    expect(validateSettings({ mode: 99 }).mode).toBe('party');
-    expect(() => validateSettings(null)).toThrow();
-  });
-  it('round-trips settings and recovers corrupt or blocked storage', () => {
-    const storage = new Map([
-      [SETTINGS_KEY, JSON.stringify({ ...defaults, players: 7, language: 'ru' })],
-    ]);
-    expect(loadSettings({ getItem: (key) => storage.get(key) ?? null }).settings.players).toBe(7);
-    expect(loadSettings({ getItem: () => '{broken' }).error).not.toBeNull();
+describe('session integrity', () => {
+  it('settles once and ignores stale round callbacks', () => {
+    const s = guessing(),
+      settled = settleRound(s, roundKey(s), 'correct', 58);
+    expect(settled.records).toHaveLength(1);
+    expect(settleRound(settled, roundKey(s), 'correct', 57)).toBe(settled);
+    const next = advanceRound(settled, 30);
+    expect(next.duration).toBe(30);
+    expect(next.round).toBe(2);
+    expect(next.character).toBeNull();
     expect(
-      loadSettings({
-        getItem: () => {
-          throw Error('blocked');
-        },
-      }).settings,
-    ).toEqual(defaults);
-    expect(loadSettings({ getItem: () => null }).error).toBeNull();
+      settleRound(
+        { ...next, phase: 'guessing', character: placeholders[1] },
+        roundKey(s),
+        'timeout',
+        0,
+      ).records,
+    ).toHaveLength(1);
+  });
+  it('finishes finite sessions and keeps unlimited sessions running', () => {
+    const s = guessing();
+    expect(advanceRound(settleRound({ ...s, round: 5 }, 'test:5', 'skipped', 12), 60).phase).toBe(
+      'finished',
+    );
+    expect(
+      advanceRound(settleRound({ ...s, round: 500, rounds: 0 }, 'test:500', 'passed', 12), 60)
+        .round,
+    ).toBe(501);
+    expect(advanceRound(s, 60)).toBe(s);
+  });
+  it('records only correct answers as a streak and counts all outcomes separately', () => {
+    let stats = { ...emptyStatistics };
+    for (const outcome of ['correct', 'correct', 'timeout', 'skipped', 'passed'] as const)
+      stats = recordStatistics(stats, {
+        round: 1,
+        character: placeholders[0],
+        outcome,
+        remaining: 22,
+      });
+    expect(stats).toMatchObject({
+      rounds: 5,
+      correct: 2,
+      timeouts: 1,
+      skipped: 1,
+      passed: 1,
+      bestStreak: 2,
+      streak: 0,
+      bestRemaining: 22,
+    });
+  });
+});
+describe('preferences', () => {
+  it('starts at one minute and ten rounds, validates imports and clamps values', () => {
+    expect(defaults).toMatchObject({ duration: 60, rounds: 10 });
+    expect(validateSettings({ scale: 99, duration: 3, rounds: -2, master: -1 })).toMatchObject({
+      scale: 1.2,
+      duration: 60,
+      rounds: 10,
+      master: 0,
+    });
+    expect(() => validateSettings('broken')).toThrow();
+  });
+  it('migrates reusable v2 preferences while using the new one-minute default', () => {
+    const storage = {
+      getItem: (key: string) =>
+        key === 'character-roulette.settings.v2'
+          ? JSON.stringify({ language: 'ru', duration: 45, reducedMotion: true, stream: true })
+          : null,
+    };
+    expect(loadSettings(storage).settings).toMatchObject({
+      language: 'ru',
+      duration: 60,
+      reducedMotion: true,
+      stream: true,
+    });
+    expect(
+      loadSettings({ getItem: (key) => (key === SETTINGS_KEY ? 'bad' : null) }).error,
+    ).toBeTruthy();
   });
 });

@@ -11,6 +11,7 @@ const types = {
   '.webmanifest': 'application/manifest+json',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.ttf': 'font/ttf',
 };
 http
@@ -48,4 +49,4 @@ http
       res.end('Not found');
     }
   })
-  .listen(4173, '127.0.0.1', () => console.log('QA static host http://127.0.0.1:4173'));
+  .listen(4174, '127.0.0.1', () => console.log('QA static host http://127.0.0.1:4174'));

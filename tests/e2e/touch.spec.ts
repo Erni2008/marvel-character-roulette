@@ -1,36 +1,22 @@
 import { test, expect } from '@playwright/test';
-test('iPhone touch flow, rotation, Russian type and two-finger presentation exit', async ({
-  page,
-}) => {
-  await page.addInitScript(() => {
-    sessionStorage.setItem('roulette.intro.v2', '1');
+test('iPhone touch, Russian labels, rotation and presentation controls', async ({ page }) => {
+  await page.addInitScript(() =>
     localStorage.setItem(
-      'character-roulette.settings.v2',
-      JSON.stringify({ reducedMotion: true, language: 'ru', largerText: true, scale: 1.1 }),
-    );
-  });
-  await page.goto('/');
-  await page.getByRole('button', { name: 'НАЧАТЬ ИГРУ', exact: true }).tap();
-  await page.getByRole('button', { name: 'ВОЙТИ В КАМЕРУ' }).tap();
-  await page.getByRole('button', { name: 'ЗАПУСТИТЬ РУЛЕТКУ' }).tap();
-  await expect(page.getByText('ГЕРОЙ ВЫБРАН', { exact: true })).toBeVisible();
-  await page.setViewportSize({ width: 844, height: 390 });
-  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(
-    false,
+      'character-roulette.settings.v3',
+      JSON.stringify({ language: 'ru', reducedMotion: true, stream: true }),
+    ),
   );
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole('button', { name: 'НАЧАТЬ ИСПЫТАНИЕ', exact: true }).tap();
-  await page.getByRole('button', { name: 'НАЧАТЬ ИСПЫТАНИЕ', exact: true }).tap();
-  await page.getByRole('button', { name: 'ПАУЗА', exact: true }).tap();
-  await page.getByRole('button', { name: 'ГОТОВО', exact: true }).tap();
-  await expect(page.getByText('УСПЕХ', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Режим трансляции', exact: true }).tap();
-  await expect(page.locator('.app-header')).toHaveCount(0);
-  await page.locator('main').dispatchEvent('touchstart', {
-    touches: [
-      { identifier: 0, clientX: 120, clientY: 300 },
-      { identifier: 1, clientX: 180, clientY: 300 },
-    ],
-  });
-  await expect(page.locator('.app-header')).toBeVisible();
+  await page.goto('/');
+  await page.locator('.play-button').tap();
+  await page.locator('.mode-card-draw').tap();
+  await expect(page.locator('.guess-screen')).toBeVisible();
+  await expect(page.locator('.guess-settings')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Верный ответ', exact: true }).tap();
+  await expect(page.getByText('ВЕРНО!', { exact: true })).toBeVisible();
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect(page.getByRole('button', { name: 'Следующий раунд' })).toBeInViewport();
+  await page.getByRole('button', { name: 'Следующий раунд' }).tap();
+  await expect(page.locator('.round-badge')).toContainText('2 / 10');
+  await page.screenshot({ path: 'docs/reference/screenshots/iphone-landscape-ru.png' });
 });

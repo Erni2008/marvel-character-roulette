@@ -10,7 +10,7 @@ export default defineConfig({
     ['html', { open: 'never' }],
     ['json', { outputFile: 'test-results/browser-results.json' }],
   ],
-  use: { baseURL: 'http://127.0.0.1:4173', trace: 'retain-on-failure', reducedMotion: 'reduce' },
+  use: { baseURL: 'http://127.0.0.1:4174', trace: 'retain-on-failure', reducedMotion: 'reduce' },
   projects: [
     { name: 'chromium', testIgnore: '**/touch.spec.ts', use: { browserName: 'chromium' } },
     { name: 'webkit', testIgnore: '**/touch.spec.ts', use: { browserName: 'webkit' } },
@@ -22,7 +22,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'node tests/qa-server.mjs',
-    url: 'http://127.0.0.1:4173',
+    url: 'http://127.0.0.1:4174',
     reuseExistingServer: false,
   },
 });

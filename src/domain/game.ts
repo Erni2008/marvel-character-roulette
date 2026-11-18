@@ -1,197 +1,186 @@
-export type Mode = 'party' | 'knowledge' | 'chaos';
-export type Difficulty = 'easy' | 'normal' | 'hard' | 'expert';
 export type Language = 'en' | 'ru';
-export type Screen = 'menu' | 'setup' | 'roulette' | 'challenge' | 'result' | 'settings';
-export type ChallengeId =
-  'taboo' | 'mime' | 'clues' | 'word' | 'reverse' | 'roleplay' | 'speed' | 'chaos';
-export interface Champion {
-  id: number;
-  identifier: string;
+export type SelectionMethod = 'card' | 'roulette';
+export type Screen = 'home' | 'modes' | 'draw' | 'guess' | 'settings' | 'stats' | 'summary';
+export interface Character {
+  id: string;
+  name: string;
+  imagePath: string;
+  enabled: boolean;
 }
 export interface CharacterRepository {
-  all(): readonly Champion[];
+  all(): readonly Character[];
 }
-export const placeholderRepository: CharacterRepository = {
-  all: () =>
-    Array.from({ length: 120 }, (_, i) => ({
-      id: i + 1,
-      identifier: `CHAMPION_${String(i + 1).padStart(3, '0')}`,
-    })),
-};
-export function selectChampion(
-  repository: CharacterRepository = placeholderRepository,
-  exclude?: number,
+export const placeholders: Character[] = Array.from({ length: 120 }, (_, i) => ({
+  id: `champion-${String(i + 1).padStart(3, '0')}`,
+  name: `CHAMPION ${String(i + 1).padStart(3, '0')}`,
+  imagePath: '',
+  enabled: true,
+}));
+export function parseCharacters(raw: unknown): Character[] {
+  if (!Array.isArray(raw)) throw new Error('The character manifest must be an array.');
+  const ids = new Set<string>();
+  const result = raw.map((item: unknown) => {
+    if (!item || typeof item !== 'object') throw new Error('Invalid character entry.');
+    const c = item as Record<string, unknown>;
+    if (
+      typeof c.id !== 'string' ||
+      !c.id.trim() ||
+      ids.has(c.id) ||
+      typeof c.name !== 'string' ||
+      !c.name.trim() ||
+      typeof c.enabled !== 'boolean' ||
+      typeof c.imagePath !== 'string'
+    )
+      throw new Error('Each character needs a unique id, name, imagePath and enabled flag.');
+    if (
+      c.imagePath &&
+      (!c.imagePath.startsWith('/characters/') ||
+        c.imagePath.includes('..') ||
+        !/^\/characters\/[\w ./-]+\.png$/i.test(c.imagePath))
+    )
+      throw new Error('Character artwork must be a local PNG under /characters/.');
+    ids.add(c.id);
+    return { id: c.id, name: c.name, imagePath: c.imagePath, enabled: c.enabled };
+  });
+  if (!result.some((c) => c.enabled)) throw new Error('Enable at least one character.');
+  return result;
+}
+export function chooseCharacter(
+  characters: readonly Character[],
+  previousId?: string,
   random = Math.random,
-): Champion {
-  const pool = repository.all().filter((c) => c.id !== exclude);
-  if (!pool.length) throw new Error('No champions available');
-  return pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))];
+): Character {
+  const enabled = characters.filter((c) => c.enabled);
+  if (!enabled.length) throw new Error('No enabled characters.');
+  const alternatives = enabled.filter((c) => c.id !== previousId),
+    pool = alternatives.length ? alternatives : enabled;
+  return pool[Math.min(pool.length - 1, Math.max(0, Math.floor(random() * pool.length)))];
 }
-export interface ChallengeDefinition {
-  id: ChallengeId;
-  title: [string, string];
-  tag: [string, string];
-  instruction: [string, string];
-  color: string;
+export function wheelStopAngle(index: number, count: number, turns = 7): number {
+  if (index < 0 || index >= count || count < 1) throw new Error('Invalid wheel entry.');
+  return turns * 360 + 360 - ((index + 0.5) * 360) / count;
 }
-export const challenges: readonly ChallengeDefinition[] = [
-  {
-    id: 'taboo',
-    title: ['Taboo', 'Табу'],
-    tag: ['THE ART OF AVOIDANCE', 'ИСКУССТВО ОБЪЯСНЕНИЯ'],
-    instruction: [
-      'Explain your champion without the forbidden words. Character-specific word lists will arrive with the champion database.',
-      'Объясните героя без запрещённых слов. Списки слов появятся вместе с базой героев.',
-    ],
-    color: '#E83246',
-  },
-  {
-    id: 'mime',
-    title: ['Mime', 'Пантомима'],
-    tag: ['LET YOUR BODY TALK', 'ЯЗЫК ТЕЛА'],
-    instruction: [
-      'No words. No sounds. Bring your champion to life using gestures alone.',
-      'Ни слов, ни звуков. Покажите героя только жестами.',
-    ],
-    color: '#8DB5D8',
-  },
-  {
-    id: 'clues',
-    title: ['Three clues', 'Три подсказки'],
-    tag: ['ONE REVEAL AT A TIME', 'ШАГ ЗА ШАГОМ'],
-    instruction: [
-      'Reveal one clue slot at a time. Character facts are not connected yet; no invented clues will be shown.',
-      'Открывайте по одному слоту. Факты о героях пока не подключены — выдуманных подсказок не будет.',
-    ],
-    color: '#D9AC60',
-  },
-  {
-    id: 'word',
-    title: ['One word', 'Одно слово'],
-    tag: ['MAKE IT COUNT', 'ВЫБИРАЙТЕ ТОЧНО'],
-    instruction: [
-      'One champion. Exactly one word. Give your team the word that unlocks the answer.',
-      'Один герой. Ровно одно слово. Дайте команде ключ к ответу.',
-    ],
-    color: '#9EC3AA',
-  },
-  {
-    id: 'reverse',
-    title: ['Reverse guess', 'Угадай себя'],
-    tag: ['THE ANSWER IS YOU', 'ОТВЕТ — ЭТО ВЫ'],
-    instruction: [
-      'Turn away from the stage. Ask yes/no questions to discover your own champion.',
-      'Отвернитесь от сцены. Задавайте вопросы с ответами «да» или «нет», чтобы угадать своего героя.',
-    ],
-    color: '#B5A0CC',
-  },
-  {
-    id: 'roleplay',
-    title: ['Roleplay', 'В роли героя'],
-    tag: ['BECOME THE LEGEND', 'СТАНЬТЕ ЛЕГЕНДОЙ'],
-    instruction: [
-      'Act and speak as your champion. Stay in character while the others guess.',
-      'Действуйте и говорите от лица героя. Не выходите из роли, пока остальные угадывают.',
-    ],
-    color: '#D5A186',
-  },
-  {
-    id: 'speed',
-    title: ['Speed guess', 'Блиц'],
-    tag: ['FIVE SECONDS. ALL IN.', 'ПЯТЬ СЕКУНД. ВА-БАНК.'],
-    instruction: [
-      'Five seconds. One chance. Help your team guess before the clock runs out.',
-      'Пять секунд. Один шанс. Помогите команде угадать до конца отсчёта.',
-    ],
-    color: '#E4C778',
-  },
-  {
-    id: 'chaos',
-    title: ['Random chaos', 'Случайный хаос'],
-    tag: ['EXPECT THE UNEXPECTED', 'БУДЬТЕ ГОТОВЫ КО ВСЕМУ'],
-    instruction: [
-      'Your champion comes with an unexpected restriction. Play by the rule below.',
-      'К герою прилагается неожиданное ограничение. Соблюдайте правило ниже.',
-    ],
-    color: '#CA93B2',
-  },
-];
-const pools: Record<Mode, ChallengeId[]> = {
-  party: ['taboo', 'mime', 'word', 'reverse', 'roleplay', 'speed'],
-  knowledge: ['taboo', 'clues', 'word', 'reverse', 'speed'],
-  chaos: challenges.map((c) => c.id),
-};
-export function generateChallenge(mode: Mode, random = Math.random): ChallengeId {
-  const pool = pools[mode];
-  return pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))];
+export function wheelIndexAtPointer(rotation: number, count: number): number {
+  const a = ((-rotation % 360) + 360) % 360;
+  return Math.min(count - 1, Math.floor(a / (360 / count)));
 }
-export function getChallenge(id: ChallengeId) {
-  return challenges.find((c) => c.id === id)!;
+export function selectionProgress(t: number): number {
+  const p = Math.min(1, Math.max(0, t));
+  return p < 0.12 ? 0.17 * (p / 0.12) ** 2 : 0.17 + 0.83 * (1 - (1 - (p - 0.12) / 0.88) ** 3);
 }
-export const restrictions: [string, string][] = [
-  ['Speak only in questions.', 'Говорите только вопросами.'],
-  ['Keep both hands behind your back.', 'Держите обе руки за спиной.'],
-  ['Use a dramatic whisper.', 'Говорите драматичным шёпотом.'],
-  ['Explain without using any names.', 'Объясняйте без имён.'],
-];
+export type Outcome = 'correct' | 'skipped' | 'passed' | 'timeout';
 export interface RoundRecord {
-  champion: Champion;
-  challenge: ChallengeId;
+  round: number;
+  character: Character;
+  outcome: Outcome;
   remaining: number;
-  success: boolean;
-  score: number;
 }
 export interface GameSession {
+  sessionId: string;
   round: number;
-  player: number;
-  champion: Champion | null;
-  challenge: ChallengeId | null;
-  restriction: number;
-  history: RoundRecord[];
+  rounds: number;
+  duration: number;
+  method: SelectionMethod;
+  character: Character | null;
+  phase: 'selecting' | 'revealed' | 'guessing' | 'settled' | 'finished';
+  outcome: Outcome | null;
   elapsed: number;
+  remaining: number;
+  records: RoundRecord[];
 }
-export function newSession(): GameSession {
+export function createSession(
+  method: SelectionMethod,
+  rounds: number,
+  duration: number,
+  id = crypto.randomUUID(),
+): GameSession {
   return {
+    sessionId: id,
     round: 1,
-    player: 1,
-    champion: null,
-    challenge: null,
-    restriction: 0,
-    history: [],
+    rounds,
+    duration,
+    method,
+    character: null,
+    phase: 'selecting',
+    outcome: null,
     elapsed: 0,
+    remaining: duration,
+    records: [],
   };
 }
-export function recordRound(s: GameSession, success: boolean, remaining: number): GameSession {
-  if (!s.champion || !s.challenge) throw new Error('Round has no selection');
-  const seconds = Math.max(0, Math.floor(remaining));
+export function roundKey(s: GameSession) {
+  return `${s.sessionId}:${s.round}`;
+}
+export function settleRound(
+  s: GameSession,
+  key: string,
+  outcome: Outcome,
+  remaining: number,
+): GameSession {
+  if (roundKey(s) !== key || s.phase !== 'guessing' || s.outcome || !s.character) return s;
+  const record = {
+    round: s.round,
+    character: s.character,
+    outcome,
+    remaining: Math.min(s.duration, Math.max(0, Math.floor(remaining))),
+  };
   return {
     ...s,
-    history: [
-      ...s.history,
-      {
-        champion: s.champion,
-        challenge: s.challenge,
-        remaining: seconds,
-        success,
-        score: success ? 100 + seconds * 5 : 0,
-      },
-    ],
+    phase: 'settled',
+    outcome,
+    remaining: record.remaining,
+    records: [...s.records, record],
   };
 }
-export function nextRound(s: GameSession, players: number): GameSession {
+export function advanceRound(s: GameSession, duration: number): GameSession {
+  if (s.phase !== 'settled') return s;
+  if (s.rounds > 0 && s.round >= s.rounds) return { ...s, phase: 'finished' };
   return {
     ...s,
     round: s.round + 1,
-    player: (s.player % players) + 1,
-    champion: null,
-    challenge: null,
+    duration,
+    phase: 'selecting',
+    character: null,
+    outcome: null,
     elapsed: 0,
+    remaining: duration,
   };
 }
-export function retryRound(s: GameSession): GameSession {
-  return { ...s, history: s.history.slice(0, -1), elapsed: 0 };
+export interface Statistics {
+  rounds: number;
+  correct: number;
+  skipped: number;
+  passed: number;
+  timeouts: number;
+  bestRemaining: number;
+  streak: number;
+  bestStreak: number;
 }
-// Future integration boundaries. No implementations request a camera or play audio.
+export const emptyStatistics: Statistics = {
+  rounds: 0,
+  correct: 0,
+  skipped: 0,
+  passed: 0,
+  timeouts: 0,
+  bestRemaining: 0,
+  streak: 0,
+  bestStreak: 0,
+};
+export function recordStatistics(s: Statistics, r: RoundRecord): Statistics {
+  const streak = r.outcome === 'correct' ? s.streak + 1 : 0;
+  return {
+    ...s,
+    rounds: s.rounds + 1,
+    correct: s.correct + Number(r.outcome === 'correct'),
+    skipped: s.skipped + Number(r.outcome === 'skipped'),
+    passed: s.passed + Number(r.outcome === 'passed'),
+    timeouts: s.timeouts + Number(r.outcome === 'timeout'),
+    bestRemaining:
+      r.outcome === 'correct' ? Math.max(s.bestRemaining, r.remaining) : s.bestRemaining,
+    streak,
+    bestStreak: Math.max(s.bestStreak, streak),
+  };
+}
 export interface CameraService {
   listDevices(): Promise<string[]>;
   startPreview(device: string, mirrored: boolean): Promise<void>;
