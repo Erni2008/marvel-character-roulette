@@ -2804,3 +2804,10 @@ html[data-contrast='true'] .metallic-title {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+/* Result panels need readable ink rather than text-clipped panel backgrounds. */
+.answer-feedback {
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: #f5f7ff;
+  color: #f5f7ff;
+}

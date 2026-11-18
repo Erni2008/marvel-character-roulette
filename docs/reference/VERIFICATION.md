@@ -1,11 +1,12 @@
 # Executed verification
 
-2026-11-18T22:45:08.206Z, darwin/arm64.
+2026-11-18T22:48:23.615Z, darwin/arm64.
 
 - Strict TypeScript and production Vite/PWA build: passed.
 - Domain/catalog/wheel/state/preferences and monotonic countdown: 11 unit tests passed.
 - Production browser integration: 35 unique cases passed, zero unresolved failures/skips; Chromium, WebKit and iPhone 13 touch emulation.
 - Full run: 33 passed; two PNG presentation fixtures initially failed because page routes did not intercept service-worker-owned image requests. Those fixtures were isolated with workers blocked and rerun successfully. Dedicated PWA tests retain real service workers. Production code did not change for this test correction.
+- After the final visible feedback fix, ten relevant Chromium/WebKit cases were rerun successfully, including explicit readable text-ink assertions and new result screenshots.
 - Layout matrix: 375×812, 390×844, 393×852, 430×932, 768×1024, 820×1180, 1024×1366, 1180×820, 1920×1080, 2560×1440.
 - Actual rendered home/modes/gameplay screenshots captured for both engines; normal card/wheel mid-animation captures; Russian iPhone landscape.
 - Functional flow: random selection, deterministic physical wheel stop, animation skip, Correct lock, Skip/Next, repeated rounds, timeout, finite summary, timer pause/resume, preferences/reload/language, camera placeholder, statistics, future PNG contain and broken-image fallback.

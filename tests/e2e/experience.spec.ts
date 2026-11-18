@@ -38,6 +38,14 @@ for (const [width, height] of [
     await page.getByRole('button', { name: 'Correct answer', exact: true }).click();
     await expect(page.getByRole('button', { name: 'Correct answer', exact: true })).toBeDisabled();
     await expect(page.getByText('CORRECT!', { exact: true })).toBeVisible();
+    await expect(page.locator('.answer-feedback')).toHaveCSS(
+      '-webkit-text-fill-color',
+      'rgb(245, 247, 255)',
+    );
+    if (width === 390)
+      await page.screenshot({
+        path: `docs/reference/screenshots/${info.project.name}/correct-390.png`,
+      });
     expect(
       await page.evaluate(
         () => JSON.parse(sessionStorage.getItem('roulette.session.v3')!).records.length,

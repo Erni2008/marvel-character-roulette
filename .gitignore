@@ -79,3 +79,5 @@ docs/reference/screenshots/**/*.png
 !docs/reference/screenshots/card-active-390.png
 !docs/reference/screenshots/roulette-active-390.png
 !docs/reference/screenshots/iphone-landscape-ru.png
+!docs/reference/screenshots/chromium/correct-390.png
+!docs/reference/screenshots/webkit/correct-390.png
