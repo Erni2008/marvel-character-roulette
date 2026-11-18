@@ -29,7 +29,9 @@ npx playwright install chromium webkit
 npm run test:e2e
 ```
 
-Browser tests build on the production output, so run `npm run build` first. The test-only host uses port **4174**. Screenshots are written to `docs/reference/screenshots/`. See [actual verification](docs/reference/VERIFICATION.md), [visual comparison](docs/reference/VISUAL-COMPARISON.md), and [art provenance](docs/reference/ASSETS.md).
+Browser tests build on the production output, so run `npm run build` first. The test-only host uses port **4174**. Screenshots are written to `docs/refinement/screenshots/`. See [actual verification](docs/refinement/VERIFICATION.md), [visual comparison](docs/reference/VISUAL-COMPARISON.md), and [art provenance](docs/reference/ASSETS.md).
+
+See the latest [interior refinement notes](docs/refinement/README.md). The accepted main menu remains unchanged.
 
 ## Architecture
 

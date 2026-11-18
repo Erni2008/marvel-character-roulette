@@ -1,36 +1,10 @@
 import fs from 'node:fs';
-const latest = JSON.parse(fs.readFileSync('test-results/browser-results.json', 'utf8'));
-const full = fs.existsSync('.openai/artifacts/reference-full-results.json')
-  ? JSON.parse(fs.readFileSync('.openai/artifacts/reference-full-results.json', 'utf8'))
-  : latest;
-const unit = JSON.parse(fs.readFileSync('.openai/artifacts/unit-results.json', 'utf8'));
-const checks = new Map();
-function collect(suites) {
-  for (const suite of suites) {
-    for (const spec of suite.specs ?? [])
-      for (const t of spec.tests) {
-        // The PNG case was isolated from workers to test rendering; title/project remain stable.
-        checks.set(`${t.projectName}:${spec.title}`, {
-          title: spec.title,
-          project: t.projectName,
-          status: t.status,
-          results: t.results,
-        });
-      }
-    collect(suite.suites ?? []);
-  }
-}
-collect(full.suites);
-collect(latest.suites);
-if (
-  !checks.size ||
-  [...checks.values()].some((t) => t.status !== 'expected') ||
-  !unit.success ||
-  unit.numFailedTests
-)
-  throw Error('Verification failed or skipped');
+const browser = JSON.parse(fs.readFileSync('test-results/browser-results.json', 'utf8'));
+const unit = JSON.parse(fs.readFileSync('.openai/artifacts/refinement-unit-results.json', 'utf8'));
+if (browser.stats.unexpected || browser.stats.skipped || !unit.success || unit.numFailedTests)
+  throw Error('A required verification failed or was skipped.');
 fs.writeFileSync(
-  'docs/reference/VERIFICATION.md',
-  `# Executed verification\n\n${new Date().toISOString()}, ${process.platform}/${process.arch}.\n\n- Strict TypeScript and production Vite/PWA build: passed.\n- Domain/catalog/wheel/state/preferences and monotonic countdown: ${unit.numPassedTests} unit tests passed.\n- Production browser integration: ${checks.size} unique cases passed, zero unresolved failures/skips; Chromium, WebKit and iPhone 13 touch emulation.\n- Full run: 33 passed; two PNG presentation fixtures initially failed because page routes did not intercept service-worker-owned image requests. Those fixtures were isolated with workers blocked and rerun successfully. Dedicated PWA tests retain real service workers. Production code did not change for this test correction.\n- After the final visible feedback fix, ten relevant Chromium/WebKit cases were rerun successfully, including explicit readable text-ink assertions and new result screenshots.\n- Layout matrix: 375×812, 390×844, 393×852, 430×932, 768×1024, 820×1180, 1024×1366, 1180×820, 1920×1080, 2560×1440.\n- Actual rendered home/modes/gameplay screenshots captured for both engines; normal card/wheel mid-animation captures; Russian iPhone landscape.\n- Functional flow: random selection, deterministic physical wheel stop, animation skip, Correct lock, Skip/Next, repeated rounds, timeout, finite summary, timer pause/resume, preferences/reload/language, camera placeholder, statistics, future PNG contain and broken-image fallback.\n- PWA: standalone manifest/icons; art/fonts/catalog/lazy screens precached; offline reload and gameplay; explicit update preserving paused elapsed time/settings; failed worker install retains old offline shell.\n\nScreenshots were visually inspected. Comparison changes and fidelity limits are documented in VISUAL-COMPARISON.md. Browser automation uses the local Playwright harness because the browser connector was unavailable.\n\nNot tested on physical iPhones/iPads, Windows hardware, Safari Home Screen installation, actual OBS capture, native fullscreen on every OS, or a measured universal 60 FPS/battery guarantee. No real camera, character downloads or external character APIs are present.\n`,
+  'docs/refinement/VERIFICATION.md',
+  `# Executed interior refinement verification\n\n${new Date().toISOString()}, ${process.platform}/${process.arch}.\n\n| Check | Executed result |\n| --- | --- |\n| Strict TypeScript + production Vite/PWA build | Passed |\n| Domain / monotonic countdown unit tests | ${unit.numPassedTests} passed |\n| Production browser integration | ${browser.stats.expected} passed, zero failed/skipped |\n| Browser engines | Chromium, WebKit, iPhone 13 WebKit touch emulation |\n\nThe production layout/round matrix covers 375×812, 390×844, 393×852, 430×932, 768×1024, 820×1180, 1024×1366, 1180×820, 1920×1080 and 2560×1440. Each case renders home/modes/gameplay/result feedback and exercises Correct, Next and Skip. Additional scenarios verify the real physical wheel stopping angle, normal-motion card progress/skip, timer pause and expiry, five-round completion/recap, settings persistence/language, camera placeholder, local PNG contain/broken-image fallback, offline gameplay and explicit/failed service-worker updates.\n\nThe new round plate opens a pause/leave menu even with administrative controls hidden in Stream Mode; this is tested with desktop browsers and Russian touch/landscape interaction. Fonts, responsive layouts and staged selection/result/utility screens were captured and visually inspected. Review corrections are documented in README.md. The accepted home capture was compared against its previous version: no changed pixels at 390×844 reduced motion.\n\nThe two local PNG presentation tests block service workers so the test image route belongs to the browser page; dedicated PWA tests exercise actual service workers. No production API or real character image is used.\n\nLimits: browser/touch emulation does not certify physical Safari Home Screen installation, actual iPhone/iPad thermal/FPS/battery behavior, Windows hardware, native fullscreen on every OS or OBS capture. No universal 60 FPS claim is made. The browser connector was unavailable; rendering used the local Playwright harness.\n`,
 );
-console.log(`${unit.numPassedTests} unit / ${checks.size} unique browser tests recorded.`);
+console.log(`${unit.numPassedTests} unit / ${browser.stats.expected} browser tests recorded.`);

@@ -39,7 +39,20 @@ export default function Selection() {
         isWheel ? 'Выбор рулеткой' : 'Розыгрыш карты',
       )}
     >
+      <header className="selection-chapter">
+        <span>
+          {t('ROUND', 'РАУНД')} {String(snapshot.round).padStart(2, '0')}
+        </span>
+        <i />
+        <span>{t(isWheel ? 'ROULETTE' : 'CARD DRAW', isWheel ? 'РУЛЕТКА' : 'РОЗЫГРЫШ КАРТЫ')}</span>
+      </header>
       <div className="draw-scene">
+        <div className="stage-reticle" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <i />
+        </div>
         <div className="blue-volumetric-light" />
         <div className="energy-structure">
           <i />
@@ -111,6 +124,19 @@ export default function Selection() {
         <div className="draw-platform-light" />
       </div>
       <div className="drawing-status">
+        <div className="selection-phase" aria-hidden="true">
+          {[
+            t('ACTIVATE', 'ЗАПУСК'),
+            t('SHUFFLE', 'ВЫБОР'),
+            t('LOCK', 'ФИКСАЦИЯ'),
+            t('REVEAL', 'ОТКРЫТИЕ'),
+          ].map((label, i) => (
+            <span key={i} className={seq.stage >= i ? 'phase-active' : ''}>
+              <b>{String(i + 1).padStart(2, '0')}</b>
+              {label}
+            </span>
+          ))}
+        </div>
         <h1 className="metallic-title" aria-live="polite">
           {seq.ready
             ? t('CHARACTER SELECTED', 'ПЕРСОНАЖ ВЫБРАН')

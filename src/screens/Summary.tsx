@@ -1,4 +1,4 @@
-import { Home, Play, Trophy } from 'lucide-react';
+import { Check, Home, Play, Trophy, X } from 'lucide-react';
 import { useGame } from '../app/Store';
 import { CinematicPanel, MetallicButton } from '../components/Cinematic';
 export default function Summary() {
@@ -6,6 +6,7 @@ export default function Summary() {
     correct = session?.records.filter((r) => r.outcome === 'correct').length ?? 0;
   return (
     <section className="utility-screen summary-screen">
+      <span className="utility-eyebrow">{t('THE FINAL REVEAL', 'ФИНАЛЬНЫЙ РЕЗУЛЬТАТ')}</span>
       <Trophy className="summary-trophy" />
       <h1 className="metallic-title">{t('SESSION COMPLETE', 'ИГРА ЗАВЕРШЕНА')}</h1>
       <CinematicPanel tone="red">
@@ -20,6 +21,16 @@ export default function Summary() {
           )}
         </p>
       </CinematicPanel>
+      <div className="round-recap">
+        {session?.records.map((r) => (
+          <div key={r.round} className={r.outcome === 'correct' ? 'recap-correct' : ''}>
+            <span>{String(r.round).padStart(2, '0')}</span>
+            <strong>{r.character.name}</strong>
+            <small>{r.remaining}s</small>
+            {r.outcome === 'correct' ? <Check size={16} /> : <X size={16} />}
+          </div>
+        ))}
+      </div>
       <MetallicButton onClick={() => navigate('modes')}>
         <Play />
         {t('PLAY AGAIN', 'ИГРАТЬ СНОВА')}

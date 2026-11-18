@@ -21,7 +21,7 @@ try {
   if (manifest.display !== 'standalone') throw Error('Manifest is not standalone.');
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page.screenshot({ path: 'docs/reference/screenshots/public-home-390.png' });
+  await page.screenshot({ path: 'docs/refinement/screenshots/public-home-390.png' });
   await context.setOffline(true);
   await page.reload();
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
@@ -29,7 +29,7 @@ try {
   await page.locator('.guess-screen').waitFor();
   await page.getByRole('button', { name: 'Correct answer', exact: true }).click();
   await page.getByText('CORRECT!', { exact: true }).waitFor();
-  await page.screenshot({ path: 'docs/reference/screenshots/public-guess-390.png' });
+  await page.screenshot({ path: 'docs/refinement/screenshots/public-guess-390.png' });
   if (errors.length) throw Error(errors.join('\n'));
   const report = {
     url,
@@ -42,7 +42,10 @@ try {
     browser: 'Chromium macOS',
     errors,
   };
-  await fs.writeFile('docs/reference/PUBLIC-SMOKE.json', JSON.stringify(report, null, 2) + '\n');
+  await fs.writeFile(
+    '.openai/artifacts/refinement-public-smoke.json',
+    JSON.stringify(report, null, 2) + '\n',
+  );
   console.log(JSON.stringify(report));
   await context.close();
 } finally {

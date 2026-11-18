@@ -70,9 +70,11 @@ export function useSelectionSequence({
       rotation.set(target * selectionProgress(wheelP));
       const revealP = Math.max(0, Math.min(1, (p - 0.81) / 0.19));
       if (motion) {
-        cardY.set(p < 0.18 ? 100 * (1 - p / 0.18) : Math.sin(p * Math.PI * 5) * (1 - revealP) * 5);
-        cardX.set(Math.sin(p * Math.PI * 8) * 5 * (1 - revealP));
-        cardRotateY.set(revealP > 0 ? -12 + revealP * 192 : -25 + Math.sin(p * Math.PI * 10) * 12);
+        cardY.set(
+          p < 0.18 ? 110 * (1 - p / 0.18) ** 3 : Math.sin(p * Math.PI * 2) * (1 - revealP) * 3,
+        );
+        cardX.set(Math.sin(p * Math.PI * 2) * 4 * (1 - revealP));
+        cardRotateY.set(revealP > 0 ? -12 + revealP * 192 : -21 + Math.sin(p * Math.PI * 2) * 7);
         cardRotateZ.set(-12 * (1 - revealP));
         cardScale.set(0.86 + Math.min(1, p / 0.25) * 0.14);
         cardOpacity.set(Math.min(1, p / 0.14));
@@ -80,10 +82,10 @@ export function useSelectionSequence({
           p < 0.2 ? 0 : p > 0.78 ? Math.max(0, 1 - (p - 0.78) / 0.1) : Math.min(1, (p - 0.2) / 0.1),
         );
         for (const g of ghosts) {
-          g.x.set(g.n * (30 + Math.sin(p * Math.PI * 8 + g.n) * 16));
-          g.y.set(12 + Math.cos(p * Math.PI * 8 + g.n) * 15);
+          g.x.set(g.n * (32 + Math.sin(p * Math.PI * 6 + g.n * 0.7) * 24));
+          g.y.set(10 + Math.cos(p * Math.PI * 6 + g.n) * 18);
           g.z.set(-100 - Math.abs(g.n) * 30);
-          g.rotate.set(g.n * (15 + Math.sin(p * Math.PI * 6) * 5));
+          g.rotate.set(g.n * (12 + Math.sin(p * Math.PI * 4) * 8));
         }
       } else {
         cardY.set(0);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { ArrowRight, Check, ChevronsRight, Settings2 } from 'lucide-react';
+import { ArrowRight, Check, ChevronsRight, Settings2, X } from 'lucide-react';
 import { motion as m } from 'motion/react';
 import { useGame } from '../app/Store';
 import { roundKey } from '../domain/game';
@@ -74,12 +74,23 @@ export default function Guess() {
       aria-labelledby="guess-title"
     >
       <header className="guess-header">
-        <div className="round-badge">
+        <button
+          type="button"
+          className="round-badge"
+          aria-label={t(
+            `Round ${s.round}. Pause and open game menu`,
+            `Раунд ${s.round}. Пауза и меню игры`,
+          )}
+          onClick={() => {
+            timer.pause();
+            game.setModal('leave');
+          }}
+        >
           <IlluminatedFrame tone="blue" shape="button" />
           <span className="metallic-title">
             {t('ROUND', 'РАУНД')} {s.round} / {s.rounds || '∞'}
           </span>
-        </div>
+        </button>
         {!settings.stream && (
           <button
             className="guess-settings"
@@ -90,6 +101,14 @@ export default function Guess() {
           </button>
         )}
       </header>
+      <div className="round-track" aria-hidden="true">
+        {Array.from({ length: s.rounds || 10 }, (_, i) => (
+          <i
+            key={i}
+            className={i < s.round - 1 ? 'round-done' : i === s.round - 1 ? 'round-current' : ''}
+          />
+        ))}
+      </div>
       <div className="guess-character">
         <CharacterCard
           front
@@ -102,7 +121,9 @@ export default function Guess() {
             initial={motion ? { opacity: 0, scale: 0.8 } : false}
             animate={{ opacity: 1, scale: 1 }}
           >
-            {outcomeText}
+            <span className="outcome-seal">{s.outcome === 'correct' ? <Check /> : <X />}</span>
+            <span>{outcomeText}</span>
+            <small>{t('ROUND VERIFIED', 'РАУНД ЗАВЕРШЁН')}</small>
           </m.div>
         )}
       </div>
@@ -112,6 +133,7 @@ export default function Guess() {
         {t('THE CHARACTER!', 'ПЕРСОНАЖА!')}
       </h1>
       <div className="guess-timer">
+        <span className="timer-caption">{t('TIME REMAINING', 'ОСТАЛОСЬ ВРЕМЕНИ')}</span>
         <CircularTimer
           remaining={isSettled ? s.remaining : timer.remaining}
           total={s.duration}
@@ -119,6 +141,13 @@ export default function Guess() {
           settled={isSettled}
           toggle={timer.toggle}
         />
+        <span className="timer-hint">
+          {isSettled
+            ? t('ROUND COMPLETE', 'РАУНД ЗАВЕРШЁН')
+            : timer.running
+              ? t('TAP TO PAUSE', 'НАЖМИТЕ ДЛЯ ПАУЗЫ')
+              : t('TAP TO RESUME', 'НАЖМИТЕ ДЛЯ ПРОДОЛЖЕНИЯ')}
+        </span>
       </div>
       <div className="guess-controls">
         <MetallicButton

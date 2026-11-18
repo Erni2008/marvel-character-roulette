@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import type { CSSProperties } from 'react';
 import { ArrowLeft, Download, Maximize, Upload } from 'lucide-react';
 import { useGame } from '../app/Store';
 import { CinematicPanel, MetallicButton } from '../components/Cinematic';
@@ -20,6 +21,7 @@ export default function Settings() {
       </span>
       <input
         type="range"
+        style={{ '--range-progress': `${((s[k] - min) / (max - min)) * 100}%` } as CSSProperties}
         min={min}
         max={max}
         step={step}

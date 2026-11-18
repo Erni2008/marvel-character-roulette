@@ -18,7 +18,7 @@ for (const [width, height] of [
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await openApp(page);
-    const directory = `docs/reference/screenshots/${info.project.name}`;
+    const directory = `docs/refinement/screenshots/${info.project.name}`;
     await fs.mkdir(directory, { recursive: true });
     const capture = async (name: string) => {
       await page.waitForTimeout(160);
@@ -44,7 +44,7 @@ for (const [width, height] of [
     );
     if (width === 390)
       await page.screenshot({
-        path: `docs/reference/screenshots/${info.project.name}/correct-390.png`,
+        path: `docs/refinement/screenshots/${info.project.name}/correct-390.png`,
       });
     expect(
       await page.evaluate(
@@ -69,7 +69,7 @@ test('roulette runs the full sequence and its physical stopping angle matches se
   await page.locator('.mode-roulette').click();
   await expect(page.locator('.drawing-wheel')).toBeVisible();
   await page.waitForTimeout(2100);
-  await page.screenshot({ path: 'docs/reference/screenshots/roulette-active-390.png' });
+  await page.screenshot({ path: 'docs/refinement/screenshots/roulette-active-390.png' });
 
   await expect(page.locator('.selection-ready')).toBeVisible();
   const index = Number(await page.getByTestId('selection-result').getAttribute('data-wheel-index'));
@@ -94,7 +94,7 @@ test('normal card animation has an actual timeline, reveal and a skip control', 
   const p = Number(await page.getByRole('progressbar').getAttribute('aria-valuenow'));
   expect(p).toBeGreaterThan(20);
   expect(p).toBeLessThan(100);
-  await page.screenshot({ path: 'docs/reference/screenshots/card-active-390.png' });
+  await page.screenshot({ path: 'docs/refinement/screenshots/card-active-390.png' });
   const selected = await page.evaluate(
     () => JSON.parse(sessionStorage.getItem('roulette.session.v3')!).character.id,
   );
@@ -109,6 +109,7 @@ test('normal card animation has an actual timeline, reveal and a skip control', 
 test('timer pause, settings persistence, language, camera placeholder and stats are functional', async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await openApp(page);
   await select(page);
   await page.waitForTimeout(1250);
@@ -127,9 +128,17 @@ test('timer pause, settings persistence, language, camera placeholder and stats 
   await expect(page.getByRole('heading', { name: 'НАСТРОЙКИ', exact: true })).toBeVisible();
   await page.reload();
   await expect(page.getByLabel('ДЛИТЕЛЬНОСТЬ РАУНДА')).toHaveValue('30');
+  await page.screenshot({
+    path: `docs/refinement/screenshots/${test.info().project.name}/settings-ru-390.png`,
+    fullPage: true,
+  });
   await page.getByRole('combobox', { name: 'ЯЗЫК', exact: true }).selectOption('en');
   await page.goto('/#/stats');
   await expect(page.getByRole('heading', { name: 'YOUR STATS', exact: true })).toBeVisible();
+  await page.screenshot({
+    path: `docs/refinement/screenshots/${test.info().project.name}/stats-390.png`,
+    fullPage: true,
+  });
 });
 test('five-round session, timeout, next and summary use the same state machine', async ({
   page,
@@ -148,6 +157,11 @@ test('five-round session, timeout, next and summary use the same state machine',
     if (round < 5) await expect(page.locator('.round-badge')).toContainText(`${round + 1} / 5`);
   }
   await expect(page.locator('.summary-screen')).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({
+    path: `docs/refinement/screenshots/${test.info().project.name}/summary-390.png`,
+    fullPage: true,
+  });
   expect(
     await page.evaluate(
       () => JSON.parse(sessionStorage.getItem('roulette.session.v3')!).records.length,
@@ -203,4 +217,25 @@ test.describe('local PNG presentation', () => {
     await expect(page.locator('.round-badge')).toContainText('2 / 10');
     await expect(page.locator('.guess-character .neutral-silhouette')).toBeVisible();
   });
+});
+
+test('round menu is reachable with presentation controls hidden and pauses accurately', async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem('character-roulette.settings.v3', JSON.stringify({ stream: true })),
+  );
+  await openApp(page);
+  await select(page);
+  await page.waitForTimeout(1150);
+  await page.locator('.round-badge').click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByRole('button', { name: 'KEEP PLAYING', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Resume timer', exact: true })).toBeVisible();
+  const value = await page.getByRole('timer').textContent();
+  await page.waitForTimeout(1100);
+  await expect(page.getByRole('timer')).toHaveText(value!);
+  await page.locator('.round-badge').click();
+  await page.getByRole('button', { name: 'MAIN MENU', exact: true }).click();
+  await expect(page.locator('.play-button')).toBeVisible();
 });

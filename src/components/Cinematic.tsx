@@ -81,7 +81,13 @@ export function IlluminatedFrame({
           <feGaussianBlur stdDeviation={shape === 'card' ? 6 : 5} />
         </filter>
       </defs>
-      <path d={bevel(w, h, c, 8)} fill="#010208" stroke="#02030a" strokeWidth="17" />
+      <path
+        className="frame-foundation"
+        d={bevel(w, h, c, 8)}
+        fill="#010208"
+        stroke="#02030a"
+        strokeWidth="17"
+      />
       <path
         className="frame-glow"
         d={bevel(w, h, c, 19)}
@@ -92,18 +98,21 @@ export function IlluminatedFrame({
         filter={`url(#${id}-light)`}
       />
       <path
+        className="frame-metal"
         d={bevel(w, h, c, 11)}
         fill={`url(#${id}-surface)`}
         stroke={`url(#${id}-metal)`}
         strokeWidth="8"
       />
       <path
+        className="frame-edge"
         d={bevel(w, h, c - 4, 22)}
         fill="none"
         stroke={`url(#${id}-edge)`}
         strokeWidth={tone === 'silver' ? 2 : tone === 'blue' ? 5 : 8}
       />
       <path
+        className="frame-sheen"
         d={bevel(w, h, c - 10, 31)}
         fill={`url(#${id}-sheen)`}
         stroke={color}
@@ -222,33 +231,104 @@ export function BrandEmblem({ className = '' }: { className?: string }) {
   );
 }
 function NeutralSilhouette() {
+  const id = useId().replace(/:/g, '');
+  // Neutral, faceless full-body display mannequin. No character artwork or anatomy is cropped.
   return (
     <svg className="neutral-silhouette" viewBox="0 0 300 460" aria-hidden="true">
       <defs>
-        <radialGradient id="silhouette-halo">
-          <stop stopColor="#ff583d" />
-          <stop offset=".45" stopColor="#bb102a" stopOpacity=".5" />
-          <stop offset="1" stopColor="#21020f" stopOpacity="0" />
+        <radialGradient id={`${id}-halo`}>
+          <stop stopColor="#ff735d" stopOpacity=".35" />
+          <stop offset=".6" stopColor="#a01b37" stopOpacity=".15" />
+          <stop offset="1" stopColor="#100d1b" stopOpacity="0" />
         </radialGradient>
-        <linearGradient id="silhouette-ink" x2=".6" y2="1">
-          <stop stopColor="#100d15" />
-          <stop offset="1" stopColor="#02040a" />
+        <linearGradient id={`${id}-body`} x1="0" x2="1" y2=".25">
+          <stop stopColor="#a45758" />
+          <stop offset=".05" stopColor="#30313f" />
+          <stop offset=".28" stopColor="#111826" />
+          <stop offset=".58" stopColor="#050913" />
+          <stop offset=".91" stopColor="#111725" />
+          <stop offset="1" stopColor="#6d3044" />
+        </linearGradient>
+        <linearGradient id={`${id}-rim`} x2="1" y2="1">
+          <stop stopColor="#ff9b79" stopOpacity=".7" />
+          <stop offset=".45" stopColor="#494453" stopOpacity=".15" />
+          <stop offset="1" stopColor="#ed3c59" stopOpacity=".5" />
+        </linearGradient>
+        <radialGradient id={`${id}-head`} cx=".25" cy=".25" r=".85">
+          <stop stopColor="#343340" />
+          <stop offset=".4" stopColor="#141a27" />
+          <stop offset="1" stopColor="#040710" />
+        </radialGradient>
+      </defs>
+      <ellipse cx="150" cy="229" rx="145" ry="203" fill={`url(#${id}-halo)`} />
+      <g fill="none" stroke="#eac6b9" strokeOpacity=".08" strokeWidth=".5">
+        <circle cx="150" cy="190" r="119" />
+        <circle cx="150" cy="190" r="125" strokeDasharray="1 9" />
+        <path d="M150 33V422M19 190H281" />
+      </g>
+      <ellipse cx="150" cy="434" rx="49" ry="5" fill="#000" opacity=".6" />
+      <g fill={`url(#${id}-body)`} stroke={`url(#${id}-rim)`} strokeWidth=".75">
+        <path d="M125 109 124 125Q111 135 97 136 81 139 75 156L62 211 53 257 57 278 68 279 77 263 80 232 99 186 105 217 101 250 112 268 150 277 188 268 199 250 195 217 201 186 220 232 223 263 232 279 243 278 247 257 238 211 225 156Q219 139 203 136 189 135 176 125L175 109Z" />
+        <path d="M112 263Q101 287 109 319L117 366 115 411 106 425Q106 432 122 432L137 430 142 414 143 367 148 309H152L157 367 158 414 163 430 178 432Q194 432 194 425L185 411 183 366 191 319Q199 287 188 263L150 276Z" />
+        <path d="M127 108 126 123Q150 143 174 123L173 108" />
+      </g>
+      <path
+        d="M129 69Q127 43 150 42 173 43 171 69L170 86Q166 103 150 110 134 103 130 86Z"
+        fill={`url(#${id}-head)`}
+        stroke={`url(#${id}-rim)`}
+        strokeWidth=".8"
+      />
+      <g fill="none" stroke="#a68b92" strokeOpacity=".14" strokeWidth=".8">
+        <path d="M105 150 126 158 150 153 174 158 195 150M105 164Q123 185 145 179M195 164Q177 185 155 179M150 187V243M118 246l32 10 32-10M118 284l14 64M182 284l-14 64M127 372l4 37M173 372l-4 37" />
+      </g>
+    </svg>
+  );
+}
+function CardEngraving() {
+  const id = useId().replace(/:/g, '');
+  return (
+    <svg className="card-engraving" viewBox="0 0 600 860" aria-hidden="true">
+      <defs>
+        <linearGradient id={`${id}-etch`} x2="1" y2="1">
+          <stop stopColor="#e8c7a3" stopOpacity=".65" />
+          <stop offset=".4" stopColor="#c7d4e5" stopOpacity=".12" />
+          <stop offset="1" stopColor="#de6c6b" stopOpacity=".5" />
         </linearGradient>
       </defs>
-      <ellipse cx="150" cy="233" rx="158" ry="218" fill="url(#silhouette-halo)" />
-      <path
-        d="M122 120c-8-10-15-30-12-49 1-30 12-46 40-46s39 16 40 46c3 19-4 39-12 49l4 20 42 20 22 113-20 9-24-73-9 85 11 53-15 93h-24l-13-126h-4l-13 126h-24l-15-93 11-53-9-85-24 73-20-9 22-113 42-20Z"
-        fill="url(#silhouette-ink)"
-        stroke="#f5505a"
-        strokeWidth="1.1"
-        strokeOpacity=".26"
-      />
-      <path
-        d="M125 123c6 10 13 16 25 16s19-6 25-16M105 168l45 23 45-23"
-        fill="none"
-        stroke="#f03948"
-        opacity=".13"
-      />
+      <g fill="none" stroke={`url(#${id}-etch)`} strokeWidth="1.2">
+        <path d="M54 124V70l24-24h75M446 46h76l24 24v54M54 736v54l24 24h75M446 814h76l24-24v-54M64 162v536M536 162v536" />
+        <path d="M80 90h30V60m380 0v30h30M80 770h30v30m380 0v-30h30M300 56l12 12-12 12-12-12ZM300 780l12 12-12 12-12-12Z" />
+        <circle cx="300" cy="422" r="178" />
+        <circle cx="300" cy="422" r="185" strokeDasharray="1 8" />
+        <circle cx="300" cy="422" r="157" strokeDasharray="170 76" />
+        {[0, 1, 2, 3].map((n) => (
+          <path
+            key={n}
+            d="M300 208v33m0 362v33m-214-214h33m362 0h33"
+            transform={`rotate(${n * 22.5} 300 422)`}
+            opacity=".45"
+          />
+        ))}
+        <path
+          d="m110 170 35-35h85m140 0h85l35 35M110 675l35 35h85m140 0h85l35-35"
+          strokeOpacity=".35"
+        />
+      </g>
+      <g
+        fill="#b7c4d9"
+        opacity=".5"
+        fontFamily="Exo, sans-serif"
+        fontSize="10"
+        letterSpacing="4"
+        textAnchor="middle"
+      >
+        <text x="300" y="128">
+          CHARACTER ARCHIVE
+        </text>
+        <text x="300" y="745">
+          ROULETTE COLLECTION
+        </text>
+      </g>
     </svg>
   );
 }
@@ -274,6 +354,7 @@ export function CharacterCard({
       <div className="card-content">
         <div className="card-hex-texture" />
         <div className="card-diagonal-sheen" />
+        {!front && <CardEngraving />}
         {front ? (
           <>
             {character?.imagePath && !broken ? (
@@ -296,6 +377,12 @@ export function CharacterCard({
         ) : (
           <BrandEmblem />
         )}
+      </div>
+      <div className="card-edge-hardware" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+        <i />
       </div>
       <div className="card-lens-flare top-flare" />
       <div className="card-lens-flare bottom-flare" />
@@ -357,6 +444,18 @@ export function RouletteWheel({
             <stop offset=".72" stopColor="#26304b" />
             <stop offset="1" stopColor="#d6dced" />
           </linearGradient>
+          <linearGradient id={`${id}-blue`} x2="1" y2="1">
+            <stop stopColor="#486381" />
+            <stop offset=".4" stopColor="#142944" />
+            <stop offset=".6" stopColor="#0d1c30" />
+            <stop offset="1" stopColor="#273d58" />
+          </linearGradient>
+          <linearGradient id={`${id}-red`} x2="1" y2="1">
+            <stop stopColor="#a54952" />
+            <stop offset=".4" stopColor="#521d2b" />
+            <stop offset=".65" stopColor="#2c111d" />
+            <stop offset="1" stopColor="#7c293c" />
+          </linearGradient>
           <radialGradient id={`${id}-hub`}>
             <stop stopColor="#222c43" />
             <stop offset=".7" stopColor="#080b15" />
@@ -393,14 +492,14 @@ export function RouletteWheel({
               d={arc(i * angle + 0.25, (i + 1) * angle - 0.25)}
               fill={
                 i === selectedIndex
-                  ? '#ff4b60'
+                  ? '#e8c38b'
                   : i % 10 < 5
                     ? i % 2
-                      ? '#102442'
-                      : '#182e50'
+                      ? `url(#${id}-blue)`
+                      : '#15253c'
                     : i % 2
-                      ? '#651022'
-                      : '#330919'
+                      ? `url(#${id}-red)`
+                      : '#36131e'
               }
               stroke="#a4afc3"
               strokeOpacity=".27"
@@ -442,6 +541,26 @@ export function RouletteWheel({
               );
             })}
         </g>
+        <circle
+          cx="180"
+          cy="180"
+          r="153"
+          fill="none"
+          stroke="#b9cbe3"
+          strokeOpacity=".3"
+          strokeWidth=".6"
+        />
+        <circle
+          cx="180"
+          cy="180"
+          r="165"
+          fill="none"
+          stroke="#a6b6cd"
+          strokeOpacity=".4"
+          strokeWidth="1"
+          strokeDasharray=".5 3"
+        />
+        <circle cx="180" cy="180" r="112" fill="none" stroke="#02040a" strokeWidth="6" />
         <circle cx="180" cy="180" r="108" fill="none" stroke={`url(#${id}-rim)`} strokeWidth="7" />
         <circle cx="180" cy="180" r="95" fill="none" stroke="#375b90" strokeWidth="1" />
         <circle
@@ -461,6 +580,7 @@ export function RouletteWheel({
           })}
         </g>
       </svg>
+      <div className="wheel-hub-reflection" aria-hidden="true" />
       <BrandEmblem className="wheel-emblem" />
       <div className="wheel-flare flare-blue" />
       <div className="wheel-flare flare-red" />
@@ -499,38 +619,65 @@ export function CircularTimer({
       <svg viewBox="0 0 200 200" aria-hidden="true">
         <defs>
           <radialGradient id={`${id}-center`}>
-            <stop stopColor="#171d2a" />
-            <stop offset=".8" stopColor="#050811" />
-            <stop offset="1" stopColor="#33111d" />
+            <stop stopColor="#172033" />
+            <stop offset=".75" stopColor="#080d17" />
+            <stop offset="1" stopColor="#1d2637" />
           </radialGradient>
+          <linearGradient id={`${id}-metal`} x2="1" y2="1">
+            <stop stopColor="#a0a8b9" />
+            <stop offset=".25" stopColor="#172235" />
+            <stop offset=".6" stopColor="#626b7d" />
+            <stop offset="1" stopColor="#121a29" />
+          </linearGradient>
+          <mask id={`${id}-remaining`}>
+            <circle
+              cx="100"
+              cy="100"
+              r="87"
+              fill="none"
+              stroke="white"
+              strokeWidth="12"
+              pathLength="100"
+              strokeDasharray={`${(remaining / total) * 100} 100`}
+            />
+          </mask>
         </defs>
+        <circle
+          cx="100"
+          cy="100"
+          r="96"
+          fill="#040710"
+          stroke={`url(#${id}-metal)`}
+          strokeWidth="1.5"
+        />
         <circle
           cx="100"
           cy="100"
           r="87"
           fill={`url(#${id}-center)`}
-          stroke="#481020"
-          strokeWidth="13"
+          stroke="#252839"
+          strokeWidth="9"
         />
         <circle
           className="timer-segments"
           cx="100"
           cy="100"
-          r="88"
-          pathLength="180"
+          r="87"
+          pathLength="120"
           fill="none"
-          stroke="#ff304c"
-          strokeWidth="13"
-          strokeDasharray=".55 .45"
+          stroke="#fb465d"
+          strokeWidth="9"
+          strokeDasharray=".65 .35"
+          mask={`url(#${id}-remaining)`}
         />
         <circle
           className="timer-progress"
           cx="100"
           cy="100"
-          r="88"
+          r="80"
           fill="none"
-          stroke="#ffdbdd"
-          strokeWidth="3.5"
+          stroke="#fa8a91"
+          strokeWidth=".65"
           pathLength="100"
           strokeDasharray="100"
           strokeDashoffset={100 - (remaining / total) * 100}
@@ -538,12 +685,22 @@ export function CircularTimer({
         <circle
           cx="100"
           cy="100"
-          r="77"
+          r="74"
           fill="none"
-          stroke="#a93b4a"
-          strokeWidth=".6"
-          strokeOpacity=".5"
+          stroke="#a7b6cf"
+          strokeWidth=".4"
+          strokeOpacity=".28"
         />
+        {Array.from({ length: 12 }, (_, i) => (
+          <path
+            key={i}
+            d="M100 31V35"
+            stroke="#c1c9d9"
+            strokeOpacity={i % 3 === 0 ? '.7' : '.25'}
+            strokeWidth={i % 3 === 0 ? 1 : 0.5}
+            transform={`rotate(${i * 30} 100 100)`}
+          />
+        ))}
       </svg>
       <span
         role="timer"

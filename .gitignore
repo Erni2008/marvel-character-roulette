@@ -81,3 +81,18 @@ docs/reference/screenshots/**/*.png
 !docs/reference/screenshots/iphone-landscape-ru.png
 !docs/reference/screenshots/chromium/correct-390.png
 !docs/reference/screenshots/webkit/correct-390.png
+
+# Refinement QA matrix: retain a curated review set.
+docs/refinement/screenshots/**/*.png
+!docs/refinement/screenshots/card-active-390.png
+!docs/refinement/screenshots/roulette-active-390.png
+!docs/refinement/screenshots/chromium/modes-390.png
+!docs/refinement/screenshots/chromium/guess-390.png
+!docs/refinement/screenshots/chromium/correct-390.png
+!docs/refinement/screenshots/chromium/settings-ru-390.png
+!docs/refinement/screenshots/chromium/stats-390.png
+!docs/refinement/screenshots/chromium/summary-390.png
+!docs/refinement/screenshots/chromium/modes-1920.png
+!docs/refinement/screenshots/chromium/guess-820.png
+!docs/refinement/screenshots/webkit/guess-390.png
+!docs/refinement/screenshots/iphone-landscape-ru.png
