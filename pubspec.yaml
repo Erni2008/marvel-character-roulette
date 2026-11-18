@@ -1,0 +1,27 @@
+name: marvel_character_roulette
+description: A cinematic desktop champion guessing game. Phase one.
+publish_to: none
+version: 1.0.0+1
+environment:
+  sdk: '>=3.14.0 <4.0.0'
+  flutter: '>=3.50.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  material_ui: ^1.11.1
+  shared_preferences: ^2.5.3
+  window_manager: ^0.5.1
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: RobotoCondensed
+      fonts:
+        - asset: assets/fonts/RobotoCondensed.ttf
