@@ -15,7 +15,7 @@ import {
   createSession,
   emptyStatistics,
   parseCharacters,
-  placeholders,
+  builtInCharacters,
   recordStatistics,
   roundKey,
   settleRound,
@@ -51,7 +51,17 @@ function recoverSession(): GameSession | null {
       !['card', 'roulette'].includes(s.method)
     )
       return null;
-    if (s.character) parseCharacters([{ ...s.character, enabled: true }]);
+    if (s.character) {
+      parseCharacters([{ ...s.character, enabled: true }]);
+      if (/^CHAMPION[ _]\d+$/.test(s.character.name)) {
+        const index = Number(s.character.id.match(/(\d+)$/)?.[1] ?? 1) - 1;
+        s.character =
+          builtInCharacters[
+            ((index % builtInCharacters.length) + builtInCharacters.length) %
+              builtInCharacters.length
+          ];
+      }
+    }
     return s;
   } catch {
     return null;
@@ -126,7 +136,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [settings, setSettings] = useState(loaded.settings),
     [session, setSession] = useState(recoverSession),
     [statistics, setStatistics] = useState(recoverStats),
-    [characters, setCharacters] = useState<Character[]>(placeholders),
+    [characters, setCharacters] = useState<Character[]>(builtInCharacters),
     [catalogReady, setCatalogReady] = useState(false),
     [screen, setScreen] = useState<Screen>(() => readScreen(recoverSession())),
     [settingsReturn, setSettingsReturn] = useState<Screen>('home'),
@@ -184,8 +194,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           setCatalogReady(true);
           setToast(
             t(
-              'The local character catalog is unavailable. Placeholder entries are ready.',
-              'Локальный каталог недоступен. Используются герои-заглушки.',
+              'The local character catalog is unavailable. The bundled text catalog is ready.',
+              'Локальный каталог недоступен. Используется встроенный текстовый каталог.',
             ),
           );
         }

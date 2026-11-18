@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { ArrowRight, Check, ChevronsRight, Settings2, X } from 'lucide-react';
 import { motion as m } from 'motion/react';
 import { useGame } from '../app/Store';
-import { roundKey } from '../domain/game';
+import { characterName, roundKey } from '../domain/game';
 import { useCountdown } from '../hooks/useCountdown';
 import {
   CharacterCard,
@@ -127,10 +127,17 @@ export default function Guess() {
           </m.div>
         )}
       </div>
+      <div
+        className="answer-nameplate"
+        aria-label={t('Answer for verification', 'Ответ для проверки')}
+      >
+        <span>{t('ANSWER FOR VERIFICATION', 'ОТВЕТ ДЛЯ ПРОВЕРКИ')}</span>
+        <strong>{s.character ? characterName(s.character, settings.language) : ''}</strong>
+        {settings.language === 'ru' && s.character?.nameRu && <small>{s.character.name}</small>}
+      </div>
       <h1 id="guess-title" className="metallic-title">
         {t('GUESS', 'УГАДАЙТЕ')}
-        <br />
-        {t('THE CHARACTER!', 'ПЕРСОНАЖА!')}
+        <br /> {t('THE CHARACTER!', 'ПЕРСОНАЖА!')}
       </h1>
       <div className="guess-timer">
         <span className="timer-caption">{t('TIME REMAINING', 'ОСТАЛОСЬ ВРЕМЕНИ')}</span>

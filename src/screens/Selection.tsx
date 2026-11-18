@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { motion as m } from 'motion/react';
+import { characterName } from '../domain/game';
 import { FastForward } from 'lucide-react';
 import { useGame } from '../app/Store';
 import { CharacterCard, RouletteWheel } from '../components/Cinematic';
 import { useSelectionSequence } from '../hooks/useSelectionSequence';
 export default function Selection() {
-  const { session, characters, prepare, reveal, enterGuess, motion, t } = useGame(),
+  const { session, characters, prepare, reveal, enterGuess, motion, t, settings } = useGame(),
     snapshot = useRef(session!).current,
     entries = useRef(characters.filter((c) => c.enabled)).current;
   const seq = useSelectionSequence({
@@ -83,36 +84,37 @@ export default function Selection() {
           </>
         ) : (
           <>
-            <div className="card-perspective">
-              <m.div className="shuffle-ghosts" style={{ opacity: seq.ghostOpacity }}>
-                {seq.ghosts.map((g) => (
-                  <m.div
-                    className="shuffle-card"
-                    key={g.n}
-                    style={{ x: g.x, y: g.y, z: g.z, rotateZ: g.rotate, rotateY: g.n * 15 }}
-                  >
+            <div className="card-perspective shuffle-deck" data-testid="shuffle-deck">
+              {seq.deck.map((card) => (
+                <m.div
+                  className={`physical-card ${card.index === 0 ? 'selected-deck-card' : ''}`}
+                  key={card.index}
+                  data-card-index={card.index}
+                  style={{
+                    x: card.x,
+                    y: card.y,
+                    rotateZ: card.rotate,
+                    rotateY: card.yaw,
+                    scale: card.scale,
+                    opacity: card.opacity,
+                    zIndex: card.layer,
+                  }}
+                >
+                  {card.index === 0 ? (
+                    <div
+                      className={`card-face ${seq.frontVisible ? 'face-front' : 'face-back'}`}
+                      data-facing={seq.frontVisible ? 'front' : 'back'}
+                    >
+                      <CharacterCard
+                        front={seq.frontVisible}
+                        character={seq.frontVisible ? seq.character : null}
+                      />
+                    </div>
+                  ) : (
                     <CharacterCard />
-                  </m.div>
-                ))}
-              </m.div>
-              <m.div
-                className="draw-card-3d"
-                style={{
-                  x: seq.cardX,
-                  y: seq.cardY,
-                  rotateY: seq.cardRotateY,
-                  rotateZ: seq.cardRotateZ,
-                  scale: seq.cardScale,
-                  opacity: seq.cardOpacity,
-                }}
-              >
-                <div className="card-face face-back">
-                  <CharacterCard />
-                </div>
-                <div className="card-face face-front">
-                  <CharacterCard front character={seq.character} />
-                </div>
-              </m.div>
+                  )}
+                </m.div>
+              ))}
             </div>
             <div className="energy-trails">
               <i />
@@ -173,7 +175,7 @@ export default function Selection() {
         data-testid="selection-result"
         data-wheel-index={seq.selectedIndex}
       >
-        {seq.ready ? seq.character?.name : ''}
+        {seq.ready && seq.character ? characterName(seq.character, settings.language) : ''}
       </span>
     </section>
   );

@@ -33,6 +33,10 @@ for (const [width, height] of [
     await capture('modes');
     await page.locator('.mode-card-draw').click();
     await expect(page.locator('.guess-screen')).toBeVisible();
+    const expectedName = await page.evaluate(
+      () => JSON.parse(sessionStorage.getItem('roulette.session.v3')!).character.name,
+    );
+    await expect(page.locator('.answer-nameplate strong')).toHaveText(expectedName);
     await capture('guess');
     await expect(page.getByRole('timer')).toHaveText('01:00');
     await page.getByRole('button', { name: 'Correct answer', exact: true }).click();
@@ -75,7 +79,8 @@ test('roulette runs the full sequence and its physical stopping angle matches se
   const index = Number(await page.getByTestId('selection-result').getAttribute('data-wheel-index'));
   const transform = await page.locator('.wheel-rotor').getAttribute('transform');
   const angle = Number(transform?.match(/rotate\(([-\d.]+)/)?.[1]);
-  const selected = Math.min(119, Math.floor((((-angle % 360) + 360) % 360) / 3));
+  const count = await page.locator('.wheel-rotor > path[data-wheel-index]').count();
+  const selected = Math.min(count - 1, Math.floor((((-angle % 360) + 360) % 360) / (360 / count)));
   expect(selected).toBe(index);
   await expect(page.locator('.guess-screen')).toBeVisible();
   const s = await page.evaluate(() => JSON.parse(sessionStorage.getItem('roulette.session.v3')!));
@@ -212,6 +217,7 @@ test.describe('local PNG presentation', () => {
       await page.locator('.guess-character img').evaluate((el) => getComputedStyle(el).objectFit),
     ).toBe('contain');
     await expect(page.locator('.guess-character')).toContainText('LOCAL TEST');
+    await expect(page.locator('.answer-nameplate strong')).toHaveText('LOCAL TEST');
     await page.route('**/characters/missing.png', (route) => route.abort());
     await page.getByRole('button', { name: 'Skip character', exact: true }).click();
     await expect(page.locator('.round-badge')).toContainText('2 / 10');
@@ -238,4 +244,46 @@ test('round menu is reachable with presentation controls hidden and pauses accur
   await page.locator('.round-badge').click();
   await page.getByRole('button', { name: 'MAIN MENU', exact: true }).click();
   await expect(page.locator('.play-button')).toBeVisible();
+});
+
+test('card shuffle changes the visible stack order and reveals the same named answer', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openApp(page);
+  await page.locator('.play-button').click();
+  await page.locator('.mode-card-draw').click();
+  await expect(page.getByTestId('shuffle-deck')).toBeVisible();
+  const chosen = await page.evaluate(
+    () => JSON.parse(sessionStorage.getItem('roulette.session.v3')!).character,
+  );
+  await page.waitForTimeout(1900);
+  const layout = await page
+    .locator('.physical-card')
+    .evaluateAll((cards) =>
+      cards.map((el) => ({
+        layer: Number(getComputedStyle(el).zIndex),
+        transform: getComputedStyle(el).transform,
+      })),
+    );
+  expect(layout).toHaveLength(7);
+  expect(new Set(layout.map((x) => x.transform)).size).toBeGreaterThan(4);
+  await page.waitForTimeout(450);
+  const top = await page
+    .locator('.physical-card')
+    .evaluateAll(
+      (cards) =>
+        cards
+          .map((el) => ({
+            index: el.getAttribute('data-card-index'),
+            layer: Number(getComputedStyle(el).zIndex),
+          }))
+          .sort((a, b) => b.layer - a.layer)[0].index,
+    );
+  expect(top).not.toBe('0');
+  await expect(page.locator('.guess-screen')).toBeVisible();
+  await expect(page.locator('.answer-nameplate strong')).toHaveText(chosen.name);
+  await page.getByRole('button', { name: 'Correct answer', exact: true }).click();
+  await expect(page.locator('.answer-nameplate strong')).toHaveText(chosen.name);
 });

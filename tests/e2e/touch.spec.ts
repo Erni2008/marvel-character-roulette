@@ -11,6 +11,10 @@ test('iPhone touch, Russian labels, rotation and presentation controls', async (
   await page.locator('.mode-card-draw').tap();
   await expect(page.locator('.guess-screen')).toBeVisible();
   await expect(page.locator('.guess-settings')).toHaveCount(0);
+  const selected = await page.evaluate(
+    () => JSON.parse(sessionStorage.getItem('roulette.session.v3')!).character,
+  );
+  await expect(page.locator('.answer-nameplate strong')).toHaveText(selected.nameRu);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Верный ответ', exact: true }).tap();
   await expect(page.getByText('ВЕРНО!', { exact: true })).toBeVisible();

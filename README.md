@@ -29,9 +29,9 @@ npx playwright install chromium webkit
 npm run test:e2e
 ```
 
-Browser tests build on the production output, so run `npm run build` first. The test-only host uses port **4174**. Screenshots are written to `docs/refinement/screenshots/`. See [actual verification](docs/refinement/VERIFICATION.md), [visual comparison](docs/reference/VISUAL-COMPARISON.md), and [art provenance](docs/reference/ASSETS.md).
+Browser tests build on the production output, so run `npm run build` first. The test-only host uses port **4174**. Screenshots are written to `docs/refinement/screenshots/`. See [actual verification](docs/shuffle/VERIFICATION.md), [visual comparison](docs/reference/VISUAL-COMPARISON.md), and [art provenance](docs/reference/ASSETS.md).
 
-See the latest [interior refinement notes](docs/refinement/README.md). The accepted main menu remains unchanged.
+See the latest [physical shuffle and named-answer notes](docs/shuffle/README.md), plus [interior refinement notes](docs/refinement/README.md). The accepted main menu remains unchanged.
 
 ## Architecture
 
@@ -55,7 +55,7 @@ Touch the timer to pause/resume. Keyboard: Space pauses, G marks correct, S skip
 
 ## Add characters later
 
-See [public/characters/README.md](public/characters/README.md). The shipped catalog contains only generic placeholders, no real names or character artwork. Transparent PNGs use `object-fit: contain` in a vertical stage; heads and feet are retained. Invalid/missing PNGs fall back to the neutral question-mark stage.
+See [public/characters/README.md](public/characters/README.md). The shipped catalog contains 40 text-only character names in English/Russian and no character artwork. The chosen name is prominent on the shared guessing screen for manual verification. Transparent PNGs use `object-fit: contain` in a vertical stage; heads and feet are retained. Invalid/missing PNGs fall back to the neutral question-mark stage.
 
 ## Free HTTPS hosting and installation
 

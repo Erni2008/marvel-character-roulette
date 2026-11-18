@@ -1,9 +1,11 @@
+import catalog from '../../public/characters/manifest.json';
 export type Language = 'en' | 'ru';
 export type SelectionMethod = 'card' | 'roulette';
 export type Screen = 'home' | 'modes' | 'draw' | 'guess' | 'settings' | 'stats' | 'summary';
 export interface Character {
   id: string;
   name: string;
+  nameRu?: string;
   imagePath: string;
   enabled: boolean;
 }
@@ -29,7 +31,8 @@ export function parseCharacters(raw: unknown): Character[] {
       typeof c.name !== 'string' ||
       !c.name.trim() ||
       typeof c.enabled !== 'boolean' ||
-      typeof c.imagePath !== 'string'
+      typeof c.imagePath !== 'string' ||
+      (c.nameRu !== undefined && (typeof c.nameRu !== 'string' || !c.nameRu.trim()))
     )
       throw new Error('Each character needs a unique id, name, imagePath and enabled flag.');
     if (
@@ -40,10 +43,20 @@ export function parseCharacters(raw: unknown): Character[] {
     )
       throw new Error('Character artwork must be a local PNG under /characters/.');
     ids.add(c.id);
-    return { id: c.id, name: c.name, imagePath: c.imagePath, enabled: c.enabled };
+    return {
+      id: c.id,
+      name: c.name,
+      ...(typeof c.nameRu === 'string' ? { nameRu: c.nameRu } : {}),
+      imagePath: c.imagePath,
+      enabled: c.enabled,
+    };
   });
   if (!result.some((c) => c.enabled)) throw new Error('Enable at least one character.');
   return result;
+}
+export const builtInCharacters: Character[] = parseCharacters(catalog);
+export function characterName(character: Character, language: Language): string {
+  return language === 'ru' ? character.nameRu || character.name : character.name;
 }
 export function chooseCharacter(
   characters: readonly Character[],

@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
 import { motion as m } from 'motion/react';
 import type { MotionValue } from 'motion/react';
+import { characterName } from '../domain/game';
 import type { Character } from '../domain/game';
 import { useGame } from '../app/Store';
 export type Tone = 'red' | 'blue' | 'green' | 'silver';
@@ -344,6 +345,8 @@ export function CharacterCard({
   className?: string;
 }) {
   const [broken, setBroken] = useState(false);
+  const { settings } = useGame();
+  const displayName = character ? characterName(character, settings.language) : '';
   return (
     <div
       className={`character-card ${front ? 'card-front' : 'card-back'} ${className}`}
@@ -361,7 +364,7 @@ export function CharacterCard({
               <img
                 className="character-art"
                 src={character.imagePath}
-                alt={character.name}
+                alt={displayName}
                 onError={() => setBroken(true)}
                 draggable={false}
               />
@@ -386,7 +389,11 @@ export function CharacterCard({
       </div>
       <div className="card-lens-flare top-flare" />
       <div className="card-lens-flare bottom-flare" />
-      {front && character && <div className="character-name">{character.name}</div>}
+      {front && character && (
+        <div className="character-name" title={displayName}>
+          {displayName}
+        </div>
+      )}
     </div>
   );
 }

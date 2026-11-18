@@ -27,6 +27,12 @@ try {
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
   await page.locator('.mode-card-draw').click();
   await page.locator('.guess-screen').waitFor();
+  const answer = await page.locator('.answer-nameplate strong').textContent();
+  const selectedName = await page.evaluate(
+    () => JSON.parse(sessionStorage.getItem('roulette.session.v3')).character.name,
+  );
+  if (!answer || answer !== selectedName || /^CHAMPION/.test(answer))
+    throw Error('The chosen character name is not visible.');
   await page.getByRole('button', { name: 'Correct answer', exact: true }).click();
   await page.getByText('CORRECT!', { exact: true }).waitFor();
   await page.screenshot({ path: 'docs/refinement/screenshots/public-guess-390.png' });
@@ -39,6 +45,7 @@ try {
     serviceWorker: true,
     offlineReloadAndRound: true,
     correctAction: true,
+    namedAnswer: answer,
     browser: 'Chromium macOS',
     errors,
   };

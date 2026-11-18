@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motionValue, useMotionValue } from 'motion/react';
+import { cardShufflePose, DECK_SIZE } from '../domain/shuffle';
 import { selectionProgress, wheelStopAngle } from '../domain/game';
 import type { Character, SelectionMethod } from '../domain/game';
 interface Options {
@@ -22,27 +23,24 @@ export function useSelectionSequence({
 }: Options) {
   const progress = useMotionValue(restored ? 1 : 0),
     rotation = useMotionValue(0),
-    cardY = useMotionValue(80),
-    cardX = useMotionValue(0),
-    cardRotateY = useMotionValue(-25),
-    cardRotateZ = useMotionValue(-12),
-    cardScale = useMotionValue(0.86),
-    cardOpacity = useMotionValue(restored ? 1 : 0),
-    ghostOpacity = useMotionValue(0),
     wheelOpacity = useMotionValue(1);
-  const ghosts = useMemo(
+  const deck = useMemo(
     () =>
-      [-2, -1, 1, 2].map((n) => ({
-        n,
+      Array.from({ length: DECK_SIZE }, (_, index) => ({
+        index,
         x: motionValue(0),
         y: motionValue(0),
-        z: motionValue(-100),
         rotate: motionValue(0),
+        yaw: motionValue(0),
+        scale: motionValue(1),
+        opacity: motionValue(0),
+        layer: motionValue(DECK_SIZE - index),
       })),
     [],
   );
   const [character, setCharacter] = useState<Character | null>(null),
     [ready, setReady] = useState(restored),
+    [frontVisible, setFrontVisible] = useState(restored),
     [stage, setStage] = useState(0),
     [selectedIndex, setSelectedIndex] = useState(-1),
     [wheelEntries, setWheelEntries] = useState(entries);
@@ -62,42 +60,53 @@ export function useSelectionSequence({
       target = wheelStopAngle(index, list.length);
     let start = performance.now(),
       elapsed = 0,
-      currentStage = -1;
-    const duration = motion ? 4200 : 800;
+      currentStage = -1,
+      currentFront = restored;
+    const duration = motion ? (method === 'card' ? 4600 : 4200) : 800;
     function pose(p: number) {
       progress.set(p);
       const wheelP = Math.min(1, p / 0.82);
       rotation.set(target * selectionProgress(wheelP));
-      const revealP = Math.max(0, Math.min(1, (p - 0.81) / 0.19));
-      if (motion) {
-        cardY.set(
-          p < 0.18 ? 110 * (1 - p / 0.18) ** 3 : Math.sin(p * Math.PI * 2) * (1 - revealP) * 3,
-        );
-        cardX.set(Math.sin(p * Math.PI * 2) * 4 * (1 - revealP));
-        cardRotateY.set(revealP > 0 ? -12 + revealP * 192 : -21 + Math.sin(p * Math.PI * 2) * 7);
-        cardRotateZ.set(-12 * (1 - revealP));
-        cardScale.set(0.86 + Math.min(1, p / 0.25) * 0.14);
-        cardOpacity.set(Math.min(1, p / 0.14));
-        ghostOpacity.set(
-          p < 0.2 ? 0 : p > 0.78 ? Math.max(0, 1 - (p - 0.78) / 0.1) : Math.min(1, (p - 0.2) / 0.1),
-        );
-        for (const g of ghosts) {
-          g.x.set(g.n * (32 + Math.sin(p * Math.PI * 6 + g.n * 0.7) * 24));
-          g.y.set(10 + Math.cos(p * Math.PI * 6 + g.n) * 18);
-          g.z.set(-100 - Math.abs(g.n) * 30);
-          g.rotate.set(g.n * (12 + Math.sin(p * Math.PI * 4) * 8));
+      if (method === 'card') {
+        const facing = motion ? cardShufflePose(0, p).yaw >= 90 : p === 1;
+        if (facing !== currentFront) {
+          currentFront = facing;
+          setFrontVisible(facing);
         }
-      } else {
-        cardY.set(0);
-        cardX.set(0);
-        cardRotateZ.set(0);
-        cardScale.set(1);
-        cardOpacity.set(1);
-        cardRotateY.set(p === 1 ? 180 : 0);
-        ghostOpacity.set(0);
+        for (const card of deck) {
+          const v = motion
+            ? cardShufflePose(card.index, p)
+            : {
+                ...cardShufflePose(card.index, 1),
+                opacity: card.index === 0 ? 1 : 0,
+                yaw: p === 1 ? 180 : 0,
+              };
+          card.x.set(v.x);
+          card.y.set(v.y);
+          card.rotate.set(v.rotate);
+          card.yaw.set(v.yaw);
+          card.scale.set(v.scale);
+          card.opacity.set(v.opacity);
+          card.layer.set(v.layer);
+        }
       }
       wheelOpacity.set(method === 'roulette' && p > 0.84 ? 1 - ((p - 0.84) / 0.16) * 0.55 : 1);
-      const step = p < 0.17 ? 0 : p < 0.73 ? 1 : p < 0.84 ? 2 : 3;
+      const step =
+        method === 'card'
+          ? p < 0.12
+            ? 0
+            : p < 0.77
+              ? 1
+              : p < 0.86
+                ? 2
+                : 3
+          : p < 0.17
+            ? 0
+            : p < 0.73
+              ? 1
+              : p < 0.84
+                ? 2
+                : 3;
       if (step !== currentStage) {
         currentStage = step;
         setStage(step);
@@ -145,20 +154,14 @@ export function useSelectionSequence({
   return {
     character,
     ready,
+    frontVisible,
     stage,
     selectedIndex,
     wheelEntries,
     skip,
     progress,
     rotation,
-    cardY,
-    cardX,
-    cardRotateY,
-    cardRotateZ,
-    cardScale,
-    cardOpacity,
-    ghostOpacity,
     wheelOpacity,
-    ghosts,
+    deck,
   };
 }

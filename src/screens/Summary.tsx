@@ -1,8 +1,9 @@
 import { Check, Home, Play, Trophy, X } from 'lucide-react';
+import { characterName } from '../domain/game';
 import { useGame } from '../app/Store';
 import { CinematicPanel, MetallicButton } from '../components/Cinematic';
 export default function Summary() {
-  const { t, session, navigate } = useGame(),
+  const { t, session, navigate, settings } = useGame(),
     correct = session?.records.filter((r) => r.outcome === 'correct').length ?? 0;
   return (
     <section className="utility-screen summary-screen">
@@ -25,7 +26,7 @@ export default function Summary() {
         {session?.records.map((r) => (
           <div key={r.round} className={r.outcome === 'correct' ? 'recap-correct' : ''}>
             <span>{String(r.round).padStart(2, '0')}</span>
-            <strong>{r.character.name}</strong>
+            <strong>{characterName(r.character, settings.language)}</strong>
             <small>{r.remaining}s</small>
             {r.outcome === 'correct' ? <Check size={16} /> : <X size={16} />}
           </div>

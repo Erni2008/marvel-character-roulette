@@ -1,0 +1,196 @@
+/* Individual composited cards change stack order; they never intersect as 3D planes. */
+.shuffle-deck {
+  transform-style: flat;
+  perspective: 1100px;
+}
+.physical-card {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+.physical-card > .character-card {
+  filter: drop-shadow(0 8px 10px #000a);
+}
+.selected-deck-card .card-diagonal-sheen::after {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  background: linear-gradient(115deg, transparent 38%, #dae8ff38 49%, transparent 60%);
+  animation: deck-reflection 4.6s ease-in-out both;
+  pointer-events: none;
+}
+@keyframes deck-reflection {
+  0%,
+  65% {
+    transform: translateX(-125%);
+  }
+  84%,
+  100% {
+    transform: translateX(125%);
+  }
+}
+.shuffle-deck .card-face {
+  transform-style: flat;
+}
+.drawing-card .card-perspective {
+  width: 52%;
+  max-width: 270px;
+}
+.answer-nameplate {
+  position: absolute;
+  top: 52.9%;
+  left: 7%;
+  right: 7%;
+  z-index: 5;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.answer-nameplate > span {
+  font-size: 6px;
+  font-weight: 500;
+  letter-spacing: 1.7px;
+  color: #ac9a82;
+}
+.answer-nameplate > strong {
+  font-size: clamp(21px, 6.3vw, 30px);
+  font-weight: 650;
+  line-height: 1.04;
+  letter-spacing: 0.2px;
+  color: #f1e8d9;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-shadow: 0 2px 8px #000b;
+}
+.answer-nameplate > small {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #98a8bf;
+}
+.guess-screen > h1 {
+  top: 61.4%;
+  font-size: clamp(12px, 3.4vw, 16px);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+}
+.guess-screen > h1 br {
+  display: none;
+}
+.guess-screen > h1 br::after {
+  content: ' ';
+}
+.guess-timer {
+  top: 67.4%;
+  width: clamp(112px, 30.5vw, 135px);
+}
+.guess-character .character-name {
+  font-size: clamp(9px, 2.6vw, 13px);
+  left: 8%;
+  right: 8%;
+  letter-spacing: 0.4px;
+  bottom: 3.5%;
+  line-height: 1.05;
+}
+.selection-result-id {
+  max-width: 86%;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 700px) and (orientation: portrait) {
+  .answer-nameplate {
+    top: 55.4%;
+    left: 15%;
+    right: 15%;
+    gap: 8px;
+  }
+  .answer-nameplate > span {
+    font-size: 8px;
+  }
+  .answer-nameplate > strong {
+    font-size: 35px;
+  }
+  .answer-nameplate > small {
+    font-size: 10px;
+  }
+  .guess-screen > h1 {
+    top: 64%;
+    font-size: 17px;
+  }
+  .guess-timer {
+    top: 69%;
+    width: 150px;
+  }
+  .drawing-card .card-perspective {
+    max-width: 330px;
+  }
+}
+@media (min-width: 1100px), (min-width: 900px) and (orientation: landscape) {
+  .answer-nameplate {
+    top: 25%;
+    left: 53%;
+    right: 10%;
+    gap: 11px;
+  }
+  .answer-nameplate > span {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+  }
+  .answer-nameplate > strong {
+    font-size: clamp(34px, 3vw, 51px);
+  }
+  .answer-nameplate > small {
+    font-size: 12px;
+  }
+  .guess-screen > h1 {
+    top: 39%;
+    left: 53%;
+    right: 10%;
+    font-size: 17px;
+    letter-spacing: 2px;
+  }
+  .guess-timer {
+    top: 50%;
+    width: clamp(145px, 12vw, 190px);
+  }
+  .drawing-card .card-perspective {
+    max-width: 340px;
+  }
+}
+@media (max-height: 600px) and (orientation: landscape) {
+  .answer-nameplate {
+    top: 17%;
+    left: 51%;
+    right: 7%;
+    gap: 5px;
+  }
+  .answer-nameplate > span {
+    font-size: 5px;
+  }
+  .answer-nameplate > strong {
+    font-size: 23px;
+  }
+  .answer-nameplate > small {
+    font-size: 7px;
+  }
+  .guess-screen > h1 {
+    top: 35%;
+    left: 51%;
+    right: 7%;
+    font-size: 9px;
+  }
+  .guess-timer {
+    top: 47%;
+    width: 78px;
+  }
+  .drawing-card .card-perspective {
+    max-width: 145px;
+  }
+}
+html[data-motion='false'] .selected-deck-card .card-diagonal-sheen::after {
+  animation: none;
+  display: none;
+}

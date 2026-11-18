@@ -96,3 +96,12 @@ docs/refinement/screenshots/**/*.png
 !docs/refinement/screenshots/chromium/guess-820.png
 !docs/refinement/screenshots/webkit/guess-390.png
 !docs/refinement/screenshots/iphone-landscape-ru.png
+
+# Keep selected shuffle and localized-answer review frames.
+docs/shuffle/screenshots/**/*.png
+!docs/shuffle/screenshots/chromium-cut-390.png
+!docs/shuffle/screenshots/chromium-recut-390.png
+!docs/shuffle/screenshots/chromium-answer-390.png
+!docs/shuffle/screenshots/chromium-answer-ru-390.png
+!docs/shuffle/screenshots/webkit-cut-390.png
+!docs/shuffle/screenshots/webkit-answer-ru-390.png
