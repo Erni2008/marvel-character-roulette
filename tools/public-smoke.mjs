@@ -21,12 +21,17 @@ try {
   if (manifest.display !== 'standalone') throw Error('Manifest is not standalone.');
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => !!navigator.serviceWorker.controller);
-  await page.screenshot({ path: 'docs/refinement/screenshots/public-home-390.png' });
+  await page.screenshot({ path: 'docs/studio/screenshots/public-home-390.png' });
   await context.setOffline(true);
   await page.reload();
   await page.getByRole('button', { name: 'PLAY', exact: true }).click();
   await page.locator('.mode-card-draw').click();
   await page.locator('.guess-screen').waitFor();
+  await page.locator('.guess-character .unknown-artwork').waitFor();
+  const visualFont = await page
+    .locator('.answer-nameplate strong')
+    .evaluate((el) => getComputedStyle(el).fontFamily);
+  if (!visualFont.includes('Studio')) throw Error('The rebuilt interior stylesheet is not active.');
   const answer = await page.locator('.answer-nameplate strong').textContent();
   const selectedName = await page.evaluate(
     () => JSON.parse(sessionStorage.getItem('roulette.session.v3')).character.name,
@@ -35,7 +40,7 @@ try {
     throw Error('The chosen character name is not visible.');
   await page.getByRole('button', { name: 'Correct answer', exact: true }).click();
   await page.getByText('CORRECT!', { exact: true }).waitFor();
-  await page.screenshot({ path: 'docs/refinement/screenshots/public-guess-390.png' });
+  await page.screenshot({ path: 'docs/studio/screenshots/public-guess-390.png' });
   if (errors.length) throw Error(errors.join('\n'));
   const report = {
     url,
@@ -46,11 +51,12 @@ try {
     offlineReloadAndRound: true,
     correctAction: true,
     namedAnswer: answer,
+    rebuiltInterior: true,
     browser: 'Chromium macOS',
     errors,
   };
   await fs.writeFile(
-    '.openai/artifacts/refinement-public-smoke.json',
+    '.openai/artifacts/studio-public-smoke.json',
     JSON.stringify(report, null, 2) + '\n',
   );
   console.log(JSON.stringify(report));

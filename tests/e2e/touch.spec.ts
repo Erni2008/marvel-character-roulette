@@ -22,7 +22,7 @@ test('iPhone touch, Russian labels, rotation and presentation controls', async (
   await expect(page.getByRole('button', { name: 'Следующий раунд' })).toBeInViewport();
   await page.getByRole('button', { name: 'Следующий раунд' }).tap();
   await expect(page.locator('.round-badge')).toContainText('2 / 10');
-  await page.screenshot({ path: 'docs/refinement/screenshots/iphone-landscape-ru.png' });
+  await page.screenshot({ path: 'docs/studio/screenshots/iphone-landscape-ru.png' });
   await page.locator('.round-badge').tap();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'ПРОДОЛЖИТЬ', exact: true }).tap();

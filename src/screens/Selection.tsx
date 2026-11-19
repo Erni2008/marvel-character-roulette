@@ -126,19 +126,6 @@ export default function Selection() {
         <div className="draw-platform-light" />
       </div>
       <div className="drawing-status">
-        <div className="selection-phase" aria-hidden="true">
-          {[
-            t('ACTIVATE', 'ЗАПУСК'),
-            t('SHUFFLE', 'ВЫБОР'),
-            t('LOCK', 'ФИКСАЦИЯ'),
-            t('REVEAL', 'ОТКРЫТИЕ'),
-          ].map((label, i) => (
-            <span key={i} className={seq.stage >= i ? 'phase-active' : ''}>
-              <b>{String(i + 1).padStart(2, '0')}</b>
-              {label}
-            </span>
-          ))}
-        </div>
         <h1 className="metallic-title" aria-live="polite">
           {seq.ready
             ? t('CHARACTER SELECTED', 'ПЕРСОНАЖ ВЫБРАН')

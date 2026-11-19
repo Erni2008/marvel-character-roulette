@@ -105,3 +105,17 @@ docs/shuffle/screenshots/**/*.png
 !docs/shuffle/screenshots/chromium-answer-ru-390.png
 !docs/shuffle/screenshots/webkit-cut-390.png
 !docs/shuffle/screenshots/webkit-answer-ru-390.png
+
+# Curated interior presentation review captures.
+docs/studio/screenshots/**/*.png
+!docs/studio/screenshots/chromium/modes-390.png
+!docs/studio/screenshots/chromium/guess-390.png
+!docs/studio/screenshots/chromium/correct-390.png
+!docs/studio/screenshots/chromium/settings-ru-390.png
+!docs/studio/screenshots/chromium/stats-390.png
+!docs/studio/screenshots/chromium/summary-390.png
+!docs/studio/screenshots/chromium/modes-1920.png
+!docs/studio/screenshots/chromium/guess-820.png
+!docs/studio/screenshots/webkit/guess-390.png
+!docs/studio/screenshots/iphone-landscape-ru.png
+!docs/studio/screenshots/card-active-390.png

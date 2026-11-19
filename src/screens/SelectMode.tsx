@@ -51,18 +51,16 @@ export default function SelectMode() {
           )}
         >
           <IlluminatedFrame tone="red" />
-          <span className="mode-edition" aria-hidden="true">
-            01 / COLLECTION
+          <span className="mode-number" aria-hidden="true">
+            01
           </span>
-          <span className="mode-type">{t('THE REVEAL', 'МОМЕНТ ОТКРЫТИЯ')}</span>
           <div className="mode-art card-mode-art">
             <CardFan />
           </div>
           <div className="mode-copy">
             <h2 className="metallic-title">{t('CARD DRAW', 'КАРТА')}</h2>
             <p>
-              {t('Reveal a random character', 'Откройте случайного персонажа')}
-              <br />
+              {t('Reveal a random character', 'Откройте случайного персонажа')}{' '}
               {t('with a cinematic card', 'с помощью эффектной карты')}
             </p>
           </div>
@@ -85,18 +83,16 @@ export default function SelectMode() {
           )}
         >
           <IlluminatedFrame tone="blue" />
-          <span className="mode-edition" aria-hidden="true">
-            02 / SELECTION
+          <span className="mode-number" aria-hidden="true">
+            02
           </span>
-          <span className="mode-type">{t('THE SUSPENSE', 'ИНТРИГА ВРАЩЕНИЯ')}</span>
           <div className="mode-art roulette-mode-art">
             <RouletteWheel decorative count={32} />
           </div>
           <div className="mode-copy">
             <h2 className="metallic-title">{t('ROULETTE', 'РУЛЕТКА')}</h2>
             <p>
-              {t('Spin through characters', 'Прокрутите персонажей')}
-              <br />
+              {t('Spin through characters', 'Прокрутите персонажей')}{' '}
               {t('and land on a random one', 'и доверьте выбор случаю')}
             </p>
           </div>
@@ -107,7 +103,10 @@ export default function SelectMode() {
         </m.button>
       </div>
       <p className="mode-footnote">
-        {t('TWO WAYS TO PLAY. ONE GREAT REVEAL.', 'ДВА СПОСОБА ВЫБОРА. ОДНА БОЛЬШАЯ ИГРА.')}
+        {t(
+          'The guesser looks away. Everyone else sees the answer.',
+          'Угадывающий отворачивается. Остальные видят ответ.',
+        )}
       </p>
     </section>
   );

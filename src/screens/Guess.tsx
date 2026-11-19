@@ -38,6 +38,10 @@ export default function Guess() {
   }, [timer, advance]);
   const autoStarted = useRef(false);
   useEffect(() => {
+    if (game.modal) {
+      autoStarted.current = true;
+      return;
+    }
     const id = setTimeout(() => {
       if (!autoStarted.current && !s.elapsed && !isSettled) {
         autoStarted.current = true;
@@ -45,7 +49,7 @@ export default function Guess() {
       }
     }, 80);
     return () => clearTimeout(id);
-  }, [timer.toggle, s.elapsed, isSettled]);
+  }, [timer.toggle, s.elapsed, isSettled, game.modal]);
   useEffect(() => {
     if (isSettled) timer.pause();
   }, [isSettled, timer.pause]);
@@ -131,7 +135,7 @@ export default function Guess() {
         className="answer-nameplate"
         aria-label={t('Answer for verification', 'Ответ для проверки')}
       >
-        <span>{t('ANSWER FOR VERIFICATION', 'ОТВЕТ ДЛЯ ПРОВЕРКИ')}</span>
+        <span>{t('SELECTED CHARACTER', 'ВЫБРАННЫЙ ПЕРСОНАЖ')}</span>
         <strong>{s.character ? characterName(s.character, settings.language) : ''}</strong>
         {settings.language === 'ru' && s.character?.nameRu && <small>{s.character.name}</small>}
       </div>

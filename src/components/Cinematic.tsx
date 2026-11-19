@@ -231,105 +231,87 @@ export function BrandEmblem({ className = '' }: { className?: string }) {
     </svg>
   );
 }
-function NeutralSilhouette() {
+function DeckEngraving() {
   const id = useId().replace(/:/g, '');
-  // Neutral, faceless full-body display mannequin. No character artwork or anatomy is cropped.
   return (
-    <svg className="neutral-silhouette" viewBox="0 0 300 460" aria-hidden="true">
+    <svg className="deck-engraving" viewBox="0 0 600 860" aria-hidden="true">
       <defs>
-        <radialGradient id={`${id}-halo`}>
-          <stop stopColor="#ff735d" stopOpacity=".35" />
-          <stop offset=".6" stopColor="#a01b37" stopOpacity=".15" />
-          <stop offset="1" stopColor="#100d1b" stopOpacity="0" />
-        </radialGradient>
-        <linearGradient id={`${id}-body`} x1="0" x2="1" y2=".25">
-          <stop stopColor="#a45758" />
-          <stop offset=".05" stopColor="#30313f" />
-          <stop offset=".28" stopColor="#111826" />
-          <stop offset=".58" stopColor="#050913" />
-          <stop offset=".91" stopColor="#111725" />
-          <stop offset="1" stopColor="#6d3044" />
+        <linearGradient id={`${id}-foil`} x2=".85" y2="1">
+          <stop stopColor="#ddd0b8" />
+          <stop offset=".3" stopColor="#8a8277" />
+          <stop offset=".47" stopColor="#eee3cb" />
+          <stop offset=".63" stopColor="#716c64" />
+          <stop offset="1" stopColor="#bbad91" />
         </linearGradient>
-        <linearGradient id={`${id}-rim`} x2="1" y2="1">
-          <stop stopColor="#ff9b79" stopOpacity=".7" />
-          <stop offset=".45" stopColor="#494453" stopOpacity=".15" />
-          <stop offset="1" stopColor="#ed3c59" stopOpacity=".5" />
-        </linearGradient>
-        <radialGradient id={`${id}-head`} cx=".25" cy=".25" r=".85">
-          <stop stopColor="#343340" />
-          <stop offset=".4" stopColor="#141a27" />
-          <stop offset="1" stopColor="#040710" />
-        </radialGradient>
+        <pattern id={`${id}-weave`} width="12" height="12" patternUnits="userSpaceOnUse">
+          <path
+            d="M0 6 6 0 12 6 6 12Z"
+            fill="none"
+            stroke="#cad4e1"
+            strokeWidth=".45"
+            strokeOpacity=".07"
+          />
+        </pattern>
       </defs>
-      <ellipse cx="150" cy="229" rx="145" ry="203" fill={`url(#${id}-halo)`} />
-      <g fill="none" stroke="#eac6b9" strokeOpacity=".08" strokeWidth=".5">
-        <circle cx="150" cy="190" r="119" />
-        <circle cx="150" cy="190" r="125" strokeDasharray="1 9" />
-        <path d="M150 33V422M19 190H281" />
+      <path d="M35 53 53 35h494l18 18v754l-18 18H53l-18-18Z" fill={`url(#${id}-weave)`} />
+      <g fill="none" stroke={`url(#${id}-foil)`}>
+        <path d="M32 53 53 32h494l21 21v754l-21 21H53l-21-21Z" strokeWidth="1.4" opacity=".7" />
+        <path d="M46 62 62 46h476l16 16v736l-16 16H62l-16-16Z" strokeWidth=".6" opacity=".45" />
+        <path
+          d="M72 118V74h44m368 0h44v44M72 742v44h44m368 0h44v-44"
+          strokeWidth="1.5"
+          opacity=".7"
+        />
+        {Array.from({ length: 24 }, (_, i) => (
+          <ellipse
+            key={i}
+            cx="300"
+            cy="426"
+            rx="154"
+            ry="65"
+            transform={`rotate(${i * 7.5} 300 426)`}
+            strokeWidth=".55"
+            opacity=".28"
+          />
+        ))}
+        <circle cx="300" cy="426" r="176" strokeWidth=".6" opacity=".4" />
+        <circle cx="300" cy="426" r="102" strokeWidth=".8" opacity=".55" fill="#11161d" />
+        <path d="m300 160 7 10-7 10-7-10Zm0 512 7 10-7 10-7-10Z" strokeWidth="1" opacity=".8" />
       </g>
-      <ellipse cx="150" cy="434" rx="49" ry="5" fill="#000" opacity=".6" />
-      <g fill={`url(#${id}-body)`} stroke={`url(#${id}-rim)`} strokeWidth=".75">
-        <path d="M125 109 124 125Q111 135 97 136 81 139 75 156L62 211 53 257 57 278 68 279 77 263 80 232 99 186 105 217 101 250 112 268 150 277 188 268 199 250 195 217 201 186 220 232 223 263 232 279 243 278 247 257 238 211 225 156Q219 139 203 136 189 135 176 125L175 109Z" />
-        <path d="M112 263Q101 287 109 319L117 366 115 411 106 425Q106 432 122 432L137 430 142 414 143 367 148 309H152L157 367 158 414 163 430 178 432Q194 432 194 425L185 411 183 366 191 319Q199 287 188 263L150 276Z" />
-        <path d="M127 108 126 123Q150 143 174 123L173 108" />
-      </g>
-      <path
-        d="M129 69Q127 43 150 42 173 43 171 69L170 86Q166 103 150 110 134 103 130 86Z"
-        fill={`url(#${id}-head)`}
-        stroke={`url(#${id}-rim)`}
-        strokeWidth=".8"
-      />
-      <g fill="none" stroke="#a68b92" strokeOpacity=".14" strokeWidth=".8">
-        <path d="M105 150 126 158 150 153 174 158 195 150M105 164Q123 185 145 179M195 164Q177 185 155 179M150 187V243M118 246l32 10 32-10M118 284l14 64M182 284l-14 64M127 372l4 37M173 372l-4 37" />
+      <g fill={`url(#${id}-foil)`} fontFamily="Studio, sans-serif" textAnchor="middle">
+        <text x="300" y="448" fontSize="70" fontWeight="400" letterSpacing="-3">
+          CR
+        </text>
+        <text x="300" y="115" fontSize="12" fontWeight="500" letterSpacing="8">
+          CHARACTER
+        </text>
+        <text x="300" y="754" fontSize="12" fontWeight="500" letterSpacing="8">
+          ROULETTE
+        </text>
       </g>
     </svg>
   );
 }
-function CardEngraving() {
-  const id = useId().replace(/:/g, '');
+function UnknownArtwork() {
   return (
-    <svg className="card-engraving" viewBox="0 0 600 860" aria-hidden="true">
-      <defs>
-        <linearGradient id={`${id}-etch`} x2="1" y2="1">
-          <stop stopColor="#e8c7a3" stopOpacity=".65" />
-          <stop offset=".4" stopColor="#c7d4e5" stopOpacity=".12" />
-          <stop offset="1" stopColor="#de6c6b" stopOpacity=".5" />
-        </linearGradient>
-      </defs>
-      <g fill="none" stroke={`url(#${id}-etch)`} strokeWidth="1.2">
-        <path d="M54 124V70l24-24h75M446 46h76l24 24v54M54 736v54l24 24h75M446 814h76l24-24v-54M64 162v536M536 162v536" />
-        <path d="M80 90h30V60m380 0v30h30M80 770h30v30m380 0v-30h30M300 56l12 12-12 12-12-12ZM300 780l12 12-12 12-12-12Z" />
-        <circle cx="300" cy="422" r="178" />
-        <circle cx="300" cy="422" r="185" strokeDasharray="1 8" />
-        <circle cx="300" cy="422" r="157" strokeDasharray="170 76" />
-        {[0, 1, 2, 3].map((n) => (
-          <path
-            key={n}
-            d="M300 208v33m0 362v33m-214-214h33m362 0h33"
-            transform={`rotate(${n * 22.5} 300 422)`}
-            opacity=".45"
-          />
-        ))}
-        <path
-          d="m110 170 35-35h85m140 0h85l35 35M110 675l35 35h85m140 0h85l35-35"
-          strokeOpacity=".35"
-        />
+    <svg className="neutral-silhouette unknown-artwork" viewBox="0 0 300 460" aria-hidden="true">
+      <g fill="none" stroke="#cdc3af" strokeWidth=".5" opacity=".28">
+        <path d="M32 52V32h20m196 0h20v20M32 408v20h20m196 0h20v-20" />
+        <circle cx="150" cy="213" r="82" />
+        <circle cx="150" cy="213" r="92" strokeDasharray=".5 7" />
+        <path d="M130 98h40m-40 230h40" />
       </g>
-      <g
-        fill="#b7c4d9"
-        opacity=".5"
-        fontFamily="Exo, sans-serif"
-        fontSize="10"
-        letterSpacing="4"
+      <text
+        x="150"
+        y="251"
         textAnchor="middle"
+        fontFamily="Studio, sans-serif"
+        fontSize="114"
+        fontWeight="300"
+        fill="#d8cfbd"
       >
-        <text x="300" y="128">
-          CHARACTER ARCHIVE
-        </text>
-        <text x="300" y="745">
-          ROULETTE COLLECTION
-        </text>
-      </g>
+        ?
+      </text>
     </svg>
   );
 }
@@ -357,7 +339,7 @@ export function CharacterCard({
       <div className="card-content">
         <div className="card-hex-texture" />
         <div className="card-diagonal-sheen" />
-        {!front && <CardEngraving />}
+        {!front && <DeckEngraving />}
         {front ? (
           <>
             {character?.imagePath && !broken ? (
@@ -369,17 +351,10 @@ export function CharacterCard({
                 draggable={false}
               />
             ) : (
-              <>
-                <NeutralSilhouette />
-                <span className="mystery-question" aria-hidden="true">
-                  ?
-                </span>
-              </>
+              <UnknownArtwork />
             )}
           </>
-        ) : (
-          <BrandEmblem />
-        )}
+        ) : null}
       </div>
       <div className="card-edge-hardware" aria-hidden="true">
         <i />
@@ -500,13 +475,13 @@ export function RouletteWheel({
               fill={
                 i === selectedIndex
                   ? '#e8c38b'
-                  : i % 10 < 5
+                  : i % 5 === 0
                     ? i % 2
-                      ? `url(#${id}-blue)`
-                      : '#15253c'
+                      ? '#71333f'
+                      : '#5b2733'
                     : i % 2
-                      ? `url(#${id}-red)`
-                      : '#36131e'
+                      ? '#26313f'
+                      : '#17212e'
               }
               stroke="#a4afc3"
               strokeOpacity=".27"
@@ -578,7 +553,7 @@ export function RouletteWheel({
           stroke="#aab3c9"
           strokeWidth="3"
         />
-        <path d="M180 10 190 30 180 26 170 30Z" fill="#f5f7ff" stroke="#ff304c" strokeWidth="2" />
+        <path d="M180 10 190 30 180 26 170 30Z" fill="#e6d9bd" stroke="#9f845e" strokeWidth="1" />
         <g stroke="#b7c4db" strokeWidth="1" opacity=".6">
           {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => {
             const p = polar(103, a),
@@ -588,7 +563,9 @@ export function RouletteWheel({
         </g>
       </svg>
       <div className="wheel-hub-reflection" aria-hidden="true" />
-      <BrandEmblem className="wheel-emblem" />
+      <div className="wheel-wordmark" aria-hidden="true">
+        CR
+      </div>
       <div className="wheel-flare flare-blue" />
       <div className="wheel-flare flare-red" />
     </div>
