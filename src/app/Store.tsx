@@ -358,10 +358,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
   /** End the endless session and show the results. */
   const finish = useCallback(
-    (remaining = 0) => {
+    (remaining?: number) => {
       let s = sessionRef.current;
       if (!s) return navigate('home');
-      if (s.phase === 'guessing') settle('passed', remaining, roundKey(s));
+      if (s.phase === 'guessing')
+        settle('passed', remaining ?? Math.max(0, s.duration - Math.floor(s.elapsed / 1000)), roundKey(s));
       s = sessionRef.current!;
       commit({ ...s, phase: 'finished' });
       navigate('summary');

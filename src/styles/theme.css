@@ -978,3 +978,20 @@ html[lang='en'] .rb-value::before { content: 'ROUND '; }
   .guess-card-wrap { height: calc(100svh - 60px); max-height: none; }
 }
 .real-card .character-art { transform: none; } .real-card .rc-window { top: 7.5% !important; }
+/* v11: results gallery with hero cards */
+.summary-screen { max-width: 1400px; }
+.recap-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 14px; width: 100%; perspective: 1000px; }
+.recap-card { display: grid; justify-items: center; gap: 6px; text-align: center; }
+.recap-art { position: relative; width: 100%; }
+.recap-art .character-card { width: 100%; }
+.recap-card.is-miss .recap-art { filter: grayscale(0.85) brightness(0.6); }
+.recap-round { position: absolute; top: 4%; right: 6%; min-width: 26px; padding: 2px 6px; border-radius: 6px; background: rgba(0, 0, 0, 0.75); font: 800 12px var(--cond); color: #fff; }
+.recap-card strong { font: italic 900 15px/1.1 var(--display); text-transform: uppercase; color: #fff; }
+.recap-status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; font: 800 11px var(--cond); letter-spacing: 0.16em; clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 8px 100%, 0 50%); }
+.recap-status.hit { background: #0f6d3a; color: #c9ffe0; box-shadow: inset 0 0 0 1.5px #3dff8e; }
+.recap-status.miss { background: #5a0614; color: #ffd0d6; box-shadow: inset 0 0 0 1.5px #ff3b52; }
+.recap-time { font: italic 900 24px/1 var(--display); font-variant-numeric: tabular-nums; color: #fff; text-shadow: 0 0 14px rgba(255, 40, 70, 0.55); }
+.is-miss .recap-time { color: #c9ced8; text-shadow: none; }
+.recap-card .real-card { filter: drop-shadow(0 0 10px rgba(255, 30, 60, 0.45)) drop-shadow(0 10px 14px rgba(0, 0, 0, 0.7)); }
+.is-hit .real-card { filter: drop-shadow(0 0 12px rgba(61, 255, 142, 0.5)) drop-shadow(0 10px 14px rgba(0, 0, 0, 0.7)); }
+@media (max-width: 600px) { .recap-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 8px; } .recap-card strong { font-size: 11px; } .recap-time { font-size: 18px; } .recap-status { font-size: 9px; padding: 2px 7px; letter-spacing: 0.08em; } }

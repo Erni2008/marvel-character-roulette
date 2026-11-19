@@ -1,8 +1,8 @@
-import { Check, ChevronsRight, Home, Play, Trash2, Trophy } from 'lucide-react';
+import { Check, Home, Play, Trophy, X } from 'lucide-react';
 import { motion as m } from 'motion/react';
 import { characterName } from '../domain/game';
 import { useGame } from '../app/Store';
-import { MetallicButton } from '../components/Cinematic';
+import { CharacterCard, MetallicButton } from '../components/Cinematic';
 const fmt = (sec: number) => `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 export default function Summary() {
   const { t, session, navigate, settings, motion } = useGame(),
@@ -31,15 +31,30 @@ export default function Summary() {
           </m.div>
         ))}
       </div>
-      <div className="round-recap">
-        {rows.map((r) => (
-          <div key={r.round} className={`recap-${r.outcome}`}>
-            <span>{r.round}</span>
-            <strong>{characterName(r.character, settings.language)}</strong>
-            <small>{r.outcome === 'correct' ? fmt(r.time) : r.outcome === 'skipped' ? t('skipped', 'пропуск') : t('passed', 'дальше')}</small>
-            {r.outcome === 'correct' ? <Check size={16} /> : r.outcome === 'skipped' ? <Trash2 size={16} /> : <ChevronsRight size={16} />}
-          </div>
-        ))}
+      <div className="recap-gallery">
+        {rows.map((r, i) => {
+          const ok = r.outcome === 'correct';
+          return (
+            <m.div
+              key={r.round}
+              className={`recap-card ${ok ? 'is-hit' : 'is-miss'}`}
+              initial={motion ? { opacity: 0, y: 30, rotateX: -20 } : false}
+              animate={{ opacity: 1, y: 0, rotateX: 0 }}
+              transition={{ delay: 0.25 + i * 0.05, type: 'spring', stiffness: 160, damping: 18 }}
+            >
+              <div className="recap-art">
+                <CharacterCard front character={r.character} showName={false} />
+                <span className="recap-round">{r.round}</span>
+              </div>
+              <strong>{characterName(r.character, settings.language)}</strong>
+              <div className={`recap-status ${ok ? 'hit' : 'miss'}`}>
+                {ok ? <Check size={14} /> : <X size={14} />}
+                {ok ? t('GUESSED', 'УГАДАН') : r.outcome === 'skipped' ? t('REMOVED', 'УБРАН') : t('NOT GUESSED', 'НЕ УГАДАН')}
+              </div>
+              <span className="recap-time">{fmt(r.time)}</span>
+            </m.div>
+          );
+        })}
         {!rows.length && <p className="recap-empty">{t('No rounds played yet.', 'Раундов пока не было.')}</p>}
       </div>
       <div className="summary-actions">
