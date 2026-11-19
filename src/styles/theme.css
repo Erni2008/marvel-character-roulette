@@ -301,11 +301,11 @@ main { position: relative; z-index: 2; min-height: 100svh; outline: none; }
 @keyframes seg-win { to { filter: brightness(2.1) saturate(1.3); } }
 .seg-label { fill: #fff8ea; font-family: var(--cond); font-weight: 800; letter-spacing: 0.06em; paint-order: stroke; stroke: rgba(0, 0, 0, 0.55); stroke-width: 3px; }
 .seg-label-win { fill: #fff; }
-.bulb { fill: #ffe3a1; }
-.bulb-1 { fill: #ff4b5c; }
+.wheel-metal { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
+.wheel-bulbs { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; }
 .wheel-bulbs .bulb { animation: bulb 0.9s steps(1) infinite; }
 .wheel-bulbs .bulb-1 { animation-delay: -0.45s; }
-@keyframes bulb { 0% { opacity: 1; } 50% { opacity: 0.25; } }
+@keyframes bulb { 0% { opacity: 1; } 50% { opacity: 0.18; } }
 .drawing-wheel.stage-1 .wheel-bulbs .bulb { animation-duration: 0.25s; }
 .drawing-wheel.stage-1 .wheel-bulbs .bulb-1 { animation-delay: -0.125s; }
 .wheel-center { position: absolute; inset: 39%; }
@@ -541,3 +541,117 @@ input[type='range']::-moz-range-thumb { width: 22px; height: 22px; border-radius
 .has-art .character-name { bottom: 7%; display: grid; justify-items: center; gap: 2.2cqw; }
 .cn-rule { width: 30%; height: 0.5cqw; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
 .has-art .character-name span { font-size: 10.5cqw; letter-spacing: 0.01em; text-shadow: 0 0.5cqw 0 rgba(0, 0, 0, 0.8); }
+
+/* ================================================================ v3: cinematic motion */
+/* wheel: tilted "camera" while spinning, settles flat with a bounce, shake on stop */
+.draw-scene { perspective: 1600px; }
+.drawing-wheel .selection-wheel-wrap { transform-style: preserve-3d; transition: transform 1.4s cubic-bezier(0.22, 1.2, 0.36, 1); }
+.drawing-wheel.stage-0 .selection-wheel-wrap { transform: rotateX(28deg) scale(0.9) translateY(4%); }
+.drawing-wheel.stage-1 .selection-wheel-wrap { transform: rotateX(16deg) scale(0.97); }
+.drawing-wheel.stage-2 .selection-wheel-wrap { transform: rotateX(0) scale(1); }
+.drawing-wheel.stage-3 .draw-scene, .drawing-card.stage-3 .draw-scene { animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 1px, 0); }
+  20%, 80% { transform: translate3d(4px, -2px, 0); }
+  30%, 50%, 70% { transform: translate3d(-6px, 2px, 0); }
+  40%, 60% { transform: translate3d(6px, -1px, 0); }
+}
+.drawing-wheel.stage-1 .seg-label { opacity: 0.55; transition: opacity 0.4s; }
+.drawing-wheel.stage-3 .wheel-bulbs .bulb, .selection-ready .wheel-bulbs .bulb { animation: bulb 0.16s steps(1) infinite; }
+/* god rays behind the reveal */
+.reveal-rays { position: absolute; width: min(150vmin, 1300px); aspect-ratio: 1; opacity: 0; transform: scale(0.3) rotate(0); pointer-events: none; mix-blend-mode: screen; z-index: 4; transition: opacity 0.8s, transform 1.2s var(--ease-out); }
+.reveal-rays.on { opacity: 0.85; transform: scale(1); animation: rays-spin 40s linear infinite; }
+@keyframes rays-spin { from { rotate: 0deg; } to { rotate: 360deg; } }
+.drawing-card .reveal-rays { z-index: 0; }
+/* card draw: deck lifts and breathes */
+.drawing-card .card-perspective { width: min(42vmin, 360px); }
+.drawing-card.stage-1 .shuffle-deck { animation: deck-breathe 1.2s ease-in-out infinite; }
+@keyframes deck-breathe { 50% { translate: 0 -8px; } }
+/* home: real character art in the wings */
+.showcase-card { width: auto; height: min(78vh, 760px); top: auto; bottom: -4vh; left: auto; filter: none; }
+.showcase-art { height: 100%; width: auto; display: block; filter: brightness(0.55) contrast(1.1) drop-shadow(0 0 30px rgba(232, 19, 47, 0.35)); -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%); mask-image: linear-gradient(180deg, #000 70%, transparent 100%); }
+.art-0 { right: 4vw; }
+.art-1 { left: 4vw; transform: scaleX(-1); }
+.showcase-card > .showcase-art { animation: hover-float 8s ease-in-out infinite; }
+/* nicer screen + guess entrance */
+.guess-card-wrap::after { content: ''; position: absolute; inset: 0; border-radius: 6% / 4.3%; pointer-events: none; background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.35) 48%, transparent 62%) -100% 0 / 200% 100% no-repeat; animation: card-sweep 1.4s 0.35s var(--ease-out) both; mix-blend-mode: soft-light; }
+@keyframes card-sweep { from { background-position: 150% 0; } to { background-position: -150% 0; } }
+
+/* ================================================================ v3: iPhone layouts */
+@media (max-width: 600px) and (orientation: portrait) {
+  .reference-screen, .utility-screen { padding-top: max(14px, env(safe-area-inset-top)); padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+  .home-screen { gap: 18px; grid-template-rows: 1fr auto auto; }
+  #home-title { font-size: clamp(44px, 15vw, 72px); }
+  .home-heading p { letter-spacing: 0.18em; font-size: 12px; }
+  .play-button { min-width: 0; width: min(80vw, 320px); }
+  .showcase-card { height: 52vh; bottom: -6vh; opacity: 0.55; }
+  .art-0 { right: -12vw; } .art-1 { left: -12vw; }
+  .mode-header h1, .utility-header h1 { font-size: 30px; }
+  .mode-header p { font-size: 10px; letter-spacing: 0.2em; }
+  .mode-screen { height: 100svh; min-height: 0; gap: 12px; }
+  .mode-footnote { display: none; }
+  .mode-choice { min-height: 0; padding: 18px; grid-template-rows: minmax(0, 1fr) auto; }
+  .selection-modes { grid-template-rows: 1fr 1fr; }
+  .mode-art { min-height: 0; }
+  .mode-copy p { display: none; }
+  .card-fan { width: min(36%, 150px); }
+  .roulette-mode-art .roulette-wheel { width: min(48%, 200px); }
+  .mode-copy h2 { font-size: 30px; }
+  .mode-copy p { font-size: 13px; }
+  .mode-enter { width: 44px; height: 44px; }
+  .drawing-card .card-perspective { width: min(64vw, 300px); }
+  .wheel-reveal-card { width: min(56vw, 260px); }
+  .selection-wheel-wrap { width: min(94vw, calc(100svh - 260px)); }
+  /* guess: everything on one screen, no scrolling */
+  .guess-screen { height: 100svh; min-height: 0; grid-template-rows: auto minmax(0, 1fr) auto; row-gap: 10px; overflow: hidden; }
+  .guess-character { min-height: 0; }
+  .guess-card-wrap { width: auto; height: 100%; max-height: 100%; aspect-ratio: 5 / 7; max-width: 74vw; }
+  .guess-card-wrap .character-card { height: 100%; width: auto; }
+  .guess-panel { gap: 10px; align-content: end; }
+  .answer-nameplate strong { font-size: clamp(30px, 10vw, 44px); }
+  .answer-nameplate > span { font-size: 10px; }
+  .guess-timer { order: -1; position: absolute; top: max(10px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); }
+  .circular-timer { width: 84px; }
+  .circular-timer [role='timer'] { font-size: 24px; }
+  .circular-timer small { display: none; }
+  .guess-controls { grid-template-columns: 1fr 1.5fr 1fr; gap: 8px; }
+  .guess-controls .metallic-tile { min-height: 70px; padding: 10px 6px; }
+  .guesser-instruction { font-size: 9px; letter-spacing: 0.12em; text-align: center; }
+  .rb-value { font-size: 26px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .reference-screen, .utility-screen { padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+  .home-screen { gap: 10px; padding-top: 10px; }
+  .home-emblem, .optional-brand { display: none; }
+  #home-title { font-size: clamp(36px, 8vw, 70px); }
+  .play-button { min-height: 52px; }
+  .home-navigation .metallic-button { min-height: 56px; padding: 8px 14px; }
+  .showcase-card { height: 92vh; bottom: -6vh; }
+  .mode-screen { gap: 10px; height: 100svh; min-height: 0; }
+  .selection-modes { grid-template-columns: 1fr 1fr; grid-template-rows: none; }
+  .mode-choice { grid-template-columns: 1fr; }
+  .mode-header h1 { font-size: 26px; }
+  .mode-choice { min-height: 0; padding: 14px 18px; }
+  .mode-copy h2 { font-size: 24px; }
+  .mode-copy p, .mode-footnote { display: none; }
+  .card-fan { width: min(30%, 110px); }
+  .roulette-mode-art .roulette-wheel { width: min(48%, 160px); }
+  .selection-chapter { font-size: 10px; }
+  .selection-wheel-wrap { width: calc(100svh - 120px); }
+  .drawing-card .card-perspective { width: calc((100svh - 150px) * 0.714); }
+  .wheel-reveal-card { width: calc((100svh - 150px) * 0.6); }
+  .drawing-status { gap: 6px; }
+  .drawing-status h1 { font-size: 22px; }
+  .sequence-skip { padding: 6px 14px; }
+  .guess-screen { height: 100svh; min-height: 0; grid-template-columns: auto 1fr; grid-template-rows: auto minmax(0, 1fr); column-gap: 24px; row-gap: 6px; overflow: hidden; }
+  .guess-card-wrap { height: calc(100svh - 80px); width: auto; aspect-ratio: 5 / 7; }
+  .guess-card-wrap .character-card { height: 100%; width: auto; }
+  .guess-panel { gap: 10px; }
+  .answer-nameplate strong { font-size: clamp(28px, 5.4vw, 48px); }
+  .circular-timer { width: 96px; }
+  .circular-timer [role='timer'] { font-size: 26px; }
+  .circular-timer small { display: none; }
+  .guess-controls .metallic-tile { min-height: 58px; padding: 6px; }
+  .guesser-instruction { display: none; }
+  .rb-value { font-size: 22px; }
+}

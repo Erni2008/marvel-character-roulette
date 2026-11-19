@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { motion as m } from 'motion/react';
 import { characterName, wheelIndexAtPointer } from '../domain/game';
-import { identity } from '../domain/identity';
+import { asset, identity } from '../domain/identity';
 import { FastForward } from 'lucide-react';
 import { useGame } from '../app/Store';
 import { Burst, CharacterCard, RouletteWheel } from '../components/Cinematic';
@@ -85,6 +85,7 @@ export default function Selection() {
       <div className="draw-scene">
         <div className="stage-spot" aria-hidden="true" />
         {revealed && motion && <div className="reveal-flash" aria-hidden="true" />}
+        <img className={`reveal-rays ${revealed ? 'on' : ''}`} src={asset('art/rays.webp')} alt="" aria-hidden="true" />
         {isWheel ? (
           <>
             <m.div className="selection-wheel-wrap" ref={pointer} style={{ opacity: seq.wheelOpacity }}>

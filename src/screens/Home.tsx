@@ -1,11 +1,12 @@
 import { BarChart3, Gamepad2, Play, Settings } from 'lucide-react';
 import { motion as m } from 'motion/react';
 import { useGame } from '../app/Store';
-import { BrandEmblem, CharacterCard, MetallicButton } from '../components/Cinematic';
+import { asset } from '../domain/identity';
+import { BrandEmblem, MetallicButton } from '../components/Cinematic';
 const ease = [0.16, 1, 0.3, 1] as const;
 export default function Home() {
   const { t, navigate, openSettings, motion, characters } = useGame();
-  const showcase = [0, 3, 4, 8, 12].map((i) => characters[i % characters.length]);
+  const showcase = characters.filter((c) => c.enabled && c.imagePath).slice(0, 2);
   const rise = (d: number) =>
     motion ? { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.9, delay: d, ease } } : {};
   return (
@@ -14,12 +15,12 @@ export default function Home() {
         {showcase.map((c, i) => (
           <m.div
             key={c.id}
-            className={`showcase-card sc-${i}`}
+            className={`showcase-card art-${i}`}
             initial={motion ? { opacity: 0, y: 80, rotate: 0 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.25 + i * 0.08, ease }}
           >
-            <CharacterCard front character={c} showName={false} />
+            <img className="showcase-art" src={asset(c.imagePath)} alt="" draggable={false} />
           </m.div>
         ))}
       </div>

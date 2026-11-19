@@ -213,14 +213,7 @@ export function RouletteWheel({
           </linearGradient>
         </defs>
         <circle cx={C} cy={C} r="496" fill="#07070c" />
-        <circle cx={C} cy={C} r="486" fill="none" stroke={`url(#${id}-gold)`} strokeWidth="22" />
         <circle cx={C} cy={C} r="470" fill="#14070b" />
-        <g className="wheel-bulbs">
-          {Array.from({ length: bulbs }, (_, i) => {
-            const [x, y] = polar(486, (360 / bulbs) * i);
-            return <circle key={i} cx={x} cy={y} r="6.5" className={`bulb bulb-${i % 2}`} />;
-          })}
-        </g>
       </svg>
       <div className="wheel-spin" ref={spin} style={typeof rotation === 'number' ? { transform: `rotate(${rotation}deg)` } : undefined}>
         <svg viewBox="0 0 1000 1000" aria-hidden="true">
@@ -308,9 +301,28 @@ export function RouletteWheel({
             <stop offset="1" stopColor="#000" />
           </radialGradient>
         </defs>
-        <circle cx={C} cy={C} r="252" fill="none" stroke={`url(#${id}-hub)`} strokeWidth="14" />
-        <circle cx={C} cy={C} r="238" fill={`url(#${id}-core)`} />
+                <circle cx={C} cy={C} r="238" fill={`url(#${id}-core)`} />
         <circle cx={C} cy={C} r="205" fill="none" stroke="#f3c56b" strokeOpacity=".3" strokeWidth="2" strokeDasharray="3 9" />
+      </svg>
+      <img className="wheel-metal" src={asset('art/wheel-hub.webp')} alt="" draggable={false} />
+      <img className="wheel-metal" src={asset('art/wheel-rim.webp')} alt="" draggable={false} />
+      <svg className="wheel-bulbs" viewBox="0 0 1000 1000" aria-hidden="true">
+        <defs>
+          <radialGradient id={`${id}-bulb`}>
+            <stop stopColor="#fffbe8" />
+            <stop offset=".35" stopColor="#ffd77a" />
+            <stop offset="1" stopColor="#ff9a2e" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {Array.from({ length: bulbs }, (_, i) => {
+          const [x, y] = polar(485, (360 / bulbs) * i);
+          return (
+            <g key={i} className={`bulb bulb-${i % 2}`}>
+              <circle cx={x} cy={y} r="22" fill={`url(#${id}-bulb)`} opacity=".55" />
+              <circle cx={x} cy={y} r="6" fill="#fff6d8" />
+            </g>
+          );
+        })}
       </svg>
       <div className="wheel-center">
         <BrandEmblem />

@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Component, Suspense, useEffect, useRef, useState } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { AnimatePresence, MotionConfig, motion as m } from 'motion/react';
 import { ChevronLeft, Download, Share2, VideoOff, X } from 'lucide-react';
@@ -13,13 +13,13 @@ import ScreenTransition from '../components/ScreenTransition';
 import { usePWA } from '../hooks/usePWA';
 import { roundKey } from '../domain/game';
 import { setVolume, unlockAudio } from '../fx/sound';
-const Home = lazy(() => import('../screens/Home')),
-  SelectMode = lazy(() => import('../screens/SelectMode')),
-  Selection = lazy(() => import('../screens/Selection')),
-  Guess = lazy(() => import('../screens/Guess')),
-  Settings = lazy(() => import('../screens/Settings')),
-  Stats = lazy(() => import('../screens/Stats')),
-  Summary = lazy(() => import('../screens/Summary'));
+import Home from '../screens/Home';
+import SelectMode from '../screens/SelectMode';
+import Selection from '../screens/Selection';
+import Guess from '../screens/Guess';
+import Settings from '../screens/Settings';
+import Stats from '../screens/Stats';
+import Summary from '../screens/Summary';
 class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {

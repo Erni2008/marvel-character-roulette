@@ -6,25 +6,16 @@ export default function ScreenTransition({ children }: { children: ReactNode }) 
   return (
     <m.div
       className="screen-transition"
-      initial={motion ? { opacity: 0, x: 22, scale: 0.985 } : false}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
+      initial={motion ? { opacity: 0, scale: 1.04, filter: 'blur(10px)' } : false}
+      animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
       exit={
         motion
-          ? { opacity: 0, x: -16, transition: { duration: 0.15 } }
+          ? { opacity: 0, scale: 0.97, filter: 'blur(8px)', transition: { duration: 0.22 } }
           : { opacity: 0, transition: { duration: 0 } }
       }
-      transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
-      {motion && (
-        <m.div
-          className="transition-light"
-          initial={{ x: '-110%', opacity: 0.6 }}
-          animate={{ x: '140%', opacity: 0 }}
-          transition={{ duration: 0.6, ease: [0.2, 0.7, 0.2, 1] }}
-          aria-hidden="true"
-        />
-      )}
     </m.div>
   );
 }
