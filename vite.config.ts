@@ -2,7 +2,9 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+const base = process.env.BASE_PATH ?? '/';
 export default defineConfig({
+  base,
   plugins: [
     react(),
     tailwindcss(),
@@ -20,12 +22,12 @@ export default defineConfig({
         'characters/manifest.json',
       ],
       manifest: {
-        id: '/',
+        id: base,
         name: 'Character Roulette',
         short_name: 'Roulette',
         description: 'Draw a card or spin the wheel. Guess the character.',
-        start_url: '/',
-        scope: '/',
+        start_url: base,
+        scope: base,
         display: 'standalone',
         orientation: 'any',
         background_color: '#050811',
@@ -33,10 +35,10 @@ export default defineConfig({
         lang: 'en',
         categories: ['games', 'entertainment'],
         icons: [
-          { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-          { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
           {
-            src: '/icons/maskable-512.png',
+            src: 'icons/maskable-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',

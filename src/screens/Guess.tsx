@@ -4,12 +4,10 @@ import { motion as m } from 'motion/react';
 import { useGame } from '../app/Store';
 import { characterName, roundKey } from '../domain/game';
 import { useCountdown } from '../hooks/useCountdown';
-import {
-  CharacterCard,
-  CircularTimer,
-  IlluminatedFrame,
-  MetallicButton,
-} from '../components/Cinematic';
+import type { CSSProperties } from 'react';
+import { Burst, CharacterCard, CircularTimer, MetallicButton } from '../components/Cinematic';
+import { identity } from '../domain/identity';
+import { sfx } from '../fx/sound';
 export default function Guess() {
   const game = useGame(),
     { session: live, settings, t, settle, advance, saveElapsed, openSettings, motion } = game,
@@ -66,137 +64,114 @@ export default function Guess() {
       window.removeEventListener('roulette:skip', skip);
     };
   }, [isSettled, next, timer.toggle, correct, skip]);
+  const shown = isSettled ? s.remaining : timer.remaining;
+  useEffect(() => {
+    if (!isSettled && timer.running && shown <= 5 && shown > 0) sfx.beep(shown <= 3);
+  }, [shown, isSettled, timer.running]);
+  useEffect(() => {
+    if (!isSettled) return;
+    if (s.outcome === 'correct') sfx.correct();
+    else if (s.outcome === 'timeout') sfx.fail();
+  }, [isSettled, s.outcome]);
+  const id = identity(s.character);
   const outcomeText =
     s.outcome === 'correct'
       ? t('CORRECT!', 'ВЕРНО!')
       : s.outcome === 'timeout'
         ? t('TIME’S UP', 'ВРЕМЯ ВЫШЛО')
         : t('ROUND COMPLETE', 'РАУНД ЗАВЕРШЁН');
+  const name = s.character ? characterName(s.character, settings.language) : '';
   return (
     <section
-      className={`guess-screen reference-screen ${isSettled ? `outcome-${s.outcome}` : ''}`}
+      className={`guess-screen reference-screen ${isSettled ? `outcome-${s.outcome}` : ''} ${shown <= 10 && !isSettled ? 'is-urgent' : ''}`}
+      style={{ '--a': id.a, '--b': id.b, '--glow': id.glow } as CSSProperties}
       aria-labelledby="selected-name"
     >
+      <div className="guess-aura" aria-hidden="true" />
       <header className="guess-header">
         <button
           type="button"
           className="round-badge"
-          aria-label={t(
-            `Round ${s.round}. Pause and open game menu`,
-            `Раунд ${s.round}. Пауза и меню игры`,
-          )}
+          aria-label={t(`Round ${s.round}. Pause and open game menu`, `Раунд ${s.round}. Пауза и меню игры`)}
           onClick={() => {
             timer.pause();
             game.setModal('leave');
           }}
         >
-          <IlluminatedFrame tone="blue" shape="button" />
-          <span className="metallic-title">
-            {t('ROUND', 'РАУНД')} {s.round} / {s.rounds || '∞'}
+          <span className="rb-label">{t('ROUND', 'РАУНД')}</span>
+          <span className="rb-value">
+            {String(s.round).padStart(2, '0')}
+            <em>/{s.rounds ? String(s.rounds).padStart(2, '0') : '∞'}</em>
           </span>
         </button>
+        <div className="round-track" aria-hidden="true">
+          {Array.from({ length: s.rounds || 10 }, (_, i) => {
+            const rec = s.records.find((r) => r.round === i + 1);
+            return (
+              <i
+                key={i}
+                className={`${i < s.round - 1 ? 'round-done' : i === s.round - 1 ? 'round-current' : ''} ${rec ? `rec-${rec.outcome}` : ''}`}
+              />
+            );
+          })}
+        </div>
         {!settings.stream && (
-          <button
-            className="guess-settings"
-            aria-label={t('Game settings', 'Настройки игры')}
-            onClick={openSettings}
-          >
-            <Settings2 size={17} />
+          <button className="guess-settings" aria-label={t('Game settings', 'Настройки игры')} onClick={openSettings}>
+            <Settings2 size={18} />
           </button>
         )}
       </header>
-      <div className="round-track" aria-hidden="true">
-        {Array.from({ length: s.rounds || 10 }, (_, i) => (
-          <i
-            key={i}
-            className={i < s.round - 1 ? 'round-done' : i === s.round - 1 ? 'round-current' : ''}
-          />
-        ))}
-      </div>
       <div className="guess-character">
-        <CharacterCard
-          front
-          showName={false}
-          character={s.character}
-          tone={s.outcome === 'correct' ? 'green' : 'red'}
-        />
+        <m.div
+          className="guess-card-wrap"
+          initial={motion ? { opacity: 0, scale: 0.88, y: 30 } : false}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 110, damping: 16 }}
+        >
+          <CharacterCard front character={s.character} />
+        </m.div>
         {isSettled && (
           <m.div
             className="answer-feedback metallic-title"
-            initial={motion ? { opacity: 0, scale: 0.8 } : false}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={motion ? { opacity: 0, scale: 1.8, rotate: -14 } : false}
+            animate={{ opacity: 1, scale: 1, rotate: -8 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 18 }}
           >
             <span className="outcome-seal">{s.outcome === 'correct' ? <Check /> : <X />}</span>
             <span>{outcomeText}</span>
-            <small>{t('ROUND VERIFIED', 'РАУНД ЗАВЕРШЁН')}</small>
           </m.div>
         )}
+        {isSettled && s.outcome === 'correct' && motion && <Burst color="#2fe38a" count={36} />}
       </div>
-      <div
-        className="answer-nameplate"
-        aria-label={t('Answer for verification', 'Ответ для проверки')}
-      >
-        <span>{t('SELECTED CHARACTER', 'ВЫБРАННЫЙ ПЕРСОНАЖ')}</span>
-        <strong id="selected-name">
-          {s.character ? characterName(s.character, settings.language) : ''}
-        </strong>
-        {settings.language === 'ru' && s.character?.nameRu && <small>{s.character.name}</small>}
+      <div className="guess-panel">
+        <div className="answer-nameplate" aria-label={t('Answer for verification', 'Ответ для проверки')}>
+          <span>{t('THE ANSWER', 'ОТВЕТ')}</span>
+          <m.strong id="selected-name" initial={motion ? { opacity: 0, x: 40 } : false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}>
+            {name}
+          </m.strong>
+          {settings.language === 'ru' && s.character?.nameRu && <small>{s.character.name}</small>}
+        </div>
+        <div className="guess-timer">
+          <CircularTimer remaining={shown} total={s.duration} running={timer.running} settled={isSettled} toggle={timer.toggle} />
+        </div>
+        <div className="guess-controls">
+          <MetallicButton tone="silver" shape="tile" onClick={skip} disabled={isSettled} aria-label={t('Skip character', 'Пропустить персонажа')}>
+            <ChevronsRight />
+            <span>{t('SKIP', 'ПРОПУСК')}</span>
+          </MetallicButton>
+          <MetallicButton tone="green" shape="tile" className="correct-control" onClick={correct} disabled={isSettled} aria-label={t('Correct answer', 'Верный ответ')}>
+            <Check />
+            <span>{t('CORRECT', 'ВЕРНО')}</span>
+          </MetallicButton>
+          <MetallicButton tone={isSettled ? 'gold' : 'silver'} shape="tile" className={isSettled ? 'next-ready' : ''} onClick={next} aria-label={t('Next round', 'Следующий раунд')}>
+            <ArrowRight />
+            <span>{t('NEXT', 'ДАЛЕЕ')}</span>
+          </MetallicButton>
+        </div>
+        <p className="guesser-instruction">
+          {t('GUESSER: LOOK AWAY · EVERYONE ELSE: GIVE CLUES', 'УГАДЫВАЮЩИЙ НЕ СМОТРИТ · ОСТАЛЬНЫЕ ПОДСКАЗЫВАЮТ')}
+        </p>
       </div>
-      <div className="guess-timer">
-        <span className="timer-caption">{t('TIME REMAINING', 'ОСТАЛОСЬ ВРЕМЕНИ')}</span>
-        <CircularTimer
-          remaining={isSettled ? s.remaining : timer.remaining}
-          total={s.duration}
-          running={timer.running}
-          settled={isSettled}
-          toggle={timer.toggle}
-        />
-        <span className="timer-hint">
-          {isSettled
-            ? t('ROUND COMPLETE', 'РАУНД ЗАВЕРШЁН')
-            : timer.running
-              ? t('Pause', 'Пауза')
-              : t('Resume', 'Продолжить')}
-        </span>
-      </div>
-      <div className="guess-controls">
-        <MetallicButton
-          tone="blue"
-          shape="tile"
-          onClick={skip}
-          disabled={isSettled}
-          aria-label={t('Skip character', 'Пропустить персонажа')}
-        >
-          <ChevronsRight />
-          <span>{t('SKIP', 'ПРОПУСК')}</span>
-        </MetallicButton>
-        <MetallicButton
-          tone="green"
-          shape="tile"
-          className="correct-control"
-          onClick={correct}
-          disabled={isSettled}
-          aria-label={t('Correct answer', 'Верный ответ')}
-        >
-          <Check />
-          <span>{t('CORRECT', 'ВЕРНО')}</span>
-        </MetallicButton>
-        <MetallicButton
-          tone="silver"
-          shape="tile"
-          onClick={next}
-          aria-label={t('Next round', 'Следующий раунд')}
-        >
-          <ArrowRight />
-          <span>{t('NEXT', 'ДАЛЕЕ')}</span>
-        </MetallicButton>
-      </div>
-      <p className="guesser-instruction">
-        {t(
-          'GUESSER: LOOK AWAY · EVERYONE ELSE: GIVE CLUES',
-          'УГАДЫВАЮЩИЙ НЕ СМОТРИТ НА ЭКРАН · ОСТАЛЬНЫЕ ПОМОГАЮТ',
-        )}
-      </p>
     </section>
   );
 }

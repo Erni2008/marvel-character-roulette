@@ -119,3 +119,10 @@ docs/studio/screenshots/**/*.png
 !docs/studio/screenshots/webkit/guess-390.png
 !docs/studio/screenshots/iphone-landscape-ru.png
 !docs/studio/screenshots/card-active-390.png
+
+# web build
+/dist/
+/test-results/
+/playwright-report/
+/node_modules/
+*.tsbuildinfo

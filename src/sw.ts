@@ -23,7 +23,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (
     url.origin !== self.location.origin ||
-    !url.pathname.startsWith('/characters/') ||
+    !url.pathname.includes('/characters/') ||
     !url.pathname.toLowerCase().endsWith('.png')
   )
     return;

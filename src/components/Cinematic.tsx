@@ -1,240 +1,89 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
 import { motion as m } from 'motion/react';
 import type { MotionValue } from 'motion/react';
 import { characterName } from '../domain/game';
 import type { Character } from '../domain/game';
+import { asset, identity, monogram } from '../domain/identity';
 import { useGame } from '../app/Store';
-export type Tone = 'red' | 'blue' | 'green' | 'silver';
+import { sfx } from '../fx/sound';
+
+export type Tone = 'red' | 'blue' | 'green' | 'silver' | 'gold';
 const hues: Record<Tone, string> = {
-  red: '#ff304c',
-  blue: '#258bff',
-  green: '#39ff8d',
-  silver: '#bfc8d8',
+  red: '#ff2e43',
+  blue: '#3d8bff',
+  green: '#2fe38a',
+  silver: '#c9d2e3',
+  gold: '#f3c56b',
 };
-function bevel(w: number, h: number, c: number, inset = 0) {
-  const x = inset,
-    y = inset,
-    r = w - inset,
-    b = h - inset,
-    k = c;
-  return `M${x + k} ${y}H${r - k}L${r} ${y + k}V${b - k}L${r - k} ${b}H${x + k}L${x} ${b - k}V${y + k}Z`;
+
+/** Kept for API compatibility: a thin luminous corner frame. */
+export function IlluminatedFrame({ tone = 'red', className = '' }: { tone?: Tone; shape?: string; className?: string }) {
+  return <span className={`lux-frame ${className}`} style={{ '--accent': hues[tone] } as CSSProperties} aria-hidden="true" />;
 }
-export function IlluminatedFrame({
-  tone = 'red',
-  shape = 'panel',
-  className = '',
-}: {
-  tone?: Tone;
-  shape?: 'panel' | 'button' | 'card' | 'tile';
-  className?: string;
-}) {
-  const id = useId().replace(/:/g, ''),
-    color = hues[tone],
-    w = shape === 'card' ? 700 : 1000,
-    h = shape === 'button' ? 245 : shape === 'tile' ? 920 : shape === 'card' ? 1000 : 760,
-    c = shape === 'button' ? 90 : shape === 'tile' ? 140 : shape === 'card' ? 45 : 76;
-  return (
-    <svg
-      className={`illuminated-frame ${className}`}
-      viewBox={`0 0 ${w} ${h}`}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id={`${id}-metal`} x1="0" x2=".85" y2="1">
-          <stop stopColor="#ecf4ff" />
-          <stop offset=".08" stopColor="#4e5971" />
-          <stop offset=".25" stopColor="#141b2c" />
-          <stop offset=".49" stopColor="#78819a" />
-          <stop offset=".53" stopColor="#171b29" />
-          <stop offset=".85" stopColor="#343b51" />
-          <stop offset="1" stopColor="#d0d4e0" />
-        </linearGradient>
-        <linearGradient id={`${id}-surface`} x2=".4" y2="1">
-          <stop stopColor={tone === 'red' ? '#300511' : tone === 'green' ? '#06261c' : '#142239'} />
-          <stop
-            offset=".16"
-            stopColor={tone === 'red' ? '#30030f' : tone === 'green' ? '#03251a' : '#0a0c17'}
-          />
-          <stop
-            offset=".55"
-            stopColor={tone === 'red' ? '#310410' : tone === 'green' ? '#03180f' : '#070d1a'}
-          />
-          <stop offset="1" stopColor="#03050b" />
-        </linearGradient>
-        <linearGradient id={`${id}-edge`} x2="1" y2=".3">
-          <stop stopColor={color} stopOpacity=".5" />
-          <stop offset=".2" stopColor="#fff4ff" />
-          <stop offset=".34" stopColor={color} />
-          <stop offset=".7" stopColor={color} />
-          <stop offset=".9" stopColor="#fff4ff" />
-          <stop offset="1" stopColor={color} />
-        </linearGradient>
-        <linearGradient id={`${id}-sheen`} x2=".7" y2="1">
-          <stop stopColor="#fff" stopOpacity=".16" />
-          <stop offset=".14" stopColor="#fff" stopOpacity=".015" />
-          <stop offset=".46" stopColor="#fff" stopOpacity="0" />
-          <stop offset=".5" stopColor="#fff" stopOpacity=".035" />
-          <stop offset=".51" stopColor="#fff" stopOpacity="0" />
-        </linearGradient>
-        <filter id={`${id}-light`} x="-20%" y="-25%" width="140%" height="150%">
-          <feGaussianBlur stdDeviation={shape === 'card' ? 6 : 5} />
-        </filter>
-      </defs>
-      <path
-        className="frame-foundation"
-        d={bevel(w, h, c, 8)}
-        fill="#010208"
-        stroke="#02030a"
-        strokeWidth="17"
-      />
-      <path
-        className="frame-glow"
-        d={bevel(w, h, c, 19)}
-        fill="none"
-        stroke={color}
-        strokeWidth="17"
-        opacity=".8"
-        filter={`url(#${id}-light)`}
-      />
-      <path
-        className="frame-metal"
-        d={bevel(w, h, c, 11)}
-        fill={`url(#${id}-surface)`}
-        stroke={`url(#${id}-metal)`}
-        strokeWidth="8"
-      />
-      <path
-        className="frame-edge"
-        d={bevel(w, h, c - 4, 22)}
-        fill="none"
-        stroke={`url(#${id}-edge)`}
-        strokeWidth={tone === 'silver' ? 2 : tone === 'blue' ? 5 : 8}
-      />
-      <path
-        className="frame-sheen"
-        d={bevel(w, h, c - 10, 31)}
-        fill={`url(#${id}-sheen)`}
-        stroke={color}
-        strokeOpacity=".4"
-        strokeWidth="1.4"
-      />
-      <path
-        d={`M${c + 13} 36H${w - c - 13}M36 ${c + 15}V${h - c - 15}M${c + 13} ${h - 36}H${w - c - 13}M${w - 36} ${c + 15}V${h - c - 15}`}
-        fill="none"
-        stroke="#d5ddec"
-        strokeOpacity=".12"
-        strokeWidth="2"
-      />
-      {shape !== 'button' && (
-        <g stroke={color} opacity=".55" fill="none" strokeWidth="2">
-          <path
-            d={`M45 ${c + 12}L${c + 13} 45H${c + 73}L${c + 40} 73H${c + 8}L73 ${c + 8}V${c + 46}L45 ${c + 73}ZM52 ${h - c - 10}L${c + 9} ${h - 52}H${c + 65}L${c + 39} ${h - 77}H${c + 15}L77 ${h - c - 15}V${h - c - 45}Z`}
-          />
-          <path
-            d={`M${w - 45} ${c + 12}L${w - c - 13} 45H${w - c - 73}L${w - c - 40} 73H${w - c - 8}L${w - 73} ${c + 8}V${c + 46}L${w - 45} ${c + 73}Z`}
-          />
-        </g>
-      )}
-      <path
-        d={`M${w * 0.34} 20H${w * 0.66}M${w * 0.34} ${h - 20}H${w * 0.66}`}
-        stroke={color}
-        strokeWidth="6"
-      />
-      <path
-        d={`M${w * 0.46} 20H${w * 0.54}M${w * 0.46} ${h - 20}H${w * 0.54}`}
-        stroke="#fff1f4"
-        strokeWidth="3"
-      />
-      <g fill="#a0adc4" opacity=".45">
-        <circle cx="28" cy={h * 0.26} r="3" />
-        <circle cx={w - 28} cy={h * 0.74} r="3" />
-      </g>
-    </svg>
-  );
-}
+
 export function MetallicButton({
   children,
   tone = 'red',
   shape = 'button',
   className = '',
+  onClick,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & {
-  tone?: Tone;
-  shape?: 'button' | 'tile';
-  children: ReactNode;
-}) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { tone?: Tone; shape?: 'button' | 'tile'; children: ReactNode }) {
   const { motion } = useGame();
-  const { onAnimationStart: _, onDrag: __, onDragStart: ___, onDragEnd: ____, ...props } = rest;
+  const { onAnimationStart: _a, onDrag: _b, onDragStart: _c, onDragEnd: _d, ...props } = rest;
   return (
     <m.button
       type="button"
       {...props}
+      onClick={(e) => {
+        sfx.click();
+        onClick?.(e);
+      }}
       className={`metallic-button tone-${tone} ${shape === 'tile' ? 'metallic-tile' : ''} ${className}`}
       style={{ '--accent': hues[tone], ...props.style } as CSSProperties}
-      whileTap={motion ? { scale: 0.965, y: 2 } : undefined}
-      whileHover={motion ? { scale: 1.015 } : undefined}
-      transition={{ type: 'spring', stiffness: 450, damping: 30 }}
+      whileTap={motion ? { scale: 0.96 } : undefined}
+      transition={{ type: 'spring', stiffness: 520, damping: 28 }}
     >
-      <IlluminatedFrame tone={tone} shape={shape} />
+      <span className="btn-plate" aria-hidden="true" />
       <span className="metallic-button-content">{children}</span>
       <span className="button-sweep" aria-hidden="true" />
     </m.button>
   );
 }
+
 export function BrandEmblem({ className = '' }: { className?: string }) {
   const id = useId().replace(/:/g, '');
   return (
-    <svg viewBox="0 0 160 180" className={`brand-emblem ${className}`} aria-hidden="true">
+    <svg viewBox="0 0 200 200" className={`brand-emblem ${className}`} aria-hidden="true">
       <defs>
-        <linearGradient id={`${id}-silver`} x1=".1" y1="0" x2=".9" y2="1">
-          <stop stopColor="#eef5ff" />
-          <stop offset=".29" stopColor="#6b7897" />
-          <stop offset=".5" stopColor="#f4f7ff" />
-          <stop offset=".58" stopColor="#69728c" />
-          <stop offset=".8" stopColor="#1c2436" />
-          <stop offset="1" stopColor="#c9d4e8" />
+        <linearGradient id={`${id}-g`} x1="0" y1="0" x2="1" y2="1">
+          <stop stopColor="#fff3d1" />
+          <stop offset=".35" stopColor="#f0b34a" />
+          <stop offset=".55" stopColor="#8a5a16" />
+          <stop offset=".8" stopColor="#f7d488" />
+          <stop offset="1" stopColor="#7a4e12" />
         </linearGradient>
+        <radialGradient id={`${id}-c`}>
+          <stop stopColor="#ff3a4c" />
+          <stop offset=".7" stopColor="#8c0717" />
+          <stop offset="1" stopColor="#3a020a" />
+        </radialGradient>
       </defs>
-      <circle cx="80" cy="91" r="57" fill="#060a13" stroke="#05060b" strokeWidth="11" />
-      <circle
-        cx="80"
-        cy="87"
-        r="57"
-        fill="none"
-        stroke={`url(#${id}-silver)`}
-        strokeWidth="4"
-        strokeDasharray="285 75"
-        transform="rotate(-40 80 87)"
-      />
-      <path
-        d="M103 10 40 99 75 89 57 164 123 66 88 79Z"
-        fill="#03050a"
-        stroke="#03040a"
-        strokeWidth="8"
-        transform="translate(3 5)"
-      />
-      <path
-        d="M103 10 40 99 75 89 57 164 123 66 88 79Z"
-        fill={`url(#${id}-silver)`}
-        stroke="#c0cadc"
-        strokeWidth="1"
-      />
-      <path
-        d="m103 10-27 78-36 11m83-33-36 29-30 69"
-        stroke="#e9324a"
-        opacity=".7"
-        fill="none"
-        strokeWidth="1.4"
-      />
+      <circle cx="100" cy="100" r="92" fill={`url(#${id}-c)`} stroke={`url(#${id}-g)`} strokeWidth="7" />
+      <circle cx="100" cy="100" r="78" fill="none" stroke="#ffd98a" strokeOpacity=".35" strokeWidth="1.5" strokeDasharray="2 5" />
+      <path d="M100 26 L117 79 L173 79 L128 111 L145 165 L100 132 L55 165 L72 111 L27 79 L83 79 Z" fill={`url(#${id}-g)`} stroke="#3a0208" strokeWidth="3" />
     </svg>
   );
 }
+
+function Pattern({ kind }: { kind: string }) {
+  return <div className={`cc-pattern pattern-${kind}`} aria-hidden="true" />;
+}
+
 export function CharacterCard({
   character,
   front = false,
-  tone = 'red',
   className = '',
   showName = true,
 }: {
@@ -246,57 +95,48 @@ export function CharacterCard({
 }) {
   const [broken, setBroken] = useState(false);
   const { settings } = useGame();
-  const displayName = character ? characterName(character, settings.language) : '';
+  const name = character ? characterName(character, settings.language) : '';
+  const id = identity(character);
+  const style = { '--a': id.a, '--b': id.b, '--glow': id.glow } as CSSProperties;
+  if (!front || !character)
+    return (
+      <div className={`character-card card-back ${className}`} aria-hidden="true">
+        <div className="cb-field" />
+        <div className="cb-rays" />
+        <div className="cb-border" />
+        <BrandEmblem className="cb-emblem" />
+        <span className="cb-word cb-top">CHARACTER</span>
+        <span className="cb-word cb-bottom">ROULETTE</span>
+        <div className="cc-foil" />
+      </div>
+    );
+  const art = character.imagePath && !broken;
   return (
-    <div
-      className={`character-card ${front ? 'card-front' : 'card-back'} ${!front || !character?.imagePath || broken ? 'has-prop-render' : ''} ${className}`}
-      style={{ '--accent': hues[tone] } as CSSProperties}
-      data-character-id={character?.id}
-    >
-      <IlluminatedFrame tone={tone} shape="card" />
-      <div className="card-content">
-        <div className="card-hex-texture" />
-        <div className="card-diagonal-sheen" />
-        {!front && (
-          <img className="prop-card-render" src="/art/prop-card.webp" alt="" draggable={false} />
-        )}
-        {front ? (
-          <>
-            {character?.imagePath && !broken ? (
-              <img
-                className="character-art"
-                src={character.imagePath}
-                alt={displayName}
-                onError={() => setBroken(true)}
-                draggable={false}
-              />
-            ) : (
-              <img
-                className="prop-card-render neutral-silhouette unknown-artwork"
-                src="/art/prop-card-front.webp"
-                alt=""
-                draggable={false}
-              />
-            )}
-          </>
-        ) : null}
-      </div>
-      <div className="card-edge-hardware" aria-hidden="true">
-        <i />
-        <i />
-        <i />
-        <i />
-      </div>
-      <div className="card-lens-flare top-flare" />
-      <div className="card-lens-flare bottom-flare" />
-      {front && character && showName && (
-        <div className="character-name" title={displayName}>
-          {displayName}
+    <div className={`character-card card-front ${className}`} style={style} data-character-id={character.id}>
+      <div className="cc-bg" />
+      <Pattern kind={id.pattern} />
+      <div className="cc-halftone" />
+      {art ? (
+        <img className="character-art" src={asset(character.imagePath)} alt={name} onError={() => setBroken(true)} draggable={false} />
+      ) : (
+        <div className="cc-mono neutral-silhouette" aria-hidden="true">
+          <span className="cc-mono-shadow">{monogram(character.name)}</span>
+          <span className="cc-mono-fill">{monogram(character.name)}</span>
+        </div>
+      )}
+      <div className="cc-vignette" />
+      <div className="cc-foil" />
+      <div className="cc-border" />
+      <span className="cc-number">№ {character.id.replace(/\D/g, '').padStart(3, '0')}</span>
+      {showName && (
+        <div className="character-name" title={name}>
+          <span>{name}</span>
         </div>
       )}
     </div>
   );
 }
+
 export function CardFan() {
   return (
     <div className="card-fan" aria-hidden="true">
@@ -308,200 +148,173 @@ export function CardFan() {
     </div>
   );
 }
+
+const C = 500;
+const polar = (r: number, a: number) => [C + r * Math.cos(((a - 90) * Math.PI) / 180), C + r * Math.sin(((a - 90) * Math.PI) / 180)];
+function arc(r1: number, r2: number, a1: number, a2: number) {
+  const big = a2 - a1 > 180 ? 1 : 0,
+    p = polar(r2, a1),
+    q = polar(r2, a2),
+    s = polar(r1, a2),
+    t = polar(r1, a1);
+  return `M${p.join(' ')}A${r2} ${r2} 0 ${big} 1 ${q.join(' ')}L${s.join(' ')}A${r1} ${r1} 0 ${big} 0 ${t.join(' ')}Z`;
+}
+
 export function RouletteWheel({
   rotation = 0,
-  count = 120,
+  count = 40,
+  entries,
   selectedIndex = -1,
   decorative = false,
 }: {
   rotation?: number | MotionValue<number>;
   count?: number;
+  entries?: Character[];
   selectedIndex?: number;
   decorative?: boolean;
 }) {
   const id = useId().replace(/:/g, '');
-  const rotor = useRef<SVGGElement>(null);
+  const spin = useRef<HTMLDivElement>(null);
+  const { settings } = useGame();
+  const n = entries?.length || count;
   useEffect(() => {
     if (typeof rotation === 'number') return;
-    return rotation.on('change', (v) =>
-      rotor.current?.setAttribute('transform', `rotate(${v} 180 180)`),
-    );
+    const apply = (v: number) => {
+      if (spin.current) spin.current.style.transform = `rotate(${v}deg)`;
+    };
+    apply(rotation.get());
+    return rotation.on('change', apply);
   }, [rotation]);
-  if (decorative)
-    return (
-      <div className="roulette-wheel wheel-decorative">
-        <img src="/art/prop-wheel.webp" alt="" draggable={false} />
-      </div>
-    );
-  const angle = 360 / count;
-  const polar = (r: number, a: number) => [
-    180 + r * Math.cos(((a - 90) * Math.PI) / 180),
-    180 + r * Math.sin(((a - 90) * Math.PI) / 180),
-  ];
-  const arc = (start: number, end: number) => {
-    const a = polar(149, start),
-      b = polar(149, end),
-      c = polar(114, end),
-      d = polar(114, start);
-    return `M${a.join(' ')}A149 149 0 ${end - start > 180 ? 1 : 0} 1 ${b.join(' ')}L${c.join(' ')}A114 114 0 ${end - start > 180 ? 1 : 0} 0 ${d.join(' ')}Z`;
-  };
+  const step = 360 / n;
+  const segments = useMemo(
+    () =>
+      Array.from({ length: n }, (_, i) => {
+        const c = entries?.[i],
+          ident = identity(c ?? { id: `x-${i}`, name: '', imagePath: '', enabled: true });
+        return { c, ident, d: arc(250, 452, i * step, (i + 1) * step) };
+      }),
+    [n, entries, step],
+  );
+  const bulbs = 36;
   return (
     <div className={`roulette-wheel ${decorative ? 'wheel-decorative' : ''}`}>
-      <svg viewBox="0 0 360 360" aria-hidden="true">
+      <div className="wheel-shadow" />
+      <svg className="wheel-frame" viewBox="0 0 1000 1000" aria-hidden="true">
         <defs>
-          <linearGradient id={`${id}-rim`} x2=".7" y2="1">
-            <stop stopColor="#f5f7ff" />
-            <stop offset=".2" stopColor="#31496f" />
-            <stop offset=".42" stopColor="#11162b" />
-            <stop offset=".6" stopColor="#a5b4cf" />
-            <stop offset=".72" stopColor="#26304b" />
-            <stop offset="1" stopColor="#d6dced" />
+          <linearGradient id={`${id}-gold`} x1="0" y1="0" x2="1" y2="1">
+            <stop stopColor="#fff1c9" />
+            <stop offset=".22" stopColor="#c8891f" />
+            <stop offset=".45" stopColor="#5e3a08" />
+            <stop offset=".62" stopColor="#f6d27f" />
+            <stop offset=".82" stopColor="#8a5a12" />
+            <stop offset="1" stopColor="#ffe6a3" />
           </linearGradient>
-          <linearGradient id={`${id}-blue`} x2="1" y2="1">
-            <stop stopColor="#486381" />
-            <stop offset=".4" stopColor="#142944" />
-            <stop offset=".6" stopColor="#0d1c30" />
-            <stop offset="1" stopColor="#273d58" />
-          </linearGradient>
-          <linearGradient id={`${id}-red`} x2="1" y2="1">
-            <stop stopColor="#a54952" />
-            <stop offset=".4" stopColor="#521d2b" />
-            <stop offset=".65" stopColor="#2c111d" />
-            <stop offset="1" stopColor="#7c293c" />
-          </linearGradient>
-          <radialGradient id={`${id}-hub`}>
-            <stop stopColor="#222c43" />
-            <stop offset=".7" stopColor="#080b15" />
-            <stop offset=".9" stopColor="#4a5672" />
-            <stop offset="1" stopColor="#0b101c" />
-          </radialGradient>
         </defs>
-        <circle cx="180" cy="180" r="171" fill="#02040b" stroke="#04070e" strokeWidth="11" />
-        <circle
-          cx="180"
-          cy="180"
-          r="168"
-          fill="#0b1527"
-          stroke={`url(#${id}-rim)`}
-          strokeWidth="7"
-        />
-        <circle
-          cx="180"
-          cy="180"
-          r="159"
-          fill="none"
-          stroke="#258bff"
-          strokeWidth="2"
-          className="wheel-light"
-        />
-        <g
-          ref={rotor}
-          className="wheel-rotor"
-          transform={`rotate(${typeof rotation === 'number' ? rotation : rotation.get()} 180 180)`}
-        >
-          {Array.from({ length: count }, (_, i) => (
-            <path
-              key={i}
-              d={arc(i * angle + 0.25, (i + 1) * angle - 0.25)}
-              fill={
-                i === selectedIndex
-                  ? '#e8c38b'
-                  : i % 5 === 0
-                    ? i % 2
-                      ? '#71333f'
-                      : '#5b2733'
-                    : i % 2
-                      ? '#26313f'
-                      : '#17212e'
-              }
-              stroke="#a4afc3"
-              strokeOpacity=".27"
-              strokeWidth=".6"
-              data-wheel-index={i}
-              data-selected={i === selectedIndex ? true : undefined}
-            />
-          ))}
-          {Array.from({ length: Math.min(count, 24) }, (_, i) => {
-            const a = (360 / Math.min(count, 24)) * i,
-              p = polar(154, a),
-              q = polar(164, a);
-            return (
-              <path
-                key={i}
-                d={`M${p.join(' ')}L${q.join(' ')}`}
-                stroke={i % 2 ? '#ff304c' : '#68b4ff'}
-                strokeWidth={i % 3 === 0 ? 3 : 1}
-              />
-            );
-          })}
-          {!decorative &&
-            Array.from({ length: Math.min(count, 12) }, (_, i) => {
-              const index = Math.floor((i * count) / Math.min(count, 12)),
-                p = polar(129, (index + 0.5) * angle);
-              return (
-                <text
-                  key={i}
-                  x={p[0]}
-                  y={p[1]}
-                  fill="#edf4ff"
-                  fontSize="8"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  transform={`rotate(${(index + 0.5) * angle} ${p[0]} ${p[1]})`}
-                >
-                  {String(index + 1).padStart(3, '0')}
-                </text>
-              );
-            })}
-        </g>
-        <circle
-          cx="180"
-          cy="180"
-          r="153"
-          fill="none"
-          stroke="#b9cbe3"
-          strokeOpacity=".3"
-          strokeWidth=".6"
-        />
-        <circle
-          cx="180"
-          cy="180"
-          r="165"
-          fill="none"
-          stroke="#a6b6cd"
-          strokeOpacity=".4"
-          strokeWidth="1"
-          strokeDasharray=".5 3"
-        />
-        <circle cx="180" cy="180" r="112" fill="none" stroke="#02040a" strokeWidth="6" />
-        <circle cx="180" cy="180" r="108" fill="none" stroke={`url(#${id}-rim)`} strokeWidth="7" />
-        <circle cx="180" cy="180" r="95" fill="none" stroke="#375b90" strokeWidth="1" />
-        <circle
-          cx="180"
-          cy="180"
-          r="76"
-          fill={`url(#${id}-hub)`}
-          stroke="#aab3c9"
-          strokeWidth="3"
-        />
-        <path d="M180 10 190 30 180 26 170 30Z" fill="#e6d9bd" stroke="#9f845e" strokeWidth="1" />
-        <g stroke="#b7c4db" strokeWidth="1" opacity=".6">
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => {
-            const p = polar(103, a),
-              q = polar(109, a);
-            return <path key={a} d={`M${p.join(' ')}L${q.join(' ')}`} />;
+        <circle cx={C} cy={C} r="496" fill="#07070c" />
+        <circle cx={C} cy={C} r="486" fill="none" stroke={`url(#${id}-gold)`} strokeWidth="22" />
+        <circle cx={C} cy={C} r="470" fill="#14070b" />
+        <g className="wheel-bulbs">
+          {Array.from({ length: bulbs }, (_, i) => {
+            const [x, y] = polar(486, (360 / bulbs) * i);
+            return <circle key={i} cx={x} cy={y} r="6.5" className={`bulb bulb-${i % 2}`} />;
           })}
         </g>
       </svg>
-      <div className="wheel-hub-reflection" aria-hidden="true" />
-      <div className="wheel-wordmark" aria-hidden="true">
-        CR
+      <div className="wheel-spin" ref={spin} style={typeof rotation === 'number' ? { transform: `rotate(${rotation}deg)` } : undefined}>
+        <svg viewBox="0 0 1000 1000" aria-hidden="true">
+          <defs>
+            <radialGradient id={`${id}-shade`} cx="50%" cy="50%" r="50%">
+              <stop offset=".5" stopColor="#000" stopOpacity=".55" />
+              <stop offset=".75" stopColor="#000" stopOpacity="0" />
+              <stop offset=".93" stopColor="#000" stopOpacity=".05" />
+              <stop offset="1" stopColor="#000" stopOpacity=".5" />
+            </radialGradient>
+          </defs>
+          <g className="wheel-rotor">
+            {segments.map(({ d, ident }, i) => (
+              <path
+                key={i}
+                d={d}
+                fill={i % 2 ? ident.a : ident.b}
+                className={i === selectedIndex ? 'seg seg-win' : 'seg'}
+                style={{ '--glow': ident.glow } as CSSProperties}
+                stroke="#f3c56b"
+                strokeOpacity=".55"
+                strokeWidth="1.6"
+                data-wheel-index={i}
+                data-selected={i === selectedIndex ? true : undefined}
+              />
+            ))}
+            <circle cx={C} cy={C} r="452" fill={`url(#${id}-shade)`} pointerEvents="none" />
+            {!decorative &&
+              segments.map(({ c }, i) => {
+                const a = (i + 0.5) * step,
+                  [x, y] = polar(352, a),
+                  label = c ? characterName(c, settings.language) : String(i + 1).padStart(2, '0');
+                const size = n > 48 ? 15 : n > 30 ? 19 : 24;
+                return (
+                  <text
+                    key={`t${i}`}
+                    x={x}
+                    y={y}
+                    className={i === selectedIndex ? 'seg-label seg-label-win' : 'seg-label'}
+                    fontSize={label.length > 15 ? size * 0.82 : size}
+                    textAnchor="middle"
+                    dominantBaseline="central"
+                    transform={`rotate(${a - 90} ${x} ${y})`}
+                  >
+                    {label.toUpperCase()}
+                  </text>
+                );
+              })}
+            {Array.from({ length: n }, (_, i) => {
+              const [x1, y1] = polar(452, i * step),
+                [x2, y2] = polar(250, i * step);
+              return <line key={`l${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#f7d488" strokeOpacity=".7" strokeWidth="2" />;
+            })}
+          </g>
+        </svg>
       </div>
-      <div className="wheel-flare flare-blue" />
-      <div className="wheel-flare flare-red" />
+      <svg className="wheel-hub" viewBox="0 0 1000 1000" aria-hidden="true">
+        <defs>
+          <linearGradient id={`${id}-hub`} x1="0" y1="0" x2="1" y2="1">
+            <stop stopColor="#fff1c9" />
+            <stop offset=".3" stopColor="#b47a1a" />
+            <stop offset=".55" stopColor="#4a2c05" />
+            <stop offset=".75" stopColor="#e9bf63" />
+            <stop offset="1" stopColor="#6b430c" />
+          </linearGradient>
+          <radialGradient id={`${id}-core`}>
+            <stop stopColor="#2a0910" />
+            <stop offset=".8" stopColor="#0b0306" />
+            <stop offset="1" stopColor="#000" />
+          </radialGradient>
+        </defs>
+        <circle cx={C} cy={C} r="252" fill="none" stroke={`url(#${id}-hub)`} strokeWidth="14" />
+        <circle cx={C} cy={C} r="238" fill={`url(#${id}-core)`} />
+        <circle cx={C} cy={C} r="205" fill="none" stroke="#f3c56b" strokeOpacity=".3" strokeWidth="2" strokeDasharray="3 9" />
+      </svg>
+      <div className="wheel-center">
+        <BrandEmblem />
+      </div>
+      <div className="wheel-gloss" />
+      <div className="wheel-pointer" aria-hidden="true">
+        <svg viewBox="0 0 80 110">
+          <defs>
+            <linearGradient id={`${id}-ptr`} x1="0" x2="1">
+              <stop stopColor="#fff3d1" />
+              <stop offset=".5" stopColor="#e0a33a" />
+              <stop offset="1" stopColor="#7a4e12" />
+            </linearGradient>
+          </defs>
+          <path d="M40 106 L8 30 A34 34 0 1 1 72 30 Z" fill={`url(#${id}-ptr)`} stroke="#3a0208" strokeWidth="3" />
+          <circle cx="40" cy="34" r="13" fill="#c8102e" stroke="#fff1c9" strokeWidth="3" />
+        </svg>
+      </div>
     </div>
   );
 }
+
 export function CircularTimer({
   remaining,
   total,
@@ -517,147 +330,92 @@ export function CircularTimer({
 }) {
   const { t } = useGame(),
     id = useId().replace(/:/g, ''),
-    time = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`;
+    ratio = total ? remaining / total : 0,
+    urgent = remaining <= 10 && !settled,
+    time = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')}`;
+  const R = 88,
+    L = 2 * Math.PI * R;
+  const [x, y] = [100 + R * Math.sin(ratio * 2 * Math.PI), 100 - R * Math.cos(ratio * 2 * Math.PI)];
   return (
     <button
-      className={`circular-timer ${running ? 'is-running' : ''} ${remaining <= 10 ? 'urgent' : ''}`}
+      className={`circular-timer ${running ? 'is-running' : ''} ${urgent ? 'urgent' : ''} ${settled ? 'is-settled' : ''}`}
       onClick={toggle}
       disabled={settled}
-      aria-label={
-        settled
-          ? t('Round complete', 'Раунд завершён')
-          : running
-            ? t('Pause timer', 'Приостановить таймер')
-            : t('Resume timer', 'Продолжить таймер')
-      }
+      aria-label={settled ? t('Round complete', 'Раунд завершён') : running ? t('Pause timer', 'Приостановить таймер') : t('Resume timer', 'Продолжить таймер')}
     >
       <svg viewBox="0 0 200 200" aria-hidden="true">
         <defs>
-          <radialGradient id={`${id}-center`}>
-            <stop stopColor="#172033" />
-            <stop offset=".75" stopColor="#080d17" />
-            <stop offset="1" stopColor="#1d2637" />
-          </radialGradient>
-          <linearGradient id={`${id}-metal`} x2="1" y2="1">
-            <stop stopColor="#a0a8b9" />
-            <stop offset=".25" stopColor="#172235" />
-            <stop offset=".6" stopColor="#626b7d" />
-            <stop offset="1" stopColor="#121a29" />
+          <linearGradient id={`${id}-arc`} x1="0" y1="0" x2="1" y2="1">
+            <stop stopColor={urgent ? '#ff8a8a' : '#ffe6a3'} />
+            <stop offset="1" stopColor={urgent ? '#ff1f3d' : '#e0a33a'} />
           </linearGradient>
-          <mask id={`${id}-remaining`}>
-            <circle
-              cx="100"
-              cy="100"
-              r="87"
-              fill="none"
-              stroke="white"
-              strokeWidth="12"
-              pathLength="100"
-              strokeDasharray={`${(remaining / total) * 100} 100`}
-            />
-          </mask>
+          <filter id={`${id}-blur`} x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="4" />
+          </filter>
         </defs>
-        <circle
-          cx="100"
-          cy="100"
-          r="96"
-          fill="#040710"
-          stroke={`url(#${id}-metal)`}
-          strokeWidth="1.5"
-        />
-        <circle
-          cx="100"
-          cy="100"
-          r="87"
-          fill={`url(#${id}-center)`}
-          stroke="#252839"
-          strokeWidth="9"
-        />
-        <circle
-          className="timer-segments"
-          cx="100"
-          cy="100"
-          r="87"
-          pathLength="120"
-          fill="none"
-          stroke="#fb465d"
-          strokeWidth="9"
-          strokeDasharray=".65 .35"
-          mask={`url(#${id}-remaining)`}
-        />
-        <circle
-          className="timer-progress"
-          cx="100"
-          cy="100"
-          r="80"
-          fill="none"
-          stroke="#fa8a91"
-          strokeWidth=".65"
-          pathLength="100"
-          strokeDasharray="100"
-          strokeDashoffset={100 - (remaining / total) * 100}
-        />
-        <circle
-          cx="100"
-          cy="100"
-          r="74"
-          fill="none"
-          stroke="#a7b6cf"
-          strokeWidth=".4"
-          strokeOpacity=".28"
-        />
-        {Array.from({ length: 12 }, (_, i) => (
-          <path
-            key={i}
-            d="M100 31V35"
-            stroke="#c1c9d9"
-            strokeOpacity={i % 3 === 0 ? '.7' : '.25'}
-            strokeWidth={i % 3 === 0 ? 1 : 0.5}
-            transform={`rotate(${i * 30} 100 100)`}
-          />
+        <circle cx="100" cy="100" r="98" className="tm-plate" />
+        <circle cx="100" cy="100" r={R} fill="none" stroke="#ffffff" strokeOpacity=".07" strokeWidth="9" />
+        {Array.from({ length: 60 }, (_, i) => (
+          <line key={i} x1="100" y1="22" x2="100" y2={i % 5 ? 26 : 30} stroke="#fff" strokeOpacity={i % 5 ? 0.15 : 0.4} strokeWidth={i % 5 ? 0.8 : 1.4} transform={`rotate(${i * 6} 100 100)`} />
         ))}
+        <circle cx="100" cy="100" r={R} fill="none" stroke={`url(#${id}-arc)`} strokeWidth="9" strokeLinecap="round" strokeDasharray={`${L * ratio} ${L}`} transform="rotate(-90 100 100)" filter={`url(#${id}-blur)`} opacity=".8" className="tm-arc" />
+        <circle cx="100" cy="100" r={R} fill="none" stroke={`url(#${id}-arc)`} strokeWidth="7" strokeLinecap="round" strokeDasharray={`${L * ratio} ${L}`} transform="rotate(-90 100 100)" className="tm-arc" />
+        {ratio > 0 && <circle cx={x} cy={y} r="6" fill="#fff" className="tm-head" />}
       </svg>
-      <span
-        role="timer"
-        aria-label={t(`${remaining} seconds remaining`, `${remaining} секунд осталось`)}
-      >
+      <span role="timer" aria-label={t(`${remaining} seconds remaining`, `${remaining} секунд осталось`)}>
         {time}
       </span>
-      {!running && !settled && <small>{t('PAUSED', 'ПАУЗА')}</small>}
+      <small>{settled ? t('DONE', 'ГОТОВО') : running ? t('TAP TO PAUSE', 'ПАУЗА — ТАП') : t('PAUSED', 'ПАУЗА')}</small>
     </button>
   );
 }
+
 export function AtmosphericBackground({ city = false }: { city?: boolean }) {
   return (
-    <div
-      className={`atmospheric-background ${city ? 'city-background' : 'vault-background'}`}
-      aria-hidden="true"
-    >
-      <div className="art-layer" />
-      <div className="atmosphere-shade" />
-      <div className="edge-light left-edge" />
-      <div className="edge-light right-edge" />
-      <div className="environment-sparks">
-        {[0, 1, 2, 3, 4, 5].map((n) => (
-          <i key={n} style={{ '--spark': n } as CSSProperties} />
+    <div className={`atmospheric-background ${city ? 'is-home' : ''}`} aria-hidden="true">
+      <div className="bg-base" />
+      <div className="bg-beam beam-1" />
+      <div className="bg-beam beam-2" />
+      <div className="bg-beam beam-3" />
+      <div className="bg-floor" />
+      <div className="bg-embers">
+        {Array.from({ length: 16 }, (_, n) => (
+          <i key={n} style={{ '--i': n, '--x': `${(n * 61) % 100}%`, '--d': `${9 + ((n * 7) % 9)}s`, '--delay': `${-((n * 13) % 17)}s` } as CSSProperties} />
         ))}
       </div>
+      <div className="bg-grain" />
+      <div className="bg-vignette" />
     </div>
   );
 }
-export function CinematicPanel({
-  children,
-  tone = 'blue',
-  className = '',
-}: {
-  children: ReactNode;
-  tone?: Tone;
-  className?: string;
-}) {
+
+export function CinematicPanel({ children, tone = 'blue', className = '' }: { children: ReactNode; tone?: Tone; className?: string }) {
   return (
-    <section className={`cinematic-panel tone-${tone} ${className}`}>
-      <IlluminatedFrame tone={tone} />
+    <section className={`cinematic-panel tone-${tone} ${className}`} style={{ '--accent': hues[tone] } as CSSProperties}>
       <div className="cinematic-panel-content">{children}</div>
     </section>
+  );
+}
+
+/** Radial burst of particles for big moments. Pure CSS, mounted only briefly. */
+export function Burst({ color = '#f3c56b', count = 28 }: { color?: string; count?: number }) {
+  const parts = useMemo(
+    () =>
+      Array.from({ length: count }, (_, i) => ({
+        a: (360 / count) * i + Math.random() * 8,
+        d: 140 + Math.random() * 220,
+        s: 4 + Math.random() * 8,
+        h: i % 3,
+      })),
+    [count],
+  );
+  return (
+    <div className="burst" aria-hidden="true" style={{ '--c': color } as CSSProperties}>
+      <i className="burst-ring" />
+      <i className="burst-ring r2" />
+      {parts.map((p, i) => (
+        <b key={i} className={`bp h${p.h}`} style={{ '--a': `${p.a}deg`, '--d': `${p.d}px`, '--s': `${p.s}px` } as CSSProperties} />
+      ))}
+    </div>
   );
 }

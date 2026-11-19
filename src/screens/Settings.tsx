@@ -170,8 +170,8 @@ export default function Settings() {
           <h2 className="metallic-title">{t('AUDIO PREFERENCES', 'НАСТРОЙКИ ЗВУКА')}</h2>
           <p>
             {t(
-              'Levels are saved for future audio playback. No sound is played in this edition.',
-              'Уровни сохраняются для будущего звука. В этой версии звук не воспроизводится.',
+              'Sound effects: wheel ticks, card shuffle, reveal sting and timer beeps. Music is reserved for a future update.',
+              'Звуковые эффекты: щелчки колеса, тасование карт, эффект раскрытия и сигналы таймера. Музыка — в будущем обновлении.',
             )}
           </p>
           {range(t('Master volume', 'Общая громкость'), 'master')}

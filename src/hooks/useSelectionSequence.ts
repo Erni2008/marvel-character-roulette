@@ -62,7 +62,7 @@ export function useSelectionSequence({
       elapsed = 0,
       currentStage = -1,
       currentFront = restored;
-    const duration = motion ? (method === 'card' ? 4600 : 4200) : 800;
+    const duration = motion ? (method === 'card' ? 5200 : 6400) : 800;
     function pose(p: number) {
       progress.set(p);
       const wheelP = Math.min(1, p / 0.82);
@@ -121,7 +121,7 @@ export function useSelectionSequence({
       setSelectedIndex(index);
       setReady(true);
       options.current.reveal();
-      hold.current = setTimeout(() => options.current.continueToGuess(), motion ? 600 : 650);
+      hold.current = setTimeout(() => options.current.continueToGuess(), motion ? 2400 : 650);
     }
     finishRef.current = finish;
     function tick(now: number) {

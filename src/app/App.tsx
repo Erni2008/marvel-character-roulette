@@ -12,6 +12,7 @@ import {
 import ScreenTransition from '../components/ScreenTransition';
 import { usePWA } from '../hooks/usePWA';
 import { roundKey } from '../domain/game';
+import { setVolume, unlockAudio } from '../fx/sound';
 const Home = lazy(() => import('../screens/Home')),
   SelectMode = lazy(() => import('../screens/SelectMode')),
   Selection = lazy(() => import('../screens/Selection')),
@@ -259,6 +260,8 @@ function Experience() {
   useEffect(() => {
     main.current?.focus({ preventScroll: true });
   }, [screen]);
+  useEffect(() => unlockAudio(), []);
+  useEffect(() => setVolume(settings.master * settings.effects), [settings.master, settings.effects]);
   useEffect(() => {
     const key = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {

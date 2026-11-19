@@ -5,7 +5,7 @@ import type { SelectionMethod } from '../domain/game';
 import { useGame } from '../app/Store';
 import { CardFan, MetallicButton, RouletteWheel } from '../components/Cinematic';
 export default function SelectMode() {
-  const { t, navigate, start, motion, catalogReady } = useGame();
+  const { t, navigate, start, motion, catalogReady, characters } = useGame();
   const [armed, setArmed] = useState<SelectionMethod | null>(null);
   const activation = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(
@@ -54,6 +54,7 @@ export default function SelectMode() {
             <CardFan />
           </div>
           <div className="mode-copy">
+            <span className="mode-index">01</span>
             <h2 className="metallic-title">{t('CARD DRAW', 'КАРТА')}</h2>
             <p>
               {t('Shuffle the deck', 'Перемешайте колоду')}{' '}
@@ -61,9 +62,10 @@ export default function SelectMode() {
             </p>
           </div>
           <span className="mode-enter" aria-hidden="true">
-            <ArrowUpRight size={15} />
+            <ArrowUpRight size={18} />
           </span>
           <span className="mode-panel-flare" />
+          <span className="mode-cta" aria-hidden="true">{t('SELECT', 'ВЫБРАТЬ')}</span>
         </m.button>
         <m.button
           className={`mode-choice mode-roulette ${armed === 'roulette' ? 'mode-armed' : ''} ${armed === 'card' ? 'mode-muted' : ''}`}
@@ -79,9 +81,10 @@ export default function SelectMode() {
           )}
         >
           <div className="mode-art roulette-mode-art">
-            <RouletteWheel decorative count={32} />
+            <RouletteWheel decorative entries={characters.slice(0, 24)} />
           </div>
           <div className="mode-copy">
+            <span className="mode-index">02</span>
             <h2 className="metallic-title">{t('ROULETTE', 'РУЛЕТКА')}</h2>
             <p>
               {t('Spin the wheel', 'Запустите колесо')}{' '}
@@ -89,9 +92,10 @@ export default function SelectMode() {
             </p>
           </div>
           <span className="mode-enter" aria-hidden="true">
-            <ArrowUpRight size={15} />
+            <ArrowUpRight size={18} />
           </span>
           <span className="mode-panel-flare" />
+          <span className="mode-cta" aria-hidden="true">{t('SELECT', 'ВЫБРАТЬ')}</span>
         </m.button>
       </div>
       <p className="mode-footnote">

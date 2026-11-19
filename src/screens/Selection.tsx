@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react';
 import { motion as m } from 'motion/react';
-import { characterName } from '../domain/game';
+import { characterName, wheelIndexAtPointer } from '../domain/game';
+import { identity } from '../domain/identity';
 import { FastForward } from 'lucide-react';
 import { useGame } from '../app/Store';
-import { CharacterCard, RouletteWheel } from '../components/Cinematic';
+import { Burst, CharacterCard, RouletteWheel } from '../components/Cinematic';
 import { useSelectionSequence } from '../hooks/useSelectionSequence';
+import { sfx } from '../fx/sound';
+import type { CSSProperties } from 'react';
 export default function Selection() {
   const { session, characters, prepare, reveal, enterGuess, motion, t, settings } = useGame(),
     snapshot = useRef(session!).current,
@@ -19,7 +22,8 @@ export default function Selection() {
       restored: snapshot.phase === 'revealed',
     }),
     isWheel = snapshot.method === 'roulette';
-  const progressBar = useRef<HTMLDivElement>(null);
+  const progressBar = useRef<HTMLDivElement>(null),
+    pointer = useRef<HTMLDivElement>(null);
   useEffect(
     () =>
       seq.progress.on('change', (value) =>
@@ -27,112 +31,103 @@ export default function Selection() {
       ),
     [seq.progress],
   );
+  // Ratchet: tick + pointer flick each time a segment boundary passes the pointer.
+  useEffect(() => {
+    if (!isWheel) return;
+    let last = -1,
+      lastSound = 0;
+    return seq.rotation.on('change', (v) => {
+      const i = wheelIndexAtPointer(v, seq.wheelEntries.length);
+      if (i === last) return;
+      last = i;
+      const now = performance.now();
+      if (now - lastSound > 38) {
+        lastSound = now;
+        sfx.tick();
+      }
+      const p = pointer.current?.querySelector<HTMLElement>('.wheel-pointer');
+      if (p) {
+        p.classList.remove('flick');
+        void p.offsetWidth;
+        p.classList.add('flick');
+      }
+    });
+  }, [isWheel, seq.rotation, seq.wheelEntries.length]);
+  useEffect(() => {
+    if (seq.stage === 1) isWheel ? sfx.whoosh() : sfx.riffle();
+    if (seq.stage === 2 && !isWheel) sfx.riffle();
+    if (seq.stage === 3) sfx.reveal();
+  }, [seq.stage, isWheel]);
+  useEffect(() => {
+    if (seq.frontVisible && !isWheel) sfx.flip();
+  }, [seq.frontVisible, isWheel]);
   useEffect(() => {
     const primary = () => (seq.ready ? enterGuess() : seq.skip());
     window.addEventListener('roulette:primary', primary);
     return () => window.removeEventListener('roulette:primary', primary);
   }, [seq.ready, seq.skip, enterGuess]);
+  const winner = identity(seq.character);
+  const revealed = seq.stage >= 3 || seq.ready;
   return (
     <section
       className={`drawing-screen reference-screen ${isWheel ? 'drawing-wheel' : 'drawing-card'} ${seq.ready ? 'selection-ready' : ''} stage-${seq.stage}`}
-      aria-label={t(
-        isWheel ? 'Roulette selection' : 'Drawing character',
-        isWheel ? 'Выбор рулеткой' : 'Розыгрыш карты',
-      )}
+      style={{ '--win': revealed ? winner.glow : '#f3c56b', '--win-a': winner.a } as CSSProperties}
+      aria-label={t(isWheel ? 'Roulette selection' : 'Drawing character', isWheel ? 'Выбор рулеткой' : 'Розыгрыш карты')}
     >
       <header className="selection-chapter">
         <span>
           {t('ROUND', 'РАУНД')} {String(snapshot.round).padStart(2, '0')}
+          {snapshot.rounds ? <em> / {String(snapshot.rounds).padStart(2, '0')}</em> : null}
         </span>
         <i />
-        <span>{t(isWheel ? 'ROULETTE' : 'CARD DRAW', isWheel ? 'РУЛЕТКА' : 'РОЗЫГРЫШ КАРТЫ')}</span>
+        <span>{t(isWheel ? 'ROULETTE' : 'CARD DRAW', isWheel ? 'РУЛЕТКА' : 'КАРТА')}</span>
       </header>
       <div className="draw-scene">
-        <div className="stage-reticle" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-          <i />
-        </div>
-        <div className="blue-volumetric-light" />
-        <div className="energy-structure">
-          <i />
-          <i />
-          <i />
-        </div>
+        <div className="stage-spot" aria-hidden="true" />
+        {revealed && motion && <div className="reveal-flash" aria-hidden="true" />}
         {isWheel ? (
           <>
-            <m.div className="selection-wheel-wrap" style={{ opacity: seq.wheelOpacity }}>
-              <RouletteWheel
-                rotation={seq.rotation}
-                count={seq.wheelEntries.length}
-                selectedIndex={seq.selectedIndex}
-              />
+            <m.div className="selection-wheel-wrap" ref={pointer} style={{ opacity: seq.wheelOpacity }}>
+              <RouletteWheel rotation={seq.rotation} entries={seq.wheelEntries} selectedIndex={seq.selectedIndex} />
             </m.div>
             <m.div
               className="wheel-reveal-card"
-              initial={{ opacity: 0, scale: 0.65, rotateY: -25 }}
-              animate={
-                seq.stage >= 3
-                  ? { opacity: 1, scale: 1, rotateY: 0 }
-                  : { opacity: 0, scale: 0.65, rotateY: -25 }
-              }
-              transition={{ duration: motion ? 0.65 : 0 }}
+              initial={{ opacity: 0, scale: 0.4, rotateY: -180, y: 40 }}
+              animate={revealed ? { opacity: 1, scale: 1, rotateY: 0, y: 0 } : { opacity: 0, scale: 0.4, rotateY: -180, y: 40 }}
+              transition={motion ? { type: 'spring', stiffness: 120, damping: 15 } : { duration: 0 }}
             >
               <CharacterCard front character={seq.character} />
             </m.div>
           </>
         ) : (
-          <>
-            <div className="card-perspective shuffle-deck" data-testid="shuffle-deck">
-              {seq.deck.map((card) => (
-                <m.div
-                  className={`physical-card ${card.index === 0 ? 'selected-deck-card' : ''}`}
-                  key={card.index}
-                  data-card-index={card.index}
-                  style={{
-                    x: card.x,
-                    y: card.y,
-                    rotateZ: card.rotate,
-                    rotateY: card.yaw,
-                    scale: card.scale,
-                    opacity: card.opacity,
-                    zIndex: card.layer,
-                  }}
-                >
-                  {card.index === 0 ? (
-                    <div
-                      className={`card-face ${seq.frontVisible ? 'face-front' : 'face-back'}`}
-                      data-facing={seq.frontVisible ? 'front' : 'back'}
-                    >
-                      <CharacterCard
-                        front={seq.frontVisible}
-                        character={seq.frontVisible ? seq.character : null}
-                      />
-                    </div>
-                  ) : (
-                    <CharacterCard />
-                  )}
-                </m.div>
-              ))}
-            </div>
-            <div className="energy-trails">
-              <i />
-              <i />
-              <i />
-            </div>
-          </>
+          <div className="card-perspective shuffle-deck" data-testid="shuffle-deck">
+            {seq.deck.map((card) => (
+              <m.div
+                className={`physical-card ${card.index === 0 ? 'selected-deck-card' : ''}`}
+                key={card.index}
+                data-card-index={card.index}
+                style={{ x: card.x, y: card.y, rotateZ: card.rotate, rotateY: card.yaw, scale: card.scale, opacity: card.opacity, zIndex: card.layer }}
+              >
+                {card.index === 0 ? (
+                  <div className={`card-face ${seq.frontVisible ? 'face-front' : 'face-back'}`} data-facing={seq.frontVisible ? 'front' : 'back'}>
+                    <CharacterCard front={seq.frontVisible} character={seq.frontVisible ? seq.character : null} />
+                  </div>
+                ) : (
+                  <CharacterCard />
+                )}
+              </m.div>
+            ))}
+          </div>
         )}
-        <div className="draw-platform-light" />
+        {revealed && motion && <Burst color={winner.glow} />}
       </div>
       <div className="drawing-status">
         <h1 className="metallic-title" aria-live="polite">
-          {seq.ready
-            ? t('CHARACTER SELECTED', 'ПЕРСОНАЖ ВЫБРАН')
-            : t(
-                isWheel ? 'SPINNING ROULETTE…' : 'DRAWING CHARACTER…',
-                isWheel ? 'РУЛЕТКА ВРАЩАЕТСЯ…' : 'ВЫБИРАЕМ ПЕРСОНАЖА…',
-              )}
+          {seq.ready || revealed
+            ? seq.character
+              ? characterName(seq.character, settings.language)
+              : t('CHARACTER SELECTED', 'ПЕРСОНАЖ ВЫБРАН')
+            : t(isWheel ? 'SPINNING…' : 'SHUFFLING…', isWheel ? 'КРУТИМ…' : 'ТАСУЕМ…')}
         </h1>
         <div
           ref={progressBar}
@@ -144,24 +139,19 @@ export default function Selection() {
           aria-valuenow={seq.ready ? 100 : undefined}
         >
           <m.div className="progress-fill" style={{ scaleX: seq.progress }} />
-          <div className="progress-slashes" />
         </div>
         <button className="sequence-skip" onClick={seq.ready ? enterGuess : seq.skip}>
           {seq.ready ? (
             t('CONTINUE', 'ПРОДОЛЖИТЬ')
           ) : (
             <>
-              <FastForward size={12} />
-              {t('SKIP ANIMATION', 'ПРОПУСТИТЬ АНИМАЦИЮ')}
+              <FastForward size={14} />
+              {t('SKIP ANIMATION', 'ПРОПУСТИТЬ')}
             </>
           )}
         </button>
       </div>
-      <span
-        className="selection-result-id"
-        data-testid="selection-result"
-        data-wheel-index={seq.selectedIndex}
-      >
+      <span className="selection-result-id" data-testid="selection-result" data-wheel-index={seq.selectedIndex}>
         {seq.ready && seq.character ? characterName(seq.character, settings.language) : ''}
       </span>
     </section>

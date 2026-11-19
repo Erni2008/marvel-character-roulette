@@ -180,7 +180,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
   useEffect(() => {
     const abort = new AbortController();
-    fetch('/characters/manifest.json', { signal: abort.signal })
+    fetch(import.meta.env.BASE_URL + 'characters/manifest.json', { signal: abort.signal })
       .then((r) => {
         if (!r.ok) throw Error();
         return r.json();
