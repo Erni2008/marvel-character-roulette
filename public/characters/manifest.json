@@ -341,5 +341,68 @@
     "nameRu": "Вонг",
     "imagePath": "/characters/wong.webp",
     "enabled": true
+  },
+  {
+    "id": "champion-050",
+    "name": "Juggernaut",
+    "nameRu": "Джаггернаут",
+    "imagePath": "/characters/juggernaut.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-051",
+    "name": "Scarecrow",
+    "nameRu": "Пугало",
+    "imagePath": "/characters/scarecrow.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-052",
+    "name": "Wasp",
+    "nameRu": "Оса",
+    "imagePath": "/characters/wasp-dark.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-053",
+    "name": "Gargoyle",
+    "nameRu": "Горгулья",
+    "imagePath": "/characters/gargoyle.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-054",
+    "name": "Ebony Maw",
+    "nameRu": "Эбони Мо",
+    "imagePath": "/characters/ebony-maw.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-055",
+    "name": "Wiccan",
+    "nameRu": "Виккан",
+    "imagePath": "/characters/wiccan.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-056",
+    "name": "Ultron",
+    "nameRu": "Альтрон",
+    "imagePath": "/characters/spiked-armor.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-057",
+    "name": "Sasquatch",
+    "nameRu": "Саскватч",
+    "imagePath": "/characters/sasquatch.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-058",
+    "name": "Spider-Man India",
+    "nameRu": "Человек-паук: Индия",
+    "imagePath": "/characters/spider-man-india.webp",
+    "enabled": true
   }
 ]
