@@ -351,22 +351,22 @@
   },
   {
     "id": "champion-051",
-    "name": "Scarecrow",
-    "nameRu": "Пугало",
+    "name": "Kindred",
+    "nameRu": "Киндред",
     "imagePath": "/characters/scarecrow.webp",
     "enabled": true
   },
   {
     "id": "champion-052",
-    "name": "Wasp",
-    "nameRu": "Оса",
+    "name": "Shathra",
+    "nameRu": "Шатра",
     "imagePath": "/characters/wasp-dark.webp",
     "enabled": true
   },
   {
     "id": "champion-053",
-    "name": "Gargoyle",
-    "nameRu": "Горгулья",
+    "name": "Dragon Man",
+    "nameRu": "Человек-дракон",
     "imagePath": "/characters/gargoyle.webp",
     "enabled": true
   },
@@ -386,22 +386,22 @@
   },
   {
     "id": "champion-056",
-    "name": "Ultron",
-    "nameRu": "Альтрон",
+    "name": "Destroyer",
+    "nameRu": "Разрушитель",
     "imagePath": "/characters/spiked-armor.webp",
     "enabled": true
   },
   {
     "id": "champion-057",
     "name": "Sasquatch",
-    "nameRu": "Саскватч",
+    "nameRu": "Сасквотч",
     "imagePath": "/characters/sasquatch.webp",
     "enabled": true
   },
   {
     "id": "champion-058",
-    "name": "Spider-Man India",
-    "nameRu": "Человек-паук: Индия",
+    "name": "Spider-Man (Pavitr Prabhakar)",
+    "nameRu": "Человек-паук (Павитр Прабхакар)",
     "imagePath": "/characters/spider-man-india.webp",
     "enabled": true
   }
