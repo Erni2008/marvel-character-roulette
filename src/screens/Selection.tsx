@@ -139,6 +139,7 @@ export default function Selection() {
                 data-card-index={card.index}
                 style={{ x: card.x, y: card.y, rotateZ: card.rotate, rotateY: card.yaw, scale: card.scale, opacity: card.opacity, zIndex: card.layer }}
               >
+                {card.index === 0 && <div className="card-edge" aria-hidden="true" />}
                 {card.index === 0 ? (
                   <div className={`card-face ${seq.frontVisible ? 'face-front' : 'face-back'}`} data-facing={seq.frontVisible ? 'front' : 'back'}>
                     <CharacterCard front={seq.frontVisible} character={seq.frontVisible ? seq.character : null} />

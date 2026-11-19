@@ -77,9 +77,6 @@ export function BrandEmblem({ className = '', silver = false }: { className?: st
   );
 }
 
-function Pattern({ kind }: { kind: string }) {
-  return <div className={`cc-pattern pattern-${kind}`} aria-hidden="true" />;
-}
 
 export function CharacterCard({
   character,
@@ -100,39 +97,32 @@ export function CharacterCard({
   const style = { '--a': id.a, '--b': id.b, '--glow': id.glow } as CSSProperties;
   if (!front || !character)
     return (
-      <div className={`character-card card-back ${className}`} aria-hidden="true">
-        <img className="cb-art" src={asset('art/card-back.webp')} alt="" draggable={false} />
-        <BrandEmblem className="cb-emblem" silver />
-        <span className="cb-word cb-top">{settings.language === 'ru' ? 'РУЛЕТКА' : 'CHARACTER'}</span>
-        <span className="cb-word cb-bottom">{settings.language === 'ru' ? 'ГЕРОЕВ' : 'ROULETTE'}</span>
-        <div className="cc-foil" />
+      <div className={`character-card card-back real-card ${className}`} aria-hidden="true">
+        <img className="rc-face" src={asset('art/card-back-real.webp')} alt="" draggable={false} />
+        <div className="rc-gloss" />
       </div>
     );
   const art = character.imagePath && !broken;
   return (
-    <div className={`character-card card-front ${art ? 'has-art' : ''} ${className}`} style={style} data-character-id={character.id}>
-      <div className="cc-bg" />
-      <Pattern kind={id.pattern} />
-      <div className="cc-halftone" />
-      {art && <div className="cc-backlight" />}
-      {art ? (
-        <img className="character-art" src={asset(character.imagePath)} alt={name} decoding="sync" loading="eager" onError={() => setBroken(true)} draggable={false} />
-      ) : (
-        <div className="cc-mono neutral-silhouette" aria-hidden="true">
-          <span className="cc-mono-shadow">{monogram(character.name)}</span>
-          <span className="cc-mono-fill">{monogram(character.name)}</span>
-        </div>
-      )}
-      <div className="cc-vignette" />
-      <div className="cc-foil" />
-      <div className="cc-border" />
+    <div className={`character-card card-front real-card ${art ? 'has-art' : 'no-art'} ${className}`} style={style} data-character-id={character.id}>
+      <img className="rc-face" src={asset('art/card-front-real.webp')} alt="" draggable={false} />
+      <div className="rc-window">
+        <div className="rc-tint" />
+        {art ? (
+          <img className="character-art" src={asset(character.imagePath)} alt={name} decoding="sync" loading="eager" onError={() => setBroken(true)} draggable={false} />
+        ) : (
+          <div className="cc-mono neutral-silhouette" aria-hidden="true">
+            <span className="cc-mono-fill">{monogram(character.name)}</span>
+          </div>
+        )}
+      </div>
       <span className="cc-number">№ {character.id.replace(/\D/g, '').padStart(3, '0')}</span>
       {showName && (
-        <div className="character-name" title={name} style={{ '--fit': Math.min(1, 10 / Math.max(name.length, 1)) } as CSSProperties}>
-          <i className="cn-rule" />
+        <div className="character-name" title={name} style={{ '--fit': Math.min(1, 12 / Math.max(name.length, 1)) } as CSSProperties}>
           <span>{name}</span>
         </div>
       )}
+      <div className="rc-gloss" />
     </div>
   );
 }

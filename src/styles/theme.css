@@ -849,3 +849,61 @@ html[lang='en'] .rb-value::before { content: 'ROUND '; }
 @media (max-width: 600px) and (orientation: portrait) {
   .answer-nameplate { display: none; }
 }
+
+/* ================================================================ v8: real printed cards (Final Answer textures) */
+:root { --card-ratio: 723 / 1100; --card-k: 0.657; }
+.character-card, .card-perspective, .card-fan { aspect-ratio: var(--card-ratio); }
+.real-card { background: transparent !important; border-radius: 4.2% / 2.7%; overflow: visible; box-shadow: none !important; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.55)) drop-shadow(0 22px 30px rgba(0, 0, 0, 0.6)); }
+.rc-face { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* printed window inside the ornate frame */
+.rc-window { position: absolute; inset: 9% 10.5% 19% 10.5%; overflow: hidden; border-radius: 1.5%; }
+.rc-tint { position: absolute; inset: 0; background: radial-gradient(70% 60% at 50% 42%, color-mix(in srgb, var(--glow) 22%, transparent), transparent 75%); mix-blend-mode: multiply; opacity: 0.9; }
+.real-card .character-art {
+  position: absolute; inset: 0 !important; width: 100% !important; height: 100% !important;
+  object-fit: contain; object-position: 50% 100%;
+  filter: drop-shadow(0 1.4cqw 1.2cqw rgba(60, 20, 10, 0.45)) contrast(1.06) saturate(1.1) !important;
+  -webkit-mask-image: none; mask-image: none;
+}
+/* ink look for heroes without artwork */
+.real-card .cc-mono { inset: 0; }
+.real-card .cc-mono-fill { font-size: 44cqw; background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #7a1414; -webkit-text-fill-color: #7a1414; filter: none; opacity: 0.85; mix-blend-mode: multiply; text-shadow: 0.4cqw 0.4cqw 0 rgba(122, 20, 20, 0.25); }
+.real-card .cc-number { top: 4.6%; left: 9%; font: 800 3.6cqw var(--cond); letter-spacing: 0.18em; color: #7a1414; mix-blend-mode: multiply; }
+.real-card .character-name { position: absolute; left: 9%; right: 9%; bottom: 8.6%; display: block; padding: 0; text-align: center; }
+.real-card .character-name span { display: block; font: italic 900 calc(10cqw * var(--fit, 1)) / 1 var(--display) !important; color: #6e0f12; -webkit-text-fill-color: #6e0f12; text-shadow: 0 0.3cqw 0 rgba(255, 240, 210, 0.6); letter-spacing: 0.01em; white-space: nowrap; mix-blend-mode: multiply; }
+.rc-gloss { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(118deg, transparent 30%, rgba(255, 250, 235, 0.22) 46%, transparent 60%); mix-blend-mode: soft-light; }
+.real-card .cn-rule, .real-card .cc-foil, .real-card .cc-vignette, .real-card .cc-backlight, .real-card .cc-halftone, .real-card .cc-bg, .real-card .cc-border { display: none; }
+/* neon page frame around real cards on the guess screen is replaced by a warm spotlight */
+.guess-card-wrap .character-card { box-shadow: none !important; }
+.guess-card-wrap::before { background: radial-gradient(closest-side, rgba(255, 190, 120, 0.35), rgba(255, 31, 61, 0.18) 60%, transparent); }
+.drawing-card .physical-card .character-card, .drawing-card .selected-deck-card .character-card { box-shadow: none !important; }
+/* physical thickness visible while the card turns */
+.card-edge { position: absolute; top: 0; bottom: 0; left: 50%; width: 2.2%; margin-left: -1.1%; background: url('/art/card-edge.webp') center / 100% 100%, linear-gradient(90deg, #6e3a1c, #e8c79a, #6e3a1c); transform: rotateY(90deg); border-radius: 2px; }
+/* BIG: the card is the star of the guess screen */
+.guess-screen { grid-template-columns: minmax(0, 1.35fr) minmax(300px, 1fr); }
+.guess-card-wrap { width: min(100%, calc((100svh - 100px) * var(--card-k)), 760px) !important; }
+.wheel-reveal-card { width: min(calc((100svh - 220px) * var(--card-k)), 520px) !important; }
+@media (max-width: 860px), (orientation: portrait) and (max-width: 1100px) {
+  .guess-screen { grid-template-columns: 1fr; }
+  .guess-card-wrap { width: min(92vw, calc((100svh - 330px) * var(--card-k)), 640px) !important; }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .guess-card-wrap { width: auto !important; height: 100%; max-width: 96vw; aspect-ratio: var(--card-ratio); }
+  .wheel-reveal-card { width: min(80vw, 360px) !important; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .guess-card-wrap { height: calc(100svh - 50px); width: auto !important; aspect-ratio: var(--card-ratio); }
+}
+.guess-card-wrap::after { display: none; }
+.real-card .character-name { bottom: 12.2%; left: 13%; right: 13%; }
+.real-card .character-name span { font-size: calc(8.6cqw * var(--fit, 1)) !important; }
+.real-card .rc-window { bottom: 22%; }
+.rc-gloss { mix-blend-mode: normal; background: linear-gradient(118deg, transparent 32%, rgba(255, 250, 235, 0.10) 46%, transparent 58%); border-radius: 4.2% / 2.7%; }
+.real-card .rc-window { inset: 10% 12% 25% 12%; }
+.real-card .character-name { bottom: 15.6%; left: 14%; right: 14%; }
+.real-card .cc-number { top: 10.5%; left: 15%; font-size: 3.2cqw; }
+.real-card .character-name span, .real-card .cc-number, .real-card .cc-mono-fill { mix-blend-mode: normal; }
+.guess-card-wrap::before { filter: none !important; animation: none; inset: -12%; border-radius: 50%; }
+.guess-card-wrap::after { content: none !important; }
+.real-card .character-name { bottom: 15.6% !important; left: 14% !important; right: 14% !important; }
+.real-card .character-art { inset: 0 !important; }
+.real-card .rc-window { inset: 7% 10% 22.5% 10% !important; }
