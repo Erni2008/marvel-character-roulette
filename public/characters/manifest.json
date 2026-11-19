@@ -281,57 +281,57 @@
   },
   {
     "id": "champion-041",
-    "name": "Swordsman",
-    "nameRu": "Мечник",
+    "name": "Diablo",
+    "nameRu": "Диабло",
     "imagePath": "/characters/swordsman.webp",
     "enabled": true
   },
   {
     "id": "champion-042",
-    "name": "Spider-Woman",
-    "nameRu": "Женщина-паук",
+    "name": "Black Widow (Claire Voyant)",
+    "nameRu": "Чёрная вдова (Клэр)",
     "imagePath": "/characters/spider-woman.webp",
     "enabled": true
   },
   {
     "id": "champion-043",
-    "name": "Brother Voodoo",
-    "nameRu": "Брат Вуду",
+    "name": "Voodoo",
+    "nameRu": "Вуду",
     "imagePath": "/characters/brother-voodoo.webp",
     "enabled": true
   },
   {
     "id": "champion-044",
-    "name": "Hela",
-    "nameRu": "Хела",
+    "name": "Madelyne Pryor",
+    "nameRu": "Мадлен Прайор",
     "imagePath": "/characters/hela.webp",
     "enabled": true
   },
   {
     "id": "champion-045",
     "name": "Enchantress",
-    "nameRu": "Чародейка",
+    "nameRu": "Чаровница",
     "imagePath": "/characters/enchantress.webp",
     "enabled": true
   },
   {
     "id": "champion-046",
-    "name": "Dani Moonstar",
-    "nameRu": "Дани Мунстар",
+    "name": "Kushala",
+    "nameRu": "Кушала",
     "imagePath": "/characters/dani-moonstar.webp",
     "enabled": true
   },
   {
     "id": "champion-047",
-    "name": "Demon",
-    "nameRu": "Демон",
+    "name": "Mangog",
+    "nameRu": "Мангог",
     "imagePath": "/characters/demon.webp",
     "enabled": true
   },
   {
     "id": "champion-048",
-    "name": "Minotaur",
-    "nameRu": "Минотавр",
+    "name": "Rintrah",
+    "nameRu": "Ринтра",
     "imagePath": "/characters/minotaur.webp",
     "enabled": true
   },
