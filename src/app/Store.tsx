@@ -114,6 +114,7 @@ interface Store {
   removedCount: number;
   removeCurrent: (remaining?: number) => void;
   restorePool: () => void;
+  finish: (remaining?: number) => void;
   screen: Screen;
   navigate: (s: Screen) => void;
   back: () => void;
@@ -355,6 +356,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     },
     [commit, navigate, settle],
   );
+  /** End the endless session and show the results. */
+  const finish = useCallback(
+    (remaining = 0) => {
+      let s = sessionRef.current;
+      if (!s) return navigate('home');
+      if (s.phase === 'guessing') settle('passed', remaining, roundKey(s));
+      s = sessionRef.current!;
+      commit({ ...s, phase: 'finished' });
+      navigate('summary');
+    },
+    [commit, navigate, settle],
+  );
   /** Take the current hero out of the pool and go straight to the next one. */
   const removeCurrent = useCallback(
     (remaining = 0) => {
@@ -396,6 +409,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       removedCount: removed.filter((id) => characters.some((c) => c.id === id)).length,
       removeCurrent,
       restorePool,
+      finish,
       screen,
       navigate,
       back,
@@ -427,6 +441,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       catalogReady,
       removeCurrent,
       restorePool,
+      finish,
       screen,
       navigate,
       back,

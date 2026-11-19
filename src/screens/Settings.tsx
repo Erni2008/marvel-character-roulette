@@ -79,19 +79,6 @@ export default function Settings() {
       <div className="settings-columns">
         <CinematicPanel>
           <h2 className="metallic-title">{t('GAMEPLAY', 'ИГРА')}</h2>
-          <label className="settings-field">
-            <span>{t('ROUND DURATION', 'ДЛИТЕЛЬНОСТЬ РАУНДА')}</span>
-            <select
-              value={s.duration}
-              onChange={(e) => update({ duration: Number(e.target.value) })}
-            >
-              {[15, 30, 45, 60, 90, 120].map((v) => (
-                <option key={v} value={v}>
-                  {v} {t('seconds', 'секунд')}
-                </option>
-              ))}
-            </select>
-          </label>
           <div className="settings-field">
             <span>{t('HERO DECK', 'КОЛОДА ГЕРОЕВ')}</span>
             <MetallicButton tone="blue" onClick={restorePool} disabled={!removedCount}>

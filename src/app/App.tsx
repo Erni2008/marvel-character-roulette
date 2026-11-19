@@ -44,7 +44,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
   }
 }
 function Dialog({ pwa }: { pwa: ReturnType<typeof usePWA> }) {
-  const { modal, setModal, navigate, resetStatistics, t } = useGame(),
+  const { modal, setModal, navigate, resetStatistics, t, finish } = useGame(),
     box = useRef<HTMLDivElement>(null),
     [ratio, setRatio] = useState('3 / 4');
   useEffect(() => {
@@ -181,6 +181,15 @@ function Dialog({ pwa }: { pwa: ReturnType<typeof usePWA> }) {
               </p>
               <MetallicButton onClick={() => setModal(null)}>
                 {t('KEEP PLAYING', 'ПРОДОЛЖИТЬ')}
+              </MetallicButton>
+              <MetallicButton
+                tone="green"
+                onClick={() => {
+                  setModal(null);
+                  finish();
+                }}
+              >
+                {t('FINISH & RESULTS', 'ЗАВЕРШИТЬ И ИТОГИ')}
               </MetallicButton>
               <MetallicButton
                 tone="blue"

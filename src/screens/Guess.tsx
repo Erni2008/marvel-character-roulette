@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { ArrowRight, Check, ChevronsRight, Settings2, Trash2, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronsRight, Flag, Pause, Play, Settings2, Trash2, X } from 'lucide-react';
 import { motion as m, useMotionValue, useTransform, animate } from 'motion/react';
 import { useGame } from '../app/Store';
 import { characterName, roundKey } from '../domain/game';
 import { useCountdown } from '../hooks/useCountdown';
 import type { CSSProperties } from 'react';
-import { Burst, CharacterCard, CircularTimer, MetallicButton } from '../components/Cinematic';
+import { Burst, CharacterCard, MetallicButton } from '../components/Cinematic';
 import { identity } from '../domain/identity';
 import { sfx } from '../fx/sound';
 export default function Guess() {
@@ -66,8 +66,10 @@ export default function Guess() {
   }, [isSettled, next, timer.toggle, correct, skip]);
   const shown = isSettled ? s.remaining : timer.remaining;
   useEffect(() => {
-    if (!isSettled && timer.running && shown <= 5 && shown > 0) sfx.beep(shown <= 3);
-  }, [shown, isSettled, timer.running]);
+    /* stopwatch: no countdown beeps */
+  }, []);
+  const spent = s.duration - shown,
+    clock = `${Math.floor(spent / 60)}:${String(spent % 60).padStart(2, '0')}`;
   useEffect(() => {
     if (!isSettled) return;
     if (s.outcome === 'correct') sfx.correct();
@@ -99,7 +101,7 @@ export default function Guess() {
   const name = s.character ? characterName(s.character, settings.language) : '';
   return (
     <section
-      className={`guess-screen reference-screen ${isSettled ? `outcome-${s.outcome}` : ''} ${shown <= 10 && !isSettled ? 'is-urgent' : ''}`}
+      className={`guess-screen reference-screen ${isSettled ? `outcome-${s.outcome}` : ''} `}
       style={{ '--a': id.a, '--b': id.b, '--glow': id.glow } as CSSProperties}
       aria-labelledby="selected-name"
     >
@@ -166,7 +168,14 @@ export default function Guess() {
           {settings.language === 'ru' && s.character?.nameRu && <small>{s.character.name}</small>}
         </div>
         <div className="guess-timer">
-          <CircularTimer remaining={shown} total={s.duration} running={timer.running} settled={isSettled} toggle={timer.toggle} />
+          <button className={`stopwatch ${timer.running ? 'is-running' : ''} ${isSettled ? 'is-settled' : ''}`} onClick={timer.toggle} disabled={isSettled} aria-label={timer.running ? t('Pause', 'Пауза') : t('Resume', 'Продолжить')}>
+            <span className="sw-label">{isSettled ? t('GUESSED IN', 'УГАДАНО ЗА') : t('TIME ON THIS HERO', 'ВРЕМЯ НА ГЕРОЯ')}</span>
+            <span className="sw-time" role="timer">{clock}</span>
+            {!isSettled && <span className="sw-icon">{timer.running ? <Pause size={14} /> : <Play size={14} />}</span>}
+          </button>
+          <button className="finish-session" onClick={() => { timer.pause(); game.finish(isSettled ? s.remaining : remaining()); }}>
+            <Flag size={14} /> {t('FINISH & RESULTS', 'ЗАВЕРШИТЬ И ИТОГИ')}
+          </button>
         </div>
         <div className="guess-controls">
           <MetallicButton tone="silver" shape="tile" onClick={skip} disabled={isSettled} aria-label={t('Skip character', 'Пропустить персонажа')}>

@@ -105,10 +105,10 @@ describe('session integrity', () => {
 });
 describe('preferences', () => {
   it('starts at one minute and endless rounds, validates imports and clamps values', () => {
-    expect(defaults).toMatchObject({ duration: 60, rounds: 0 });
+    expect(defaults).toMatchObject({ duration: 3600, rounds: 0 });
     expect(validateSettings({ scale: 99, duration: 3, rounds: -2, master: -1 })).toMatchObject({
       scale: 1.2,
-      duration: 60,
+      duration: 3600,
       rounds: 0,
       master: 0,
     });
@@ -123,7 +123,7 @@ describe('preferences', () => {
     };
     expect(loadSettings(storage).settings).toMatchObject({
       language: 'ru',
-      duration: 60,
+      duration: 3600,
       reducedMotion: true,
       stream: true,
     });

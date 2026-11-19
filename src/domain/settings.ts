@@ -19,7 +19,7 @@ export interface Settings {
   resolution: string;
 }
 export const defaults: Settings = {
-  duration: 60,
+  duration: 3600,
   rounds: 0,
   method: 'card',
   language: 'ru',
@@ -48,9 +48,7 @@ export function validateSettings(input: unknown): Settings {
     typeof m[k] === 'number' && Number.isFinite(m[k])
       ? Math.max(min, Math.min(max, m[k] as number))
       : (defaults[k] as number);
-  s.duration = [15, 30, 45, 60, 90, 120].includes(m.duration as number)
-    ? (m.duration as number)
-    : 60;
+  s.duration = 3600; // stopwatch mode: we measure how long a guess takes
   s.rounds = 0; // endless: the host decides when to stop
   s.method = m.method === 'roulette' ? 'roulette' : 'card';
   s.language = m.language === 'en' && m.langV === 2 ? 'en' : 'ru';

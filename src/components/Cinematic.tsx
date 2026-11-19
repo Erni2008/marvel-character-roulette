@@ -98,14 +98,14 @@ export function CharacterCard({
   if (!front || !character)
     return (
       <div className={`character-card card-back real-card ${className}`} aria-hidden="true">
-        <img className="rc-face" src={asset('art/card-back-real.webp')} alt="" draggable={false} />
+        <img className="rc-face" src={asset('art/card-back-neon.webp')} alt="" draggable={false} />
         <div className="rc-gloss" />
       </div>
     );
   const art = character.imagePath && !broken;
   return (
     <div className={`character-card card-front real-card ${art ? 'has-art' : 'no-art'} ${className}`} style={style} data-character-id={character.id}>
-      <img className="rc-face" src={asset('art/card-front-real.webp')} alt="" draggable={false} />
+      <img className="rc-face" src={asset('art/card-front-neon.webp')} alt="" draggable={false} />
       <div className="rc-window">
         <div className="rc-tint" />
         {art ? (
