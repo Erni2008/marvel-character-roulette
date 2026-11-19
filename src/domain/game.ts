@@ -39,9 +39,9 @@ export function parseCharacters(raw: unknown): Character[] {
       c.imagePath &&
       (!c.imagePath.startsWith('/characters/') ||
         c.imagePath.includes('..') ||
-        !/^\/characters\/[\w ./-]+\.png$/i.test(c.imagePath))
+        !/^\/characters\/[\w ./-]+\.(png|webp)$/i.test(c.imagePath))
     )
-      throw new Error('Character artwork must be a local PNG under /characters/.');
+      throw new Error('Character artwork must be a local PNG or WebP under /characters/.');
     ids.add(c.id);
     return {
       id: c.id,

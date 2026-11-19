@@ -25,7 +25,7 @@ self.addEventListener('fetch', (event) => {
   if (
     url.origin !== self.location.origin ||
     !url.pathname.includes('/characters/') ||
-    !url.pathname.toLowerCase().endsWith('.png')
+    !/\.(png|webp)$/i.test(url.pathname)
   )
     return;
   event.respondWith(

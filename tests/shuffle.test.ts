@@ -30,9 +30,9 @@ it('keeps visible trajectories continuous and all poses finite throughout the ti
     }
 });
 it('ships named text-only characters and retains optional localized names in custom catalogs', () => {
-  expect(builtInCharacters.length).toBe(40);
+  expect(builtInCharacters.length).toBe(49);
   expect(
-    builtInCharacters.every((c) => c.enabled && (!c.imagePath || c.imagePath.endsWith(".png")) && !/^CHAMPION/.test(c.name)),
+    builtInCharacters.every((c) => c.enabled && (!c.imagePath || /\.(png|webp)$/.test(c.imagePath)) && !/^CHAMPION/.test(c.name)),
   ).toBe(true);
   const c = parseCharacters([
     { id: 'custom', name: 'A custom name', nameRu: 'Своё имя', imagePath: '', enabled: true },

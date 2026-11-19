@@ -220,7 +220,7 @@
     "id": "champion-032",
     "name": "Ghost Rider",
     "nameRu": "Призрачный гонщик",
-    "imagePath": "",
+    "imagePath": "/characters/ghost-rider.webp",
     "enabled": true
   },
   {
@@ -234,7 +234,7 @@
     "id": "champion-034",
     "name": "Ant-Man",
     "nameRu": "Человек-муравей",
-    "imagePath": "/characters/ant-man.png",
+    "imagePath": "/characters/ant-man.webp",
     "enabled": true
   },
   {
@@ -277,6 +277,69 @@
     "name": "Nebula",
     "nameRu": "Небула",
     "imagePath": "",
+    "enabled": true
+  },
+  {
+    "id": "champion-041",
+    "name": "Swordsman",
+    "nameRu": "Мечник",
+    "imagePath": "/characters/swordsman.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-042",
+    "name": "Spider-Woman",
+    "nameRu": "Женщина-паук",
+    "imagePath": "/characters/spider-woman.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-043",
+    "name": "Brother Voodoo",
+    "nameRu": "Брат Вуду",
+    "imagePath": "/characters/brother-voodoo.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-044",
+    "name": "Hela",
+    "nameRu": "Хела",
+    "imagePath": "/characters/hela.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-045",
+    "name": "Enchantress",
+    "nameRu": "Чародейка",
+    "imagePath": "/characters/enchantress.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-046",
+    "name": "Dani Moonstar",
+    "nameRu": "Дани Мунстар",
+    "imagePath": "/characters/dani-moonstar.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-047",
+    "name": "Demon",
+    "nameRu": "Демон",
+    "imagePath": "/characters/demon.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-048",
+    "name": "Minotaur",
+    "nameRu": "Минотавр",
+    "imagePath": "/characters/minotaur.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-049",
+    "name": "Wong",
+    "nameRu": "Вонг",
+    "imagePath": "/characters/wong.webp",
     "enabled": true
   }
 ]
