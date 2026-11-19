@@ -112,10 +112,11 @@ export function CharacterCard({
     );
   const art = character.imagePath && !broken;
   return (
-    <div className={`character-card card-front ${className}`} style={style} data-character-id={character.id}>
+    <div className={`character-card card-front ${art ? 'has-art' : ''} ${className}`} style={style} data-character-id={character.id}>
       <div className="cc-bg" />
       <Pattern kind={id.pattern} />
       <div className="cc-halftone" />
+      {art && <div className="cc-backlight" />}
       {art ? (
         <img className="character-art" src={asset(character.imagePath)} alt={name} onError={() => setBroken(true)} draggable={false} />
       ) : (
@@ -130,6 +131,7 @@ export function CharacterCard({
       <span className="cc-number">№ {character.id.replace(/\D/g, '').padStart(3, '0')}</span>
       {showName && (
         <div className="character-name" title={name}>
+          <i className="cn-rule" />
           <span>{name}</span>
         </div>
       )}
@@ -249,7 +251,7 @@ export function RouletteWheel({
             {!decorative &&
               segments.map(({ c }, i) => {
                 const a = (i + 0.5) * step,
-                  [x, y] = polar(352, a),
+                  [x, y] = polar(c?.imagePath ? 318 : 352, a),
                   label = c ? characterName(c, settings.language) : String(i + 1).padStart(2, '0');
                 const size = n > 48 ? 15 : n > 30 ? 19 : 24;
                 return (
@@ -265,6 +267,22 @@ export function RouletteWheel({
                   >
                     {label.toUpperCase()}
                   </text>
+                );
+              })}
+            {!decorative &&
+              segments.map(({ c, ident }, i) => {
+                if (!c?.imagePath) return null;
+                const a = (i + 0.5) * step,
+                  [x, y] = polar(410, a);
+                return (
+                  <g key={`p${i}`} transform={`rotate(${a} ${x} ${y})`}>
+                    <clipPath id={`${id}-clip${i}`}>
+                      <circle cx={x} cy={y} r="30" />
+                    </clipPath>
+                    <circle cx={x} cy={y} r="33" fill="#120308" stroke="#f3c56b" strokeWidth="3" />
+                    <circle cx={x} cy={y} r="30" fill={ident.a} />
+                    <image href={asset(c.imagePath)} x={x - 30} y={y - 26} width="60" height="150" preserveAspectRatio="xMidYMin slice" clipPath={`url(#${id}-clip${i})`} />
+                  </g>
                 );
               })}
             {Array.from({ length: n }, (_, i) => {

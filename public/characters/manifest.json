@@ -234,7 +234,7 @@
     "id": "champion-034",
     "name": "Ant-Man",
     "nameRu": "Человек-муравей",
-    "imagePath": "",
+    "imagePath": "/characters/ant-man.png",
     "enabled": true
   },
   {

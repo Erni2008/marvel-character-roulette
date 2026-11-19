@@ -55,6 +55,8 @@ export function parseCharacters(raw: unknown): Character[] {
   return result;
 }
 export const builtInCharacters: Character[] = parseCharacters(catalog);
+/** Preview: the first round of every session lands on this character. Set to '' to disable. */
+export const PREVIEW_FIRST_ID = 'champion-034';
 export function characterName(character: Character, language: Language): string {
   return language === 'ru' ? character.nameRu || character.name : character.name;
 }

@@ -11,7 +11,7 @@ import type { ReactNode } from 'react';
 import { useReducedMotion } from 'motion/react';
 import {
   advanceRound,
-  chooseCharacter,
+  chooseCharacter, PREVIEW_FIRST_ID,
   createSession,
   emptyStatistics,
   parseCharacters,
@@ -283,7 +283,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const s = sessionRef.current;
     if (!s) throw Error('Start a session first.');
     if (s.character) return s.character;
-    const character = chooseCharacter(characters, s.records.at(-1)?.character.id);
+    const forced = !s.records.length && PREVIEW_FIRST_ID ? characters.find((c) => c.id === PREVIEW_FIRST_ID && c.enabled) : undefined;
+    const character = forced ?? chooseCharacter(characters, s.records.at(-1)?.character.id);
     commit({ ...s, character, phase: 'selecting' });
     return character;
   }, [characters, commit]);
