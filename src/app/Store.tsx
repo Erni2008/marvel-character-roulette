@@ -309,12 +309,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const s = sessionRef.current;
     if (!s) throw Error('Start a session first.');
     if (s.character) return s.character;
-    const forced = !s.records.length && PREVIEW_FIRST_ID ? pool.find((c) => c.id === PREVIEW_FIRST_ID && c.enabled) : undefined;
+    const forced = !s.records.length && PREVIEW_FIRST_ID ? characters.find((c) => c.id === PREVIEW_FIRST_ID) : undefined;
     const character = forced ?? chooseCharacter(pool, s.records.at(-1)?.character.id);
     if (character.imagePath) new Image().src = import.meta.env.BASE_URL + character.imagePath.replace(/^\//, '');
     commit({ ...s, character, phase: 'selecting' });
     return character;
-  }, [pool, commit]);
+  }, [pool, characters, commit]);
   const reveal = useCallback(() => {
     const s = sessionRef.current;
     if (s?.character && s.phase === 'selecting') commit({ ...s, phase: 'revealed' });

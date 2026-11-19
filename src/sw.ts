@@ -17,6 +17,7 @@ registerRoute(
 self.addEventListener('message', (e) => {
   if (e.data?.type === 'SKIP_WAITING') void self.skipWaiting();
 });
+self.addEventListener('install', () => void self.skipWaiting());
 clientsClaim();
 // Future PNGs load only when selected, with a bounded same-origin offline cache.
 self.addEventListener('fetch', (event) => {
