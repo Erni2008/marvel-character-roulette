@@ -75,7 +75,7 @@ export default function Guess() {
   return (
     <section
       className={`guess-screen reference-screen ${isSettled ? `outcome-${s.outcome}` : ''}`}
-      aria-labelledby="guess-title"
+      aria-labelledby="selected-name"
     >
       <header className="guess-header">
         <button
@@ -116,6 +116,7 @@ export default function Guess() {
       <div className="guess-character">
         <CharacterCard
           front
+          showName={false}
           character={s.character}
           tone={s.outcome === 'correct' ? 'green' : 'red'}
         />
@@ -136,13 +137,11 @@ export default function Guess() {
         aria-label={t('Answer for verification', 'Ответ для проверки')}
       >
         <span>{t('SELECTED CHARACTER', 'ВЫБРАННЫЙ ПЕРСОНАЖ')}</span>
-        <strong>{s.character ? characterName(s.character, settings.language) : ''}</strong>
+        <strong id="selected-name">
+          {s.character ? characterName(s.character, settings.language) : ''}
+        </strong>
         {settings.language === 'ru' && s.character?.nameRu && <small>{s.character.name}</small>}
       </div>
-      <h1 id="guess-title" className="metallic-title">
-        {t('GUESS', 'УГАДАЙТЕ')}
-        <br /> {t('THE CHARACTER!', 'ПЕРСОНАЖА!')}
-      </h1>
       <div className="guess-timer">
         <span className="timer-caption">{t('TIME REMAINING', 'ОСТАЛОСЬ ВРЕМЕНИ')}</span>
         <CircularTimer
@@ -156,8 +155,8 @@ export default function Guess() {
           {isSettled
             ? t('ROUND COMPLETE', 'РАУНД ЗАВЕРШЁН')
             : timer.running
-              ? t('TAP TO PAUSE', 'НАЖМИТЕ ДЛЯ ПАУЗЫ')
-              : t('TAP TO RESUME', 'НАЖМИТЕ ДЛЯ ПРОДОЛЖЕНИЯ')}
+              ? t('Pause', 'Пауза')
+              : t('Resume', 'Продолжить')}
         </span>
       </div>
       <div className="guess-controls">

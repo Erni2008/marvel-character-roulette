@@ -1743,3 +1743,161 @@ html[data-motion='false'] .selected-deck-card .card-diagonal-sheen::after {
 .mode-art {
   mask-image: none;
 }
+
+/* Give the photographed props a stage separate from the control surface. */
+.mode-screen {
+  --stage-border: #a2b2c72b;
+}
+.mode-header h1 {
+  font-family: Studio, sans-serif !important;
+  text-transform: none;
+  font-weight: 700 !important;
+  letter-spacing: -1.4px !important;
+}
+.mode-header > p {
+  color: #b1bccb;
+  font-size: 13px;
+}
+.mode-choice {
+  background: #101721;
+  border-color: var(--stage-border);
+  border-radius: 6px;
+  clip-path: none;
+}
+.mode-choice::before,
+.mode-choice::after {
+  display: none;
+}
+.mode-art {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 67%;
+  background: radial-gradient(ellipse at 49% 25%, #2c3746, #141c28 64%, #111722);
+  border-bottom: 1px solid var(--stage-border);
+}
+.mode-roulette .mode-art {
+  background: radial-gradient(ellipse at 52% 24%, #382933, #1e1d29 65%, #161822);
+}
+.mode-copy {
+  bottom: auto;
+  top: 71%;
+  left: 6%;
+  right: 17%;
+}
+.mode-copy h2 {
+  font-family: Studio, sans-serif !important;
+  font-size: clamp(17px, 5vw, 29px);
+  font-weight: 750 !important;
+  letter-spacing: -0.45px !important;
+  line-height: 1.12;
+}
+.mode-copy p {
+  margin-top: 5px;
+  color: #adbacc;
+  font-size: clamp(10px, 2.85vw, 14px);
+}
+.mode-enter {
+  bottom: 11%;
+  width: 31px;
+  height: 31px;
+  background: #273447;
+}
+.fan-leaf.leaf-2 {
+  bottom: 3%;
+}
+.fan-leaf {
+  bottom: -2%;
+}
+.wheel-decorative img {
+  padding: 5px 0;
+}
+.guess-character {
+  top: 16%;
+  height: 34%;
+}
+.answer-nameplate {
+  top: 53%;
+  gap: 8px;
+}
+.answer-nameplate > strong {
+  font-size: clamp(27px, 8vw, 38px);
+  line-height: 1.08;
+}
+.guess-timer {
+  top: 67%;
+}
+.guess-controls .metallic-button {
+  border-radius: 5px;
+  clip-path: none;
+}
+.guesser-instruction {
+  font-size: 8px;
+  letter-spacing: 0.08px;
+}
+.round-badge {
+  min-height: 44px;
+}
+.app-shell:not(.screen-home) .mode-choice:focus-visible {
+  outline-offset: -4px;
+}
+@media (min-width: 700px) and (orientation: portrait) {
+  .guess-character {
+    top: 16%;
+    height: 36%;
+  }
+  .answer-nameplate {
+    top: 55%;
+  }
+  .guess-timer {
+    top: 68%;
+  }
+}
+@media (min-width: 1100px), (min-width: 900px) and (orientation: landscape) {
+  .guess-character {
+    top: 21%;
+    height: 61%;
+  }
+  .answer-nameplate {
+    top: 25%;
+  }
+  .answer-nameplate > strong {
+    font-size: clamp(36px, 3.6vw, 65px);
+  }
+  .guess-timer {
+    top: 49%;
+  }
+  .mode-copy {
+    top: 75%;
+  }
+  .mode-copy p {
+    font-size: 14px;
+  }
+}
+@media (max-height: 600px) and (orientation: landscape) {
+  .mode-copy {
+    top: 69%;
+  }
+  .mode-copy h2 {
+    font-size: 17px;
+  }
+  .mode-copy p {
+    font-size: 9px;
+  }
+  .guess-character {
+    top: 24%;
+    height: 64%;
+  }
+  .answer-nameplate {
+    top: 27%;
+  }
+  .answer-nameplate > strong {
+    font-size: clamp(20px, 3vw, 27px);
+  }
+  .guess-timer {
+    top: 56%;
+  }
+  .guesser-instruction {
+    font-size: 6px;
+  }
+}

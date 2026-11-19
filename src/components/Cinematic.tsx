@@ -236,11 +236,13 @@ export function CharacterCard({
   front = false,
   tone = 'red',
   className = '',
+  showName = true,
 }: {
   character?: Character | null;
   front?: boolean;
   tone?: Tone;
   className?: string;
+  showName?: boolean;
 }) {
   const [broken, setBroken] = useState(false);
   const { settings } = useGame();
@@ -287,7 +289,7 @@ export function CharacterCard({
       </div>
       <div className="card-lens-flare top-flare" />
       <div className="card-lens-flare bottom-flare" />
-      {front && character && (
+      {front && character && showName && (
         <div className="character-name" title={displayName}>
           {displayName}
         </div>

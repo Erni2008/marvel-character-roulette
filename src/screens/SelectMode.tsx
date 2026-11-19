@@ -3,7 +3,7 @@ import { ArrowUpRight, ChevronLeft } from 'lucide-react';
 import { motion as m } from 'motion/react';
 import type { SelectionMethod } from '../domain/game';
 import { useGame } from '../app/Store';
-import { CardFan, IlluminatedFrame, MetallicButton, RouletteWheel } from '../components/Cinematic';
+import { CardFan, MetallicButton, RouletteWheel } from '../components/Cinematic';
 export default function SelectMode() {
   const { t, navigate, start, motion, catalogReady } = useGame();
   const [armed, setArmed] = useState<SelectionMethod | null>(null);
@@ -34,7 +34,7 @@ export default function SelectMode() {
         <h1 className="metallic-title" id="mode-title">
           {t('SELECT MODE', 'ВЫБЕРИТЕ РЕЖИМ')}
         </h1>
-        <p>{t('CHOOSE HOW TO PICK A CHARACTER', 'ВЫБЕРИТЕ СПОСОБ ВЫБОРА ПЕРСОНАЖА')}</p>
+        <p>{t('Choose how to pick a character', 'Выберите способ жеребьёвки')}</p>
       </header>
       <div className="selection-modes">
         <m.button
@@ -50,18 +50,14 @@ export default function SelectMode() {
             'Карта — открыть случайного персонажа',
           )}
         >
-          <IlluminatedFrame tone="red" />
-          <span className="mode-number" aria-hidden="true">
-            01
-          </span>
           <div className="mode-art card-mode-art">
             <CardFan />
           </div>
           <div className="mode-copy">
             <h2 className="metallic-title">{t('CARD DRAW', 'КАРТА')}</h2>
             <p>
-              {t('Reveal a random character', 'Откройте случайного персонажа')}{' '}
-              {t('with a cinematic card', 'с помощью эффектной карты')}
+              {t('Shuffle the deck', 'Перемешайте колоду')}{' '}
+              {t('and turn over a card.', 'и откройте карту.')}
             </p>
           </div>
           <span className="mode-enter" aria-hidden="true">
@@ -82,18 +78,14 @@ export default function SelectMode() {
             'Рулетка — выбрать персонажа вращением',
           )}
         >
-          <IlluminatedFrame tone="blue" />
-          <span className="mode-number" aria-hidden="true">
-            02
-          </span>
           <div className="mode-art roulette-mode-art">
             <RouletteWheel decorative count={32} />
           </div>
           <div className="mode-copy">
             <h2 className="metallic-title">{t('ROULETTE', 'РУЛЕТКА')}</h2>
             <p>
-              {t('Spin through characters', 'Прокрутите персонажей')}{' '}
-              {t('and land on a random one', 'и доверьте выбор случаю')}
+              {t('Spin the wheel', 'Запустите колесо')}{' '}
+              {t('to pick a character.', 'и дождитесь результата.')}
             </p>
           </div>
           <span className="mode-enter" aria-hidden="true">

@@ -224,7 +224,6 @@ test.describe('local PNG presentation', () => {
     expect(
       await page.locator('.guess-character img').evaluate((el) => getComputedStyle(el).objectFit),
     ).toBe('contain');
-    await expect(page.locator('.guess-character')).toContainText('LOCAL TEST');
     await expect(page.locator('.answer-nameplate strong')).toHaveText('LOCAL TEST');
     await page.route('**/characters/missing.png', (route) => route.abort());
     await page.getByRole('button', { name: 'Skip character', exact: true }).click();
