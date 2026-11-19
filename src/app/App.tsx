@@ -32,10 +32,10 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean
     return this.state.failed ? (
       <div className="error-screen">
         <BrandEmblem />
-        <h1 className="metallic-title">THE SIGNAL WAS LOST</h1>
-        <p>Your saved preferences are safe. Reload to recover your session.</p>
+        <h1 className="metallic-title">СВЯЗЬ ПОТЕРЯНА</h1>
+        <p>Настройки сохранены. Перезагрузите, чтобы восстановить игру.</p>
         <button className="native-recovery" onClick={() => location.reload()}>
-          RELOAD EXPERIENCE
+          ПЕРЕЗАГРУЗИТЬ
         </button>
       </div>
     ) : (
@@ -248,7 +248,7 @@ function Loading() {
   return (
     <div className="cinematic-loading">
       <BrandEmblem />
-      <span>LOADING ARCHIVE…</span>
+      <span>ЗАГРУЗКА…</span>
     </div>
   );
 }

@@ -145,7 +145,7 @@ export default function Guess() {
       </div>
       <div className="guess-panel">
         <div className="answer-nameplate" aria-label={t('Answer for verification', 'Ответ для проверки')}>
-          <span>{t('THE ANSWER', 'ОТВЕТ')}</span>
+          <span>{t('GUESS THE CHARACTER!', 'УГАДАЙ ПЕРСОНАЖА!')}</span>
           <m.strong id="selected-name" initial={motion ? { opacity: 0, x: 40 } : false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}>
             {name}
           </m.strong>

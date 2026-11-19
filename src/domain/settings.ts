@@ -4,6 +4,7 @@ export interface Settings {
   rounds: number;
   method: SelectionMethod;
   language: Language;
+  langV: number;
   reducedMotion: boolean;
   quality: 'auto' | 'high' | 'low';
   highContrast: boolean;
@@ -21,7 +22,8 @@ export const defaults: Settings = {
   duration: 60,
   rounds: 10,
   method: 'card',
-  language: 'en',
+  language: 'ru',
+  langV: 2,
   reducedMotion: false,
   quality: 'auto',
   highContrast: false,
@@ -51,7 +53,8 @@ export function validateSettings(input: unknown): Settings {
     : 60;
   s.rounds = [0, 5, 10, 15, 20].includes(m.rounds as number) ? (m.rounds as number) : 10;
   s.method = m.method === 'roulette' ? 'roulette' : 'card';
-  s.language = m.language === 'ru' ? 'ru' : 'en';
+  s.language = m.language === 'en' && m.langV === 2 ? 'en' : 'ru';
+  s.langV = 2;
   s.quality = ['auto', 'high', 'low'].includes(m.quality as string)
     ? (m.quality as Settings['quality'])
     : 'auto';

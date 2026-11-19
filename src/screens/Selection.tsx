@@ -84,6 +84,14 @@ export default function Selection() {
       </header>
       <div className="draw-scene">
         <div className="stage-spot" aria-hidden="true" />
+        <div className="stage-beam" aria-hidden="true" />
+        <div className="stage-pedestal" aria-hidden="true"><i /><i /><i /></div>
+        {!isWheel && (
+          <div className="stage-orbits" aria-hidden="true">
+            <i />
+            <i />
+          </div>
+        )}
         {revealed && motion && <div className="reveal-flash" aria-hidden="true" />}
         <img className={`reveal-rays ${revealed ? 'on' : ''}`} src={asset('art/rays.webp')} alt="" aria-hidden="true" />
         {isWheel ? (
@@ -128,7 +136,7 @@ export default function Selection() {
             ? seq.character
               ? characterName(seq.character, settings.language)
               : t('CHARACTER SELECTED', 'ПЕРСОНАЖ ВЫБРАН')
-            : t(isWheel ? 'SPINNING…' : 'SHUFFLING…', isWheel ? 'КРУТИМ…' : 'ТАСУЕМ…')}
+            : t(isWheel ? 'SPINNING…' : 'DRAWING CHARACTER…', isWheel ? 'КРУТИМ РУЛЕТКУ…' : 'ВЫБИРАЕМ ПЕРСОНАЖА…')}
         </h1>
         <div
           ref={progressBar}
@@ -140,6 +148,7 @@ export default function Selection() {
           aria-valuenow={seq.ready ? 100 : undefined}
         >
           <m.div className="progress-fill" style={{ scaleX: seq.progress }} />
+          <div className="progress-segments" />
         </div>
         <button className="sequence-skip" onClick={seq.ready ? enterGuess : seq.skip}>
           {seq.ready ? (

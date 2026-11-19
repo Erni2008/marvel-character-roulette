@@ -105,8 +105,8 @@ export function CharacterCard({
         <div className="cb-rays" />
         <div className="cb-border" />
         <BrandEmblem className="cb-emblem" />
-        <span className="cb-word cb-top">CHARACTER</span>
-        <span className="cb-word cb-bottom">ROULETTE</span>
+        <span className="cb-word cb-top">{settings.language === 'ru' ? 'РУЛЕТКА' : 'CHARACTER'}</span>
+        <span className="cb-word cb-bottom">{settings.language === 'ru' ? 'ГЕРОЕВ' : 'ROULETTE'}</span>
         <div className="cc-foil" />
       </div>
     );

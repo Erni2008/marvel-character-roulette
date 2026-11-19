@@ -28,8 +28,8 @@ export function useSelectionSequence({
     () =>
       Array.from({ length: DECK_SIZE }, (_, index) => ({
         index,
-        x: motionValue(0),
-        y: motionValue(0),
+        x: motionValue('0%'),
+        y: motionValue('0%'),
         rotate: motionValue(0),
         yaw: motionValue(0),
         scale: motionValue(1),
@@ -81,8 +81,8 @@ export function useSelectionSequence({
                 opacity: card.index === 0 ? 1 : 0,
                 yaw: p === 1 ? 180 : 0,
               };
-          card.x.set(v.x);
-          card.y.set(v.y);
+          card.x.set(`${v.x}%`);
+          card.y.set(`${v.y}%`);
           card.rotate.set(v.rotate);
           card.yaw.set(v.yaw);
           card.scale.set(v.scale);
