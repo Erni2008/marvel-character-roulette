@@ -1,7 +1,7 @@
 import catalog from '../../public/characters/manifest.json';
 export type Language = 'en' | 'ru';
 export type SelectionMethod = 'card' | 'roulette';
-export type Screen = 'home' | 'modes' | 'draw' | 'guess' | 'settings' | 'stats' | 'summary';
+export type Screen = 'home' | 'modes' | 'draw' | 'guess' | 'settings' | 'stats' | 'summary' | 'gallery';
 export interface Character {
   id: string;
   name: string;

@@ -90,7 +90,7 @@ function readScreen(session: GameSession | null): Screen {
       result: 'summary',
     };
   const candidate = aliases[key] ?? key;
-  const valid = ['home', 'modes', 'draw', 'guess', 'settings', 'stats', 'summary'];
+  const valid = ['home', 'modes', 'draw', 'guess', 'settings', 'stats', 'summary', 'gallery'];
   if (!valid.includes(candidate)) return 'home';
   if (['guess', 'summary'].includes(candidate) && !session?.character) return 'home';
   if (candidate === 'draw' && !session) return 'modes';

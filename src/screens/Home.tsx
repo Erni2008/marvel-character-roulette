@@ -1,4 +1,4 @@
-import { BarChart3, Gamepad2, Layers, Play, Settings, Volume2, VolumeX } from 'lucide-react';
+import { BarChart3, Gamepad2, Images, Layers, Play, Settings, Volume2, VolumeX } from 'lucide-react';
 import { motion as m } from 'motion/react';
 import { useGame } from '../app/Store';
 import { MetallicButton } from '../components/Cinematic';
@@ -52,6 +52,10 @@ export default function Home() {
           <button onClick={() => navigate('modes')}>
             <Gamepad2 size={18} />
             <span>{t('MODES', 'РЕЖИМЫ')}</span>
+          </button>
+          <button onClick={() => navigate('gallery')}>
+            <Images size={18} />
+            <span>{t('HEROES', 'ГЕРОИ')}</span>
           </button>
           <button onClick={() => navigate('stats')}>
             <BarChart3 size={18} />

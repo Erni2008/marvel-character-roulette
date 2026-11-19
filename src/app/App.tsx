@@ -20,6 +20,7 @@ import Guess from '../screens/Guess';
 import Settings from '../screens/Settings';
 import Stats from '../screens/Stats';
 import Summary from '../screens/Summary';
+import Gallery from '../screens/Gallery';
 class ErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() {
@@ -338,6 +339,8 @@ function Experience() {
                   <Settings />
                 ) : screen === 'stats' ? (
                   <Stats />
+                ) : screen === 'gallery' ? (
+                  <Gallery />
                 ) : (
                   <Summary />
                 )}
