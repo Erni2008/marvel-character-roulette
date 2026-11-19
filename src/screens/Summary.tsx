@@ -13,9 +13,13 @@ export default function Summary() {
     avg = hits.length ? Math.round(hits.reduce((a, r) => a + r.time, 0) / hits.length) : 0,
     best = hits.reduce<(typeof hits)[number] | null>((b, r) => (!b || r.time < b.time ? r : b), null),
     total = rows.reduce((a, r) => a + r.time, 0);
-  const [order, setOrder] = useState<'fast' | 'slow' | 'round'>('fast');
+  const [order, setOrder] = useState<'fast' | 'slow' | 'miss' | 'round'>('fast');
   const sorted = [...rows].sort((a, b) => {
     if (order === 'round') return a.round - b.round;
+    if (order === 'miss') {
+      const am = a.outcome !== 'correct', bm = b.outcome !== 'correct';
+      return am !== bm ? (am ? -1 : 1) : a.round - b.round;
+    }
     const ah = a.outcome === 'correct', bh = b.outcome === 'correct';
     if (ah !== bh) return ah ? -1 : 1; // guessed first, then the rest
     return order === 'fast' ? a.time - b.time : b.time - a.time;
@@ -44,6 +48,7 @@ export default function Summary() {
           {([
             ['fast', <ArrowUpNarrowWide key="f" size={15} />, t('FASTEST FIRST', 'СНАЧАЛА БЫСТРЫЕ')],
             ['slow', <ArrowDownWideNarrow key="s" size={15} />, t('SLOWEST FIRST', 'СНАЧАЛА МЕДЛЕННЫЕ')],
+            ['miss', <X key="m" size={15} />, t('NOT GUESSED FIRST', 'СНАЧАЛА НЕУГАДАННЫЕ')],
             ['round', <ListOrdered key="r" size={15} />, t('BY ROUND', 'ПО РАУНДАМ')],
           ] as const).map(([k, icon, label]) => (
             <button key={k} className={order === k ? 'is-on' : ''} aria-pressed={order === k} onClick={() => setOrder(k)}>

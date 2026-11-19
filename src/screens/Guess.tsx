@@ -121,8 +121,10 @@ export default function Guess() {
             {s.round}
           </span>
         </button>
-        <div className="pool-info" aria-hidden="true">
-          {t(`${game.characters.filter((c) => c.enabled).length} heroes in the deck`, `В колоде героев: ${game.characters.filter((c) => c.enabled).length}`)}
+        <div className="score-hud" aria-label={t('Score', 'Счёт')}>
+          <span className="sc-hit"><Check size={15} /> {s.records.filter((r) => r.outcome === 'correct').length}</span>
+          <span className="sc-miss"><X size={15} /> {s.records.filter((r) => r.outcome !== 'correct').length}</span>
+          <span className="sc-deck">{t('IN DECK', 'В КОЛОДЕ')} {game.characters.filter((c) => c.enabled).length}</span>
         </div>
         {!settings.stream && (
           <button className="guess-settings" aria-label={t('Game settings', 'Настройки игры')} onClick={openSettings}>
@@ -159,7 +161,8 @@ export default function Guess() {
         )}
         {isSettled && s.outcome === 'correct' && motion && <Burst color="#2fe38a" count={36} />}
       </div>
-      <div className="guess-panel">
+      <div className="guess-panel hud-panel">
+        <i className="hud-corner tl" /><i className="hud-corner tr" /><i className="hud-corner bl" /><i className="hud-corner br" />
         <div className="answer-nameplate" aria-label={t('Answer for verification', 'Ответ для проверки')}>
           <span>{t('GUESS THE CHARACTER!', 'УГАДАЙ ПЕРСОНАЖА!')}</span>
           <m.strong id="selected-name" initial={motion ? { opacity: 0, x: 40 } : false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}>
