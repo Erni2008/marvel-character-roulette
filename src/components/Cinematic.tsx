@@ -116,7 +116,7 @@ export function CharacterCard({
       <div className="cc-halftone" />
       {art && <div className="cc-backlight" />}
       {art ? (
-        <img className="character-art" src={asset(character.imagePath)} alt={name} onError={() => setBroken(true)} draggable={false} />
+        <img className="character-art" src={asset(character.imagePath)} alt={name} decoding="sync" loading="eager" onError={() => setBroken(true)} draggable={false} />
       ) : (
         <div className="cc-mono neutral-silhouette" aria-hidden="true">
           <span className="cc-mono-shadow">{monogram(character.name)}</span>

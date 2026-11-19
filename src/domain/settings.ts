@@ -20,7 +20,7 @@ export interface Settings {
 }
 export const defaults: Settings = {
   duration: 60,
-  rounds: 10,
+  rounds: 0,
   method: 'card',
   language: 'ru',
   langV: 2,
@@ -51,7 +51,7 @@ export function validateSettings(input: unknown): Settings {
   s.duration = [15, 30, 45, 60, 90, 120].includes(m.duration as number)
     ? (m.duration as number)
     : 60;
-  s.rounds = [0, 5, 10, 15, 20].includes(m.rounds as number) ? (m.rounds as number) : 10;
+  s.rounds = 0; // endless: the host decides when to stop
   s.method = m.method === 'roulette' ? 'roulette' : 'card';
   s.language = m.language === 'en' && m.langV === 2 ? 'en' : 'ru';
   s.langV = 2;

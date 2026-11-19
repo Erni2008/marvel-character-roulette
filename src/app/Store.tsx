@@ -101,6 +101,7 @@ function readScreen(session: GameSession | null): Screen {
     return 'draw';
   return candidate as Screen;
 }
+const REMOVED_KEY = 'character-roulette.removed.v1';
 export type Modal = 'install' | 'help' | 'leave' | 'reset' | 'camera' | null;
 interface Store {
   settings: Settings;
@@ -110,6 +111,9 @@ interface Store {
   statistics: Statistics;
   characters: Character[];
   catalogReady: boolean;
+  removedCount: number;
+  removeCurrent: (remaining?: number) => void;
+  restorePool: () => void;
   screen: Screen;
   navigate: (s: Screen) => void;
   back: () => void;
@@ -142,7 +146,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [settingsReturn, setSettingsReturn] = useState<Screen>('home'),
     [modal, setModal] = useState<Modal>(null),
     [toast, setToast] = useState<string | null>(loaded.error),
-    [active, setActive] = useState(!document.hidden);
+    [active, setActive] = useState(!document.hidden),
+    [removed, setRemoved] = useState<string[]>(() => {
+      try {
+        const v = JSON.parse(localStorage.getItem(REMOVED_KEY) || '[]');
+        return Array.isArray(v) ? v.filter((x) => typeof x === 'string') : [];
+      } catch {
+        return [];
+      }
+    });
   const sessionRef = useRef(session),
     statsRef = useRef(statistics),
     settingsRef = useRef(settings);
@@ -279,15 +291,29 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     },
     [commit, navigate, update],
   );
+  const pool = useMemo(() => {
+    const live = characters.map((c) => (removed.includes(c.id) ? { ...c, enabled: false } : c));
+    return live.some((c) => c.enabled) ? live : characters;
+  }, [characters, removed]);
+  const saveRemoved = useCallback((next: string[]) => {
+    setRemoved(next);
+    try {
+      localStorage.setItem(REMOVED_KEY, JSON.stringify(next));
+    } catch {
+      /* optional */
+    }
+  }, []);
+  const restorePool = useCallback(() => saveRemoved([]), [saveRemoved]);
   const prepare = useCallback(() => {
     const s = sessionRef.current;
     if (!s) throw Error('Start a session first.');
     if (s.character) return s.character;
-    const forced = !s.records.length && PREVIEW_FIRST_ID ? characters.find((c) => c.id === PREVIEW_FIRST_ID && c.enabled) : undefined;
-    const character = forced ?? chooseCharacter(characters, s.records.at(-1)?.character.id);
+    const forced = !s.records.length && PREVIEW_FIRST_ID ? pool.find((c) => c.id === PREVIEW_FIRST_ID && c.enabled) : undefined;
+    const character = forced ?? chooseCharacter(pool, s.records.at(-1)?.character.id);
+    if (character.imagePath) new Image().src = import.meta.env.BASE_URL + character.imagePath.replace(/^\//, '');
     commit({ ...s, character, phase: 'selecting' });
     return character;
-  }, [characters, commit]);
+  }, [pool, commit]);
   const reveal = useCallback(() => {
     const s = sessionRef.current;
     if (s?.character && s.phase === 'selecting') commit({ ...s, phase: 'revealed' });
@@ -329,6 +355,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     },
     [commit, navigate, settle],
   );
+  /** Take the current hero out of the pool and go straight to the next one. */
+  const removeCurrent = useCallback(
+    (remaining = 0) => {
+      const s = sessionRef.current;
+      if (!s?.character) return;
+      const id = s.character.id,
+        left = pool.filter((c) => c.enabled && c.id !== id).length;
+      saveRemoved(left ? [...new Set([...removed, id])] : []);
+      if (!left) setToast(t('All heroes were used — the deck is full again.', 'Все герои использованы — колода снова полная.'));
+      advance('skipped', remaining);
+    },
+    [pool, removed, saveRemoved, advance, t],
+  );
   const saveElapsed = useCallback(
     (elapsed: number, key?: string) => {
       const s = sessionRef.current;
@@ -352,8 +391,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       importSettings,
       session,
       statistics,
-      characters,
+      characters: pool,
       catalogReady,
+      removedCount: removed.filter((id) => characters.some((c) => c.id === id)).length,
+      removeCurrent,
+      restorePool,
       screen,
       navigate,
       back,
@@ -380,8 +422,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       importSettings,
       session,
       statistics,
-      characters,
+      pool,
+      removed,
       catalogReady,
+      removeCurrent,
+      restorePool,
       screen,
       navigate,
       back,

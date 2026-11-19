@@ -35,15 +35,28 @@ export default function Selection() {
   useEffect(() => {
     if (!isWheel) return;
     let last = -1,
-      lastSound = 0;
+      lastSound = 0,
+      lastV = 0,
+      lastT = performance.now(),
+      stopped = false;
     return seq.rotation.on('change', (v) => {
+      const now = performance.now(),
+        vel = Math.abs(v - lastV) / Math.max(1, now - lastT); // deg per ms
+      lastV = v;
+      lastT = now;
       const i = wheelIndexAtPointer(v, seq.wheelEntries.length);
-      if (i === last) return;
+      if (i === last) {
+        if (!stopped && vel < 0.002 && now - lastSound > 300 && seq.progress.get() > 0.8) {
+          stopped = true;
+          sfx.thunk();
+        }
+        return;
+      }
       last = i;
-      const now = performance.now();
-      if (now - lastSound > 38) {
+      // at top speed pegs blur together: thin them out like a real wheel's flapper
+      if (now - lastSound > (vel > 1 ? 55 : 28)) {
         lastSound = now;
-        sfx.tick();
+        sfx.tick(Math.min(1, vel / 1.2));
       }
       const p = pointer.current?.querySelector<HTMLElement>('.wheel-pointer');
       if (p) {
@@ -52,18 +65,19 @@ export default function Selection() {
         p.classList.add('flick');
       }
     });
-  }, [isWheel, seq.rotation, seq.wheelEntries.length]);
+  }, [isWheel, seq.rotation, seq.wheelEntries.length, seq.progress]);
   const stopShuffle = useRef<(() => void) | null>(null);
   useEffect(() => {
     if (seq.stage === 1) {
       if (isWheel) sfx.whoosh();
-      else stopShuffle.current = sfx.riffle(1.15);
+      else stopShuffle.current = sfx.riffle();
     }
     if (seq.stage >= 2 && stopShuffle.current) {
       stopShuffle.current();
       stopShuffle.current = null;
       if (!isWheel) sfx.slide();
     }
+    if (seq.stage === 2 && isWheel) sfx.thunk();
     if (seq.stage === 3) sfx.reveal();
   }, [seq.stage, isWheel]);
   useEffect(() => () => stopShuffle.current?.(), []);
@@ -85,8 +99,7 @@ export default function Selection() {
     >
       <header className="selection-chapter">
         <span>
-          {t('ROUND', 'РАУНД')} {String(snapshot.round).padStart(2, '0')}
-          {snapshot.rounds ? <em> / {String(snapshot.rounds).padStart(2, '0')}</em> : null}
+          {t('ROUND', 'РАУНД')} {snapshot.round}
         </span>
         <i />
         <span>{t(isWheel ? 'ROULETTE' : 'CARD DRAW', isWheel ? 'РУЛЕТКА' : 'КАРТА')}</span>

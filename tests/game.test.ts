@@ -104,12 +104,12 @@ describe('session integrity', () => {
   });
 });
 describe('preferences', () => {
-  it('starts at one minute and ten rounds, validates imports and clamps values', () => {
-    expect(defaults).toMatchObject({ duration: 60, rounds: 10 });
+  it('starts at one minute and endless rounds, validates imports and clamps values', () => {
+    expect(defaults).toMatchObject({ duration: 60, rounds: 0 });
     expect(validateSettings({ scale: 99, duration: 3, rounds: -2, master: -1 })).toMatchObject({
       scale: 1.2,
       duration: 60,
-      rounds: 10,
+      rounds: 0,
       master: 0,
     });
     expect(() => validateSettings('broken')).toThrow();

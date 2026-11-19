@@ -66,8 +66,43 @@ function noise(dur: number, gain: number, from: number, to: number, at = 0) {
   src.connect(f).connect(g).connect(out);
   src.start(t);
 }
+function peg(speed: number) {
+  const c = audio();
+  if (!c || !out || level <= 0) return;
+  const t = c.currentTime,
+    len = 0.03,
+    buf = c.createBuffer(1, Math.ceil(c.sampleRate * len), c.sampleRate),
+    d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (c.sampleRate * 0.0035));
+  const src = c.createBufferSource(),
+    bp = c.createBiquadFilter(),
+    body = c.createBiquadFilter(),
+    g = c.createGain();
+  src.buffer = buf;
+  bp.type = 'bandpass';
+  bp.frequency.value = 2200 + speed * 1600 + Math.random() * 300;
+  bp.Q.value = 3;
+  body.type = 'peaking';
+  body.frequency.value = 700;
+  body.gain.value = 8;
+  g.gain.value = 0.35 + speed * 0.4;
+  src.connect(bp).connect(body).connect(g).connect(out);
+  src.start(t);
+  // tiny wooden body resonance
+  const o = c.createOscillator(),
+    og = c.createGain();
+  o.type = 'triangle';
+  o.frequency.setValueAtTime(420 + speed * 120, t);
+  o.frequency.exponentialRampToValueAtTime(260, t + 0.04);
+  og.gain.setValueAtTime(0.0001, t);
+  og.gain.exponentialRampToValueAtTime(0.09 + speed * 0.06, t + 0.002);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+  o.connect(og).connect(out);
+  o.start(t);
+  o.stop(t + 0.06);
+}
 /* ---- recorded samples (Kenney, CC0) ---- */
-const names = ['shuffle', 'fan', 'slide1', 'slide2', 'slide3', 'place', 'shove', 'chip', 'tick', 'click', 'correct', 'fail', 'beep', 'open'] as const;
+const names = ['shuffle', 'fan', 'fan2', 'pack1', 'pack2', 'slide1', 'slide2', 'slide3', 'slide4', 'slide5', 'slide7', 'slide8', 'place', 'place2', 'place3', 'place4', 'shove', 'shove2', 'shove3', 'chip', 'tick', 'click', 'correct', 'fail', 'beep', 'open'] as const;
 type Sample = (typeof names)[number];
 const buffers = new Map<Sample, AudioBuffer>();
 let loading = false;
@@ -82,7 +117,7 @@ function load() {
       .then((buf) => buffers.set(n, buf))
       .catch(() => {});
 }
-function play(n: Sample, gain = 1, rate = 1, at = 0): false | { stop: (fade?: number) => void } {
+function play(n: Sample, gain = 1, rate = 1, at = 0, offset = 0): false | { stop: (fade?: number) => void } {
   const c = audio(),
     buf = buffers.get(n);
   if (!c || !out || !buf || level <= 0) return false;
@@ -92,7 +127,7 @@ function play(n: Sample, gain = 1, rate = 1, at = 0): false | { stop: (fade?: nu
   src.playbackRate.value = rate;
   g.gain.value = gain;
   src.connect(g).connect(out);
-  src.start(c.currentTime + at);
+  src.start(c.currentTime + at, offset);
   return {
     stop: (fade = 0.12) => {
       const t = c.currentTime;
@@ -108,24 +143,62 @@ function play(n: Sample, gain = 1, rate = 1, at = 0): false | { stop: (fade?: nu
   };
 }
 const vary = (x = 0.08) => 1 + (Math.random() * 2 - 1) * x;
+const slides: Sample[] = ['slide1', 'slide2', 'slide4', 'slide5', 'slide7', 'slide8'],
+  places: Sample[] = ['place', 'place2', 'place3', 'place4'],
+  pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+type H = ReturnType<typeof play>;
+/** A riffle "brrrt": many very short card slaps accelerating then easing. */
+function burst(at: number, count: number, span: number, gain = 0.45): H[] {
+  const out: H[] = [];
+  for (let i = 0; i < count; i++) {
+    const u = i / (count - 1),
+      t = at + span * (u * u * 0.35 + u * 0.65);
+    out.push(play(pick(places), gain * (0.7 + Math.random() * 0.4), 1.5 + Math.random() * 0.6, t));
+  }
+  return out;
+}
+const shuffles: (() => H[])[] = [
+  // 1. classic table riffle + bridge
+  () => [play('shuffle', 1, 1.12)],
+  // 2. bridge finish from the middle of the recording, then a soft fan
+  () => [play('shuffle', 0.95, 1.0, 0, 0.55), play('fan2', 0.7, 1.05, 1.7)],
+  // 3. double machine riffle
+  () => [play('slide4', 0.6, 0.9), ...burst(0.25, 16, 0.6), play('shove2', 0.6, 1, 0.95), ...burst(1.15, 16, 0.6), play('place2', 0.8, 0.95, 1.85)],
+  // 4. fan, cut, riffle
+  () => [play('fan2', 0.8, 1.1), play('shove3', 0.7, 1, 0.55), ...burst(0.85, 14, 0.55, 0.5), play('fan', 0.7, 1.1, 1.5), play('place3', 0.8, 1, 1.95)],
+  // 5. overhand shuffle: clusters of slides
+  () => {
+    const hs: H[] = [play('pack2', 0.6, 1.1)];
+    for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) hs.push(play(pick(slides), 0.45, 1.25 + Math.random() * 0.4, 0.3 + i * 0.28 + j * 0.06));
+    hs.push(play('place4', 0.8, 1, 2.05));
+    return hs;
+  },
+];
+let lastShuffle = -1;
 export const sfx = {
-  tick: () => {
-    if (!play('tick', 0.55, vary(0.12))) tone(1800, 0.03, 'square', 0.05);
+  /** Wheel peg hitting the flapper. `speed` 0..1 shapes loudness/brightness. */
+  tick: (speed = 0.5) => peg(speed),
+  thunk: () => {
+    tone(70, 0.45, 'sine', 0.5, 0, 45);
+    noise(0.25, 0.25, 900, 120);
+    play('place2', 0.9, 0.7);
   },
   whoosh: () => {
-    noise(0.7, 0.3, 200, 2600);
-    play('slide3', 0.8, 0.8);
+    noise(0.9, 0.18, 300, 1800);
+    play('slide3', 0.6, 0.75);
   },
   flip: () => {
     play('slide2', 0.9, vary());
     play('place', 0.9, 1, 0.12);
   },
-  /** Returns a stopper so the shuffle sound ends exactly when the deck settles. */
-  riffle: (rate = 1) => {
-    const h = play('shuffle', 1, rate);
-    return () => {
-      if (h) h.stop(0.1);
-    };
+  /** One of five shuffle performances (never the same twice in a row). Returns a stopper so the
+   *  sound ends exactly when the deck settles. */
+  riffle: () => {
+    let k = Math.floor(Math.random() * shuffles.length);
+    if (k === lastShuffle) k = (k + 1) % shuffles.length;
+    lastShuffle = k;
+    const hs = shuffles[k]();
+    return () => hs.forEach((h) => h && h.stop(0.08));
   },
   slide: () => play(Math.random() < 0.5 ? 'slide1' : 'slide2', 0.7, vary(0.1)),
   reveal: () => {

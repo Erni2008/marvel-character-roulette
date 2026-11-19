@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { ArrowRight, Check, ChevronsRight, Settings2, X } from 'lucide-react';
-import { motion as m } from 'motion/react';
+import { ArrowRight, Check, ChevronsRight, Settings2, Trash2, X } from 'lucide-react';
+import { motion as m, useMotionValue, useTransform, animate } from 'motion/react';
 import { useGame } from '../app/Store';
 import { characterName, roundKey } from '../domain/game';
 import { useCountdown } from '../hooks/useCountdown';
@@ -74,6 +74,22 @@ export default function Guess() {
     else if (s.outcome === 'timeout') sfx.fail();
   }, [isSettled, s.outcome]);
   const id = identity(s.character);
+  const drag = useMotionValue(0),
+    tilt = useTransform(drag, [-300, 300], [-14, 14]),
+    fade = useTransform(drag, [-320, -140, 0, 140, 320], [0.2, 0.85, 1, 0.85, 0.2]);
+  const removing = useRef(false);
+  const remove = useCallback(
+    (dir = 1) => {
+      if (removing.current) return;
+      removing.current = true;
+      timer.pause();
+      sfx.slide();
+      const done = () => game.removeCurrent(isSettled ? s.remaining : remaining());
+      if (motion) void animate(drag, dir * 900, { duration: 0.35, ease: [0.4, 0, 1, 1] }).then(done);
+      else done();
+    },
+    [timer, game, isSettled, s.remaining, motion, drag],
+  );
   const outcomeText =
     s.outcome === 'correct'
       ? t('CORRECT!', 'ВЕРНО!')
@@ -100,20 +116,11 @@ export default function Guess() {
         >
           <span className="rb-label">{t('ROUND', 'РАУНД')}</span>
           <span className="rb-value">
-            {String(s.round).padStart(2, '0')}
-            <em>/{s.rounds ? String(s.rounds).padStart(2, '0') : '∞'}</em>
+            {s.round}
           </span>
         </button>
-        <div className="round-track" aria-hidden="true">
-          {Array.from({ length: s.rounds || 10 }, (_, i) => {
-            const rec = s.records.find((r) => r.round === i + 1);
-            return (
-              <i
-                key={i}
-                className={`${i < s.round - 1 ? 'round-done' : i === s.round - 1 ? 'round-current' : ''} ${rec ? `rec-${rec.outcome}` : ''}`}
-              />
-            );
-          })}
+        <div className="pool-info" aria-hidden="true">
+          {t(`${game.characters.filter((c) => c.enabled).length} heroes in the deck`, `В колоде героев: ${game.characters.filter((c) => c.enabled).length}`)}
         </div>
         {!settings.stream && (
           <button className="guess-settings" aria-label={t('Game settings', 'Настройки игры')} onClick={openSettings}>
@@ -124,8 +131,15 @@ export default function Guess() {
       <div className="guess-character">
         <m.div
           className="guess-card-wrap"
-          initial={motion ? { opacity: 0, scale: 0.88, y: 30 } : false}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
+          drag="x"
+          dragSnapToOrigin
+          dragElastic={0.6}
+          style={{ x: drag, rotate: tilt, opacity: fade }}
+          onDragEnd={(_, info) => {
+            if (Math.abs(info.offset.x) > 120 || Math.abs(info.velocity.x) > 700) remove(info.offset.x > 0 ? 1 : -1);
+          }}
+          initial={motion ? { scale: 0.88, y: 30 } : false}
+          animate={{ scale: 1, y: 0 }}
           transition={{ type: 'spring', stiffness: 110, damping: 16 }}
         >
           <CharacterCard front character={s.character} />
@@ -163,13 +177,17 @@ export default function Guess() {
             <Check />
             <span>{t('CORRECT', 'ВЕРНО')}</span>
           </MetallicButton>
+          <MetallicButton tone="red" shape="tile" className="remove-control" onClick={() => remove(1)} aria-label={t('Remove hero from the deck', 'Убрать героя из колоды')}>
+            <Trash2 />
+            <span>{t('REMOVE', 'УБРАТЬ')}</span>
+          </MetallicButton>
           <MetallicButton tone={isSettled ? 'gold' : 'silver'} shape="tile" className={isSettled ? 'next-ready' : ''} onClick={next} aria-label={t('Next round', 'Следующий раунд')}>
             <ArrowRight />
             <span>{t('NEXT', 'ДАЛЕЕ')}</span>
           </MetallicButton>
         </div>
         <p className="guesser-instruction">
-          {t('GUESSER: LOOK AWAY · EVERYONE ELSE: GIVE CLUES', 'УГАДЫВАЮЩИЙ НЕ СМОТРИТ · ОСТАЛЬНЫЕ ПОДСКАЗЫВАЮТ')}
+          {t('SWIPE THE CARD LEFT OR RIGHT TO REMOVE THE HERO', 'СМАХНИТЕ КАРТУ ВЛЕВО ИЛИ ВПРАВО, ЧТОБЫ УБРАТЬ ГЕРОЯ')}
         </p>
       </div>
     </section>

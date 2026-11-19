@@ -5,7 +5,7 @@ import { useGame } from '../app/Store';
 import { CinematicPanel, MetallicButton } from '../components/Cinematic';
 import type { Settings as SettingsType } from '../domain/settings';
 export default function Settings() {
-  const { settings: s, update, t, back, setModal, importSettings, setToast } = useGame(),
+  const { settings: s, update, t, back, setModal, importSettings, setToast, restorePool, removedCount } = useGame(),
     input = useRef<HTMLInputElement>(null);
   const range = (
     label: string,
@@ -92,16 +92,12 @@ export default function Settings() {
               ))}
             </select>
           </label>
-          <label className="settings-field">
-            <span>{t('SESSION LENGTH', 'ДЛИТЕЛЬНОСТЬ ИГРЫ')}</span>
-            <select value={s.rounds} onChange={(e) => update({ rounds: Number(e.target.value) })}>
-              {[5, 10, 15, 20, 0].map((v) => (
-                <option key={v} value={v}>
-                  {v || t('Unlimited', 'Без ограничений')} {v ? t('rounds', 'раундов') : ''}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="settings-field">
+            <span>{t('HERO DECK', 'КОЛОДА ГЕРОЕВ')}</span>
+            <MetallicButton tone="blue" onClick={restorePool} disabled={!removedCount}>
+              {removedCount ? t(`RETURN ${removedCount} REMOVED HEROES`, `ВЕРНУТЬ УБРАННЫХ (${removedCount})`) : t('ALL HEROES ARE IN THE DECK', 'ВСЕ ГЕРОИ В КОЛОДЕ')}
+            </MetallicButton>
+          </div>
           <label className="settings-field">
             <span>{t('DEFAULT SELECTION', 'СПОСОБ ВЫБОРА')}</span>
             <select
