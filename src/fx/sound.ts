@@ -82,7 +82,7 @@ function load() {
       .then((buf) => buffers.set(n, buf))
       .catch(() => {});
 }
-function play(n: Sample, gain = 1, rate = 1, at = 0) {
+function play(n: Sample, gain = 1, rate = 1, at = 0): false | { stop: (fade?: number) => void } {
   const c = audio(),
     buf = buffers.get(n);
   if (!c || !out || !buf || level <= 0) return false;
@@ -93,7 +93,19 @@ function play(n: Sample, gain = 1, rate = 1, at = 0) {
   g.gain.value = gain;
   src.connect(g).connect(out);
   src.start(c.currentTime + at);
-  return true;
+  return {
+    stop: (fade = 0.12) => {
+      const t = c.currentTime;
+      g.gain.cancelScheduledValues(t);
+      g.gain.setValueAtTime(g.gain.value, t);
+      g.gain.linearRampToValueAtTime(0, t + fade);
+      try {
+        src.stop(t + fade + 0.02);
+      } catch {
+        /* already stopped */
+      }
+    },
+  };
 }
 const vary = (x = 0.08) => 1 + (Math.random() * 2 - 1) * x;
 export const sfx = {
@@ -108,8 +120,12 @@ export const sfx = {
     play('slide2', 0.9, vary());
     play('place', 0.9, 1, 0.12);
   },
-  riffle: () => {
-    if (!play('shuffle', 1, vary(0.04))) for (let i = 0; i < 9; i++) noise(0.05, 0.18, 2500, 1400, i * 0.035);
+  /** Returns a stopper so the shuffle sound ends exactly when the deck settles. */
+  riffle: (rate = 1) => {
+    const h = play('shuffle', 1, rate);
+    return () => {
+      if (h) h.stop(0.1);
+    };
   },
   slide: () => play(Math.random() < 0.5 ? 'slide1' : 'slide2', 0.7, vary(0.1)),
   reveal: () => {

@@ -62,7 +62,7 @@ export function useSelectionSequence({
       elapsed = 0,
       currentStage = -1,
       currentFront = restored;
-    const duration = motion ? (method === 'card' ? 5200 : 6400) : 800;
+    const duration = motion ? (method === 'card' ? 3300 : 6400) : 800;
     function pose(p: number) {
       progress.set(p);
       const wheelP = Math.min(1, p / 0.82);

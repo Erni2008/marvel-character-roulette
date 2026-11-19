@@ -52,22 +52,22 @@ export function MetallicButton({
   );
 }
 
-export function BrandEmblem({ className = '' }: { className?: string }) {
+export function BrandEmblem({ className = '', silver = false }: { className?: string; silver?: boolean }) {
   const id = useId().replace(/:/g, '');
   return (
     <svg viewBox="0 0 200 200" className={`brand-emblem ${className}`} aria-hidden="true">
       <defs>
         <linearGradient id={`${id}-g`} x1="0" y1="0" x2="1" y2="1">
-          <stop stopColor="#fff3d1" />
-          <stop offset=".35" stopColor="#f0b34a" />
-          <stop offset=".55" stopColor="#8a5a16" />
-          <stop offset=".8" stopColor="#f7d488" />
-          <stop offset="1" stopColor="#7a4e12" />
+          <stop stopColor={silver ? '#ffffff' : '#fff3d1'} />
+          <stop offset=".35" stopColor={silver ? '#c9ced8' : '#f0b34a'} />
+          <stop offset=".55" stopColor={silver ? '#4c5263' : '#8a5a16'} />
+          <stop offset=".8" stopColor={silver ? '#eef1f6' : '#f7d488'} />
+          <stop offset="1" stopColor={silver ? '#6d7486' : '#7a4e12'} />
         </linearGradient>
         <radialGradient id={`${id}-c`}>
-          <stop stopColor="#ff3a4c" />
-          <stop offset=".7" stopColor="#8c0717" />
-          <stop offset="1" stopColor="#3a020a" />
+          <stop stopColor={silver ? '#2a2d38' : '#ff3a4c'} />
+          <stop offset=".7" stopColor={silver ? '#12131a' : '#8c0717'} />
+          <stop offset="1" stopColor={silver ? '#07070b' : '#3a020a'} />
         </radialGradient>
       </defs>
       <circle cx="100" cy="100" r="92" fill={`url(#${id}-c)`} stroke={`url(#${id}-g)`} strokeWidth="7" />
@@ -101,10 +101,8 @@ export function CharacterCard({
   if (!front || !character)
     return (
       <div className={`character-card card-back ${className}`} aria-hidden="true">
-        <div className="cb-field" />
-        <div className="cb-rays" />
-        <div className="cb-border" />
-        <BrandEmblem className="cb-emblem" />
+        <img className="cb-art" src={asset('art/card-back.webp')} alt="" draggable={false} />
+        <BrandEmblem className="cb-emblem" silver />
         <span className="cb-word cb-top">{settings.language === 'ru' ? 'РУЛЕТКА' : 'CHARACTER'}</span>
         <span className="cb-word cb-bottom">{settings.language === 'ru' ? 'ГЕРОЕВ' : 'ROULETTE'}</span>
         <div className="cc-foil" />
@@ -130,7 +128,7 @@ export function CharacterCard({
       <div className="cc-border" />
       <span className="cc-number">№ {character.id.replace(/\D/g, '').padStart(3, '0')}</span>
       {showName && (
-        <div className="character-name" title={name}>
+        <div className="character-name" title={name} style={{ '--fit': Math.min(1, 10 / Math.max(name.length, 1)) } as CSSProperties}>
           <i className="cn-rule" />
           <span>{name}</span>
         </div>
@@ -230,11 +228,11 @@ export function RouletteWheel({
               <path
                 key={i}
                 d={d}
-                fill={i % 2 ? ident.a : ident.b}
+                fill={i % 10 === 0 ? '#16357a' : i % 2 ? '#7a0c1e' : '#1b1e29'}
                 className={i === selectedIndex ? 'seg seg-win' : 'seg'}
                 style={{ '--glow': ident.glow } as CSSProperties}
-                stroke="#f3c56b"
-                strokeOpacity=".55"
+                stroke="#c9ced8"
+                strokeOpacity=".35"
                 strokeWidth="1.6"
                 data-wheel-index={i}
                 data-selected={i === selectedIndex ? true : undefined}
@@ -281,7 +279,7 @@ export function RouletteWheel({
             {Array.from({ length: n }, (_, i) => {
               const [x1, y1] = polar(452, i * step),
                 [x2, y2] = polar(250, i * step);
-              return <line key={`l${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#f7d488" strokeOpacity=".7" strokeWidth="2" />;
+              return <line key={`l${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#d7dce6" strokeOpacity=".55" strokeWidth="1.6" />;
             })}
           </g>
         </svg>

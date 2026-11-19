@@ -44,8 +44,12 @@ export function usePWA() {
         if (!document.hidden && navigator.onLine)
           void registration.current?.update().catch(() => {});
       },
-      60 * 60 * 1000,
+      5 * 60 * 1000,
     );
+    const check = () => {
+      if (!document.hidden && navigator.onLine) void registration.current?.update().catch(() => {});
+    };
+    document.addEventListener('visibilitychange', check);
     return () => {
       window.removeEventListener('online', online);
       window.removeEventListener('offline', online);
@@ -53,8 +57,15 @@ export function usePWA() {
       window.removeEventListener('appinstalled', onInstalled);
       window.removeEventListener('vite:preloadError', onChunk);
       clearInterval(id);
+      document.removeEventListener('visibilitychange', check);
     };
   }, [registration]);
+  // Auto-apply new versions when not mid-round (the stream should always run the latest build).
+  useEffect(() => {
+    if (!needRefresh) return;
+    const busy = /#\/(draw|guess)/.test(location.hash);
+    if (!busy) void updateServiceWorker(true);
+  }, [needRefresh, updateServiceWorker]);
   async function update() {
     window.dispatchEvent(new Event('roulette:pause'));
     setUpdating(true);

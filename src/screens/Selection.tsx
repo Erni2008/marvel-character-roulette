@@ -53,11 +53,20 @@ export default function Selection() {
       }
     });
   }, [isWheel, seq.rotation, seq.wheelEntries.length]);
+  const stopShuffle = useRef<(() => void) | null>(null);
   useEffect(() => {
-    if (seq.stage === 1) isWheel ? sfx.whoosh() : sfx.riffle();
-    if (seq.stage === 2 && !isWheel) sfx.riffle();
+    if (seq.stage === 1) {
+      if (isWheel) sfx.whoosh();
+      else stopShuffle.current = sfx.riffle(1.15);
+    }
+    if (seq.stage >= 2 && stopShuffle.current) {
+      stopShuffle.current();
+      stopShuffle.current = null;
+      if (!isWheel) sfx.slide();
+    }
     if (seq.stage === 3) sfx.reveal();
   }, [seq.stage, isWheel]);
+  useEffect(() => () => stopShuffle.current?.(), []);
   useEffect(() => {
     if (seq.frontVisible && !isWheel) sfx.flip();
   }, [seq.frontVisible, isWheel]);
