@@ -1698,3 +1698,48 @@ html[data-motion='false'] .selected-deck-card .card-diagonal-sheen::after {
     top: 10%;
   }
 }
+
+/* Pre-rendered props preserve physical highlights as the deck moves. */
+.character-card.has-prop-render::before,
+.character-card.has-prop-render::after {
+  display: none;
+}
+.character-card.has-prop-render .card-content {
+  background: none;
+  inset: 0;
+  clip-path: none;
+  border-radius: 5%;
+}
+.prop-card-render {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+.character-card.has-prop-render .card-diagonal-sheen {
+  background: none;
+}
+.character-card.has-prop-render .character-name {
+  bottom: 7%;
+}
+.roulette-mode-art .wheel-decorative,
+.mode-armed .roulette-mode-art .wheel-decorative {
+  top: 50%;
+  left: 50%;
+  width: min(87%, 470px);
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+.wheel-decorative img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.mode-choice::before {
+  width: 1px;
+  opacity: 0.45;
+}
+.mode-art {
+  mask-image: none;
+}

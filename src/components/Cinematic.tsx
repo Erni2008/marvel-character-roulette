@@ -231,90 +231,6 @@ export function BrandEmblem({ className = '' }: { className?: string }) {
     </svg>
   );
 }
-function DeckEngraving() {
-  const id = useId().replace(/:/g, '');
-  return (
-    <svg className="deck-engraving" viewBox="0 0 600 860" aria-hidden="true">
-      <defs>
-        <linearGradient id={`${id}-foil`} x2=".85" y2="1">
-          <stop stopColor="#ddd0b8" />
-          <stop offset=".3" stopColor="#8a8277" />
-          <stop offset=".47" stopColor="#eee3cb" />
-          <stop offset=".63" stopColor="#716c64" />
-          <stop offset="1" stopColor="#bbad91" />
-        </linearGradient>
-        <pattern id={`${id}-weave`} width="12" height="12" patternUnits="userSpaceOnUse">
-          <path
-            d="M0 6 6 0 12 6 6 12Z"
-            fill="none"
-            stroke="#cad4e1"
-            strokeWidth=".45"
-            strokeOpacity=".07"
-          />
-        </pattern>
-      </defs>
-      <path d="M35 53 53 35h494l18 18v754l-18 18H53l-18-18Z" fill={`url(#${id}-weave)`} />
-      <g fill="none" stroke={`url(#${id}-foil)`}>
-        <path d="M32 53 53 32h494l21 21v754l-21 21H53l-21-21Z" strokeWidth="1.4" opacity=".7" />
-        <path d="M46 62 62 46h476l16 16v736l-16 16H62l-16-16Z" strokeWidth=".6" opacity=".45" />
-        <path
-          d="M72 118V74h44m368 0h44v44M72 742v44h44m368 0h44v-44"
-          strokeWidth="1.5"
-          opacity=".7"
-        />
-        {Array.from({ length: 24 }, (_, i) => (
-          <ellipse
-            key={i}
-            cx="300"
-            cy="426"
-            rx="154"
-            ry="65"
-            transform={`rotate(${i * 7.5} 300 426)`}
-            strokeWidth=".55"
-            opacity=".28"
-          />
-        ))}
-        <circle cx="300" cy="426" r="176" strokeWidth=".6" opacity=".4" />
-        <circle cx="300" cy="426" r="102" strokeWidth=".8" opacity=".55" fill="#11161d" />
-        <path d="m300 160 7 10-7 10-7-10Zm0 512 7 10-7 10-7-10Z" strokeWidth="1" opacity=".8" />
-      </g>
-      <g fill={`url(#${id}-foil)`} fontFamily="Studio, sans-serif" textAnchor="middle">
-        <text x="300" y="448" fontSize="70" fontWeight="400" letterSpacing="-3">
-          CR
-        </text>
-        <text x="300" y="115" fontSize="12" fontWeight="500" letterSpacing="8">
-          CHARACTER
-        </text>
-        <text x="300" y="754" fontSize="12" fontWeight="500" letterSpacing="8">
-          ROULETTE
-        </text>
-      </g>
-    </svg>
-  );
-}
-function UnknownArtwork() {
-  return (
-    <svg className="neutral-silhouette unknown-artwork" viewBox="0 0 300 460" aria-hidden="true">
-      <g fill="none" stroke="#cdc3af" strokeWidth=".5" opacity=".28">
-        <path d="M32 52V32h20m196 0h20v20M32 408v20h20m196 0h20v-20" />
-        <circle cx="150" cy="213" r="82" />
-        <circle cx="150" cy="213" r="92" strokeDasharray=".5 7" />
-        <path d="M130 98h40m-40 230h40" />
-      </g>
-      <text
-        x="150"
-        y="251"
-        textAnchor="middle"
-        fontFamily="Studio, sans-serif"
-        fontSize="114"
-        fontWeight="300"
-        fill="#d8cfbd"
-      >
-        ?
-      </text>
-    </svg>
-  );
-}
 export function CharacterCard({
   character,
   front = false,
@@ -331,7 +247,7 @@ export function CharacterCard({
   const displayName = character ? characterName(character, settings.language) : '';
   return (
     <div
-      className={`character-card ${front ? 'card-front' : 'card-back'} ${className}`}
+      className={`character-card ${front ? 'card-front' : 'card-back'} ${!front || !character?.imagePath || broken ? 'has-prop-render' : ''} ${className}`}
       style={{ '--accent': hues[tone] } as CSSProperties}
       data-character-id={character?.id}
     >
@@ -339,7 +255,9 @@ export function CharacterCard({
       <div className="card-content">
         <div className="card-hex-texture" />
         <div className="card-diagonal-sheen" />
-        {!front && <DeckEngraving />}
+        {!front && (
+          <img className="prop-card-render" src="/art/prop-card.webp" alt="" draggable={false} />
+        )}
         {front ? (
           <>
             {character?.imagePath && !broken ? (
@@ -351,7 +269,12 @@ export function CharacterCard({
                 draggable={false}
               />
             ) : (
-              <UnknownArtwork />
+              <img
+                className="prop-card-render neutral-silhouette unknown-artwork"
+                src="/art/prop-card-front.webp"
+                alt=""
+                draggable={false}
+              />
             )}
           </>
         ) : null}
@@ -402,6 +325,12 @@ export function RouletteWheel({
       rotor.current?.setAttribute('transform', `rotate(${v} 180 180)`),
     );
   }, [rotation]);
+  if (decorative)
+    return (
+      <div className="roulette-wheel wheel-decorative">
+        <img src="/art/prop-wheel.webp" alt="" draggable={false} />
+      </div>
+    );
   const angle = 360 / count;
   const polar = (r: number, a: number) => [
     180 + r * Math.cos(((a - 90) * Math.PI) / 180),
