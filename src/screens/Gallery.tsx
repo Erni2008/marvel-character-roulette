@@ -1,6 +1,8 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, EyeOff } from 'lucide-react';
+import { hintsFor } from '../domain/hints';
 import { motion as m } from 'motion/react';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useGame } from '../app/Store';
 import { builtInCharacters, characterName } from '../domain/game';
 import type { Character } from '../domain/game';
@@ -40,12 +42,29 @@ export default function Gallery() {
           </m.button>
         ))}
       </div>
-      {open && (
+      {open && createPortal(
         <m.div className="gallery-zoom" onClick={() => setOpen(null)} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <m.div className="gallery-zoom-card" initial={motion ? { scale: 0.6, rotateY: -90 } : false} animate={{ scale: 1, rotateY: 0 }} transition={{ type: 'spring', stiffness: 140, damping: 16 }}>
             <CharacterCard front character={open} />
           </m.div>
-        </m.div>
+          <div className="last-hints gallery-hints">
+            {hintsFor(open.id).map((h, i) => (
+              <m.div
+                key={h}
+                className="lh-tab"
+                initial={motion ? { opacity: 0, x: 140, skewX: -12 } : false}
+                animate={{ opacity: 1, x: 0, skewX: 0 }}
+                transition={{ delay: 0.35 + i * 0.2, type: 'spring', stiffness: 240, damping: 20 }}
+              >
+                <EyeOff size={16} />
+                <span>
+                  <b>{t("DON'T SAY", 'НЕ ГОВОРИ')}</b> {h}!
+                </span>
+              </m.div>
+            ))}
+          </div>
+        </m.div>,
+        document.body,
       )}
     </section>
   );

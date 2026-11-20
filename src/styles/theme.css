@@ -1178,3 +1178,12 @@ html[lang='en'] .rb-value::before { content: 'ROUND '; }
 @media (max-width: 700px), (max-height: 520px) {
   .lh-tab { padding: 5px 12px 5px 9px; font-size: 12px; gap: 7px; } .lh-tab b { font-size: 12px; } .lh-tab svg { width: 13px; height: 13px; } .last-hints { gap: 4px; }
 }
+/* gallery zoom: card + НЕ ГОВОРИ tabs */
+.gallery-zoom { grid-auto-flow: row; align-content: center; gap: 14px; padding: 16px; }
+.gallery-zoom-card { height: min(74svh, 130vw) !important; justify-self: center; }
+.gallery-hints { width: min(520px, 100%); justify-self: center; }
+@media (orientation: landscape) and (min-width: 900px) {
+  .gallery-zoom { grid-auto-flow: column; align-items: center; justify-content: center; gap: 32px; }
+  .gallery-zoom-card { height: min(86svh, 760px) !important; }
+  .gallery-hints { width: 420px; }
+}
