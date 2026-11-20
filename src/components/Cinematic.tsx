@@ -103,8 +103,11 @@ export function CharacterCard({
       </div>
     );
   const art = character.imagePath && !broken;
+  const cut = name.indexOf(' ('),
+    lines = name.length > 20 && cut > 0 ? [name.slice(0, cut), name.slice(cut + 1)] : [name],
+    two = showName && lines.length > 1;
   return (
-    <div className={`character-card card-front real-card ${art ? 'has-art' : 'no-art'} ${className}`} style={style} data-character-id={character.id}>
+    <div className={`character-card card-front real-card ${art ? 'has-art' : 'no-art'}${two ? ' two-line' : ''} ${className}`} style={style} data-character-id={character.id}>
       <img className="rc-face" src={asset('art/card-front-neon.webp')} alt="" draggable={false} />
       <div className="rc-window">
         <div className="rc-tint" />
@@ -118,8 +121,12 @@ export function CharacterCard({
       </div>
       <span className="cc-number">№ {character.id.replace(/\D/g, '').padStart(3, '0')}</span>
       {showName && (
-        <div className="character-name" title={name} style={{ '--fit': Math.min(1, 12 / Math.max(name.length, 1)) } as CSSProperties}>
-          <span>{name}</span>
+        <div className="character-name" title={name} style={{ '--fit': Math.min(1, 12 / Math.max(...lines.map((l) => l.length), 1)) } as CSSProperties}>
+          <span>
+            {lines.map((l, i) => (
+              <span key={i} className="cn-line">{l}</span>
+            ))}
+          </span>
         </div>
       )}
       <div className="rc-gloss" />
