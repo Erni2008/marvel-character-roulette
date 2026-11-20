@@ -143,35 +143,115 @@ function play(n: Sample, gain = 1, rate = 1, at = 0, offset = 0): false | { stop
   };
 }
 const vary = (x = 0.08) => 1 + (Math.random() * 2 - 1) * x;
-const slides: Sample[] = ['slide1', 'slide2', 'slide4', 'slide5', 'slide7', 'slide8'],
-  places: Sample[] = ['place', 'place2', 'place3', 'place4'],
-  pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
-type H = ReturnType<typeof play>;
-/** A riffle "brrrt": many very short card slaps accelerating then easing. */
-function burst(at: number, count: number, span: number, gain = 0.45): H[] {
-  const out: H[] = [];
-  for (let i = 0; i < count; i++) {
-    const u = i / (count - 1),
-      t = at + span * (u * u * 0.35 + u * 0.65);
-    out.push(play(pick(places), gain * (0.7 + Math.random() * 0.4), 1.5 + Math.random() * 0.6, t));
+/* ---- card-physics synth, timed to the on-screen choreography ---- */
+let noiseBuf: AudioBuffer | null = null;
+function whiteNoise(c: AudioContext) {
+  if (!noiseBuf) {
+    noiseBuf = c.createBuffer(1, c.sampleRate, c.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
   }
-  return out;
+  return noiseBuf;
 }
+type Voice = { stop: (fade?: number) => void };
+/** One noise grain through a filter with a fast attack and exponential decay. */
+function grain(at: number, dur: number, gain: number, type: BiquadFilterType, freq: number, q: number, toFreq?: number): Voice | false {
+  const c = audio();
+  if (!c || !out || level <= 0) return false;
+  const t = c.currentTime + at,
+    src = c.createBufferSource(),
+    f = c.createBiquadFilter(),
+    g = c.createGain();
+  src.buffer = whiteNoise(c);
+  f.type = type;
+  f.frequency.setValueAtTime(freq, t);
+  if (toFreq) f.frequency.exponentialRampToValueAtTime(toFreq, t + dur);
+  f.Q.value = q;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain, t + Math.min(0.004, dur * 0.2));
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(f).connect(g).connect(out);
+  src.start(t, Math.random() * 0.8);
+  src.stop(t + dur + 0.02);
+  return {
+    stop: (fade = 0.06) => {
+      const n = c.currentTime;
+      g.gain.cancelScheduledValues(n);
+      g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), n);
+      g.gain.exponentialRampToValueAtTime(0.0001, n + fade);
+    },
+  };
+}
+/** A single card edge snapping off the thumb: bright, papery, ~10ms. */
+const snap = (at: number, gain: number, bright: number) => [grain(at, 0.012 + Math.random() * 0.008, gain, 'bandpass', bright * (0.85 + Math.random() * 0.3), 1.1), grain(at, 0.006, gain * 0.5, 'highpass', 5200, 0.7)];
+/** A card landing flat on the pile: soft, low, felt-like. */
+const tap = (at: number, gain: number) => [grain(at, 0.05, gain, 'lowpass', 1400, 0.9, 380), grain(at, 0.018, gain * 0.35, 'bandpass', 2600, 1.4)];
+/** Air moved by a packet travelling across the table. */
+const swish = (at: number, dur: number, gain: number, from = 700, to = 3200) => [grain(at, dur, gain, 'bandpass', from, 0.8, to)];
+/** Riffle: dozens of snaps that accelerate in, peak, and thin out like a real thumb release. */
+function riffleRun(at: number, span: number, n: number, gain: number, bright: number) {
+  const vs: (Voice | false)[] = [];
+  for (let i = 0; i < n; i++) {
+    const u = i / (n - 1),
+      t = at + span * (0.55 * u + 0.45 * u * u) + (Math.random() - 0.5) * 0.006,
+      env = Math.sin(Math.PI * Math.min(1, u * 1.15 + 0.06));
+    vs.push(...snap(t, gain * (0.35 + 0.65 * env), bright * (0.9 + 0.25 * u)));
+  }
+  // the low "body" of the riffle: pages fluttering against each other
+  vs.push(...swish(at, span * 1.05, gain * 0.35, 1800, 900));
+  return vs;
+}
+/** Bridge / cascade: the arched halves falling back in a soft descending purr. */
+function cascade(at: number, span: number, n: number, gain: number) {
+  const vs: (Voice | false)[] = [];
+  for (let i = 0; i < n; i++) {
+    const u = i / (n - 1);
+    vs.push(...snap(at + span * u + (Math.random() - 0.5) * 0.004, gain * (1 - u * 0.6), 2600 - u * 1100));
+  }
+  vs.push(...swish(at, span, gain * 0.4, 2400, 600));
+  return vs;
+}
+/* Timeline (seconds from the moment shuffling starts, p = 0.12 of a 3.3s draw):
+ *  0.00–0.33 fan out · 0.33–0.66 split into two packets · 0.66–1.20 riffle #1 (lift → land)
+ *  1.22 square up · 1.22–1.55 second cut · 1.55–2.14 riffle #2 · 2.15 square up → hero card rises */
+type H = Voice | false;
 const shuffles: (() => H[])[] = [
-  // 1. classic table riffle + bridge
-  () => [play('shuffle', 1, 1.12)],
-  // 2. bridge finish from the middle of the recording, then a soft fan
-  () => [play('shuffle', 0.95, 1.0, 0, 0.55), play('fan2', 0.7, 1.05, 1.7)],
-  // 3. double machine riffle
-  () => [play('slide4', 0.6, 0.9), ...burst(0.25, 16, 0.6), play('shove2', 0.6, 1, 0.95), ...burst(1.15, 16, 0.6), play('place2', 0.8, 0.95, 1.85)],
-  // 4. fan, cut, riffle
-  () => [play('fan2', 0.8, 1.1), play('shove3', 0.7, 1, 0.55), ...burst(0.85, 14, 0.55, 0.5), play('fan', 0.7, 1.1, 1.5), play('place3', 0.8, 1, 1.95)],
-  // 5. overhand shuffle: clusters of slides
+  // A — "Казино": crisp table riffle with a tight thumb release
   () => {
-    const hs: H[] = [play('pack2', 0.6, 1.1)];
-    for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) hs.push(play(pick(slides), 0.45, 1.25 + Math.random() * 0.4, 0.3 + i * 0.28 + j * 0.06));
-    hs.push(play('place4', 0.8, 1, 2.05));
-    return hs;
+    const v: H[] = [];
+    // fan: cards fan out one after another
+    for (let i = 0; i < 6; i++) v.push(...snap(0.04 + i * 0.045, 0.22, 3000 + i * 150));
+    v.push(...swish(0.02, 0.3, 0.12, 900, 2600));
+    for (const [cut, riff, square, n] of [
+      [0.33, 0.66, 1.22, 30],
+      [1.22, 1.55, 2.09, 32],
+    ] as const) {
+      // split: the two packets slide apart and settle
+      v.push(...swish(cut + 0.02, 0.28, 0.2, 600, 2400), play('slide4', 0.35, 1.25, cut + 0.02));
+      v.push(...tap(cut + 0.27, 0.35), ...tap(cut + 0.3, 0.3));
+      // riffle: the thumbs release, then the cards rain onto the pile
+      v.push(...riffleRun(riff, 0.36, n, 0.5, 3200));
+      for (let i = 0; i < 7; i++) v.push(...tap(riff + 0.31 + i * 0.035, 0.14));
+      // square up: two firm taps of the deck on the table
+      v.push(...tap(square, 0.6), play('place3', 0.35, 1.1, square), ...tap(square + 0.07, 0.35));
+    }
+    return v;
+  },
+  // B — "Бридж": softer air riffle with a cascading bridge finish
+  () => {
+    const v: H[] = [];
+    v.push(play('fan2', 0.45, 1.25), ...swish(0, 0.34, 0.14, 500, 2200));
+    for (const [cut, riff, square, n] of [
+      [0.33, 0.66, 1.22, 38],
+      [1.22, 1.55, 2.09, 40],
+    ] as const) {
+      v.push(...swish(cut, 0.3, 0.22, 400, 1800), play('shove3', 0.3, 1.2, cut + 0.03));
+      v.push(...tap(cut + 0.29, 0.32));
+      v.push(...riffleRun(riff, 0.3, n, 0.42, 2500));
+      v.push(...cascade(riff + 0.3, 0.24, 22, 0.32));
+      v.push(...tap(square, 0.55), ...tap(square + 0.05, 0.25), play('place', 0.3, 0.95, square));
+    }
+    return v;
   },
 ];
 let lastShuffle = -1;
@@ -191,7 +271,7 @@ export const sfx = {
     play('slide2', 0.9, vary());
     play('place', 0.9, 1, 0.12);
   },
-  /** One of five shuffle performances (never the same twice in a row). Returns a stopper so the
+  /** One of two shuffle performances (never the same twice in a row). Returns a stopper so the
    *  sound ends exactly when the deck settles. */
   riffle: () => {
     let k = Math.floor(Math.random() * shuffles.length);
