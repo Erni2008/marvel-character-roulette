@@ -582,29 +582,29 @@
   },
   {
     "id": "champion-084",
-    "name": "Count Nefaria",
-    "nameRu": "Граф Нефария",
+    "name": "Bastion",
+    "nameRu": "Бастион",
     "imagePath": "/characters/count-nefaria.webp",
     "enabled": true
   },
   {
     "id": "champion-085",
-    "name": "Mastermind",
-    "nameRu": "Мастермайнд",
+    "name": "Arcade",
+    "nameRu": "Аркада",
     "imagePath": "/characters/mastermind.webp",
     "enabled": true
   },
   {
     "id": "champion-086",
     "name": "Viv Vision",
-    "nameRu": "Вив Вижен",
+    "nameRu": "Вив Вижн",
     "imagePath": "/characters/viv-vision.webp",
     "enabled": true
   },
   {
     "id": "champion-087",
-    "name": "Unknown",
-    "nameRu": "Золотой киборг",
+    "name": "Warlock",
+    "nameRu": "Уорлок",
     "imagePath": "/characters/gold-circuit.webp",
     "enabled": true
   },
