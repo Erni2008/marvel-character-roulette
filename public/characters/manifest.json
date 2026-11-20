@@ -404,5 +404,82 @@
     "nameRu": "Человек-паук (Павитр Прабхакар)",
     "imagePath": "/characters/spider-man-india.webp",
     "enabled": true
+  },
+  {
+    "id": "champion-059",
+    "name": "Shang-Chi",
+    "nameRu": "Шан-Чи",
+    "imagePath": "/characters/shang-chi.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-060",
+    "name": "Black Panther",
+    "nameRu": "Чёрная пантера",
+    "imagePath": "/characters/black-panther-dark.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-061",
+    "name": "Werewolf by Night",
+    "nameRu": "Человек-волк",
+    "imagePath": "/characters/werewolf.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-062",
+    "name": "Isophyne",
+    "nameRu": "Изофайн",
+    "imagePath": "/characters/isophyne.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-063",
+    "name": "Purple Sorceress",
+    "nameRu": "Фиолетовая колдунья",
+    "imagePath": "/characters/seraphina.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-064",
+    "name": "The Hood",
+    "nameRu": "Капюшон",
+    "imagePath": "/characters/the-hood.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-065",
+    "name": "Magik",
+    "nameRu": "Мэджик",
+    "imagePath": "/characters/magik.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-066",
+    "name": "Satana",
+    "nameRu": "Сатана",
+    "imagePath": "/characters/satana.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-067",
+    "name": "Doctor Doom",
+    "nameRu": "Доктор Дум",
+    "imagePath": "/characters/doctor-doom.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-068",
+    "name": "Scarlet Witch",
+    "nameRu": "Алая Ведьма",
+    "imagePath": "/characters/scarlet-witch.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-069",
+    "name": "Man-Thing",
+    "nameRu": "Леший",
+    "imagePath": "/characters/man-thing.webp",
+    "enabled": true
   }
 ]
