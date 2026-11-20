@@ -512,8 +512,8 @@
   },
   {
     "id": "champion-074",
-    "name": "Witch",
-    "nameRu": "Колдунья",
+    "name": "Nico Minoru",
+    "nameRu": "Минору",
     "imagePath": "/characters/mohawk-witch.webp",
     "enabled": true
   },
@@ -526,8 +526,8 @@
   },
   {
     "id": "champion-076",
-    "name": "Unknown",
-    "nameRu": "Толстяк на паучьих лапах",
+    "name": "Mojo",
+    "nameRu": "Моджо",
     "imagePath": "/characters/scorpion-rider.webp",
     "enabled": true
   },
@@ -540,8 +540,8 @@
   },
   {
     "id": "champion-078",
-    "name": "Unknown",
-    "nameRu": "Чёрный костюм",
+    "name": "The Maker",
+    "nameRu": "Творец",
     "imagePath": "/characters/dark-suit.webp",
     "enabled": true
   },
