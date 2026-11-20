@@ -104,7 +104,13 @@ export function CharacterCard({
     );
   const art = character.imagePath && !broken;
   const cut = name.indexOf(' ('),
-    lines = name.length > 20 && cut > 0 ? [name.slice(0, cut), name.slice(cut + 1)] : [name],
+    mid = (() => {
+      // split a long multi-word name at the space closest to its middle
+      let best = -1;
+      for (let i = 0; i < name.length; i++) if (name[i] === ' ' && (best < 0 || Math.abs(i - name.length / 2) < Math.abs(best - name.length / 2))) best = i;
+      return best;
+    })(),
+    lines = name.length > 20 && cut > 0 ? [name.slice(0, cut), name.slice(cut + 1)] : name.length > 17 && mid > 0 ? [name.slice(0, mid), name.slice(mid + 1)] : [name],
     two = showName && lines.length > 1;
   return (
     <div className={`character-card card-front real-card ${art ? 'has-art' : 'no-art'}${two ? ' two-line' : ''} ${className}`} style={style} data-character-id={character.id}>
@@ -124,7 +130,7 @@ export function CharacterCard({
         <div className="character-name" title={name} style={{ '--fit': Math.min(1, 12 / Math.max(...lines.map((l) => l.length), 1)) } as CSSProperties}>
           <span>
             {lines.map((l, i) => (
-              <span key={i} className="cn-line">{l}</span>
+              <span key={i} className={`cn-line${l.startsWith('(') ? ' cn-sub' : ''}`}>{l}</span>
             ))}
           </span>
         </div>

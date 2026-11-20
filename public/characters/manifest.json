@@ -551,5 +551,75 @@
     "nameRu": "Шокер",
     "imagePath": "/characters/shocker.webp",
     "enabled": true
+  },
+  {
+    "id": "champion-080",
+    "name": "War Machine",
+    "nameRu": "Воитель",
+    "imagePath": "/characters/war-machine.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-081",
+    "name": "Ironheart",
+    "nameRu": "Железное сердце",
+    "imagePath": "/characters/ironheart.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-082",
+    "name": "Red Skull",
+    "nameRu": "Красный Череп",
+    "imagePath": "/characters/red-skull.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-083",
+    "name": "Sentinel",
+    "nameRu": "Страж",
+    "imagePath": "/characters/sentinel.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-084",
+    "name": "Count Nefaria",
+    "nameRu": "Граф Нефария",
+    "imagePath": "/characters/count-nefaria.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-085",
+    "name": "Mastermind",
+    "nameRu": "Мастермайнд",
+    "imagePath": "/characters/mastermind.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-086",
+    "name": "Viv Vision",
+    "nameRu": "Вив Вижен",
+    "imagePath": "/characters/viv-vision.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-087",
+    "name": "Unknown",
+    "nameRu": "Золотой киборг",
+    "imagePath": "/characters/gold-circuit.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-088",
+    "name": "Peni Parker",
+    "nameRu": "Пени Паркер",
+    "imagePath": "/characters/peni-parker.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-089",
+    "name": "Lady Deathstrike",
+    "nameRu": "Леди Смертельный Удар",
+    "imagePath": "/characters/lady-deathstrike.webp",
+    "enabled": true
   }
 ]

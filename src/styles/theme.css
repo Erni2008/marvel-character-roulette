@@ -1144,7 +1144,7 @@ html[lang='en'] .rb-value::before { content: 'ROUND '; }
 }
 /* two-line names (e.g. long names with a parenthetical) */
 .real-card .character-name .cn-line { display: block; font-size: inherit !important; line-height: 1.02; }
-.real-card .character-name .cn-line + .cn-line { font-size: 0.82em !important; opacity: 0.92; }
+.real-card .character-name .cn-line.cn-sub { font-size: 0.82em !important; opacity: 0.92; }
 .real-card.two-line .rc-window { bottom: 17.5% !important; }
 
 /* v16: draw stage polish */
