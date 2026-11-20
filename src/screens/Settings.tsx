@@ -64,7 +64,7 @@ export default function Settings() {
   }
   return (
     <section className="utility-screen settings-screen">
-      <header className="utility-header">
+      <header className="utility-header page-head">
         <MetallicButton
           tone="silver"
           shape="tile"
@@ -74,7 +74,10 @@ export default function Settings() {
         >
           <ArrowLeft />
         </MetallicButton>
-        <h1 className="metallic-title">{t('SETTINGS', 'НАСТРОЙКИ')}</h1>
+        <div className="page-title">
+          <h1 className="metallic-title">{t('SETTINGS', 'НАСТРОЙКИ')}</h1>
+          <p>{t('Game, screen, stream and sound', 'Игра, экран, трансляция и звук')}</p>
+        </div>
       </header>
       <div className="settings-columns">
         <CinematicPanel>
@@ -150,15 +153,14 @@ export default function Settings() {
           </button>
         </CinematicPanel>
         <CinematicPanel>
-          <h2 className="metallic-title">{t('AUDIO PREFERENCES', 'НАСТРОЙКИ ЗВУКА')}</h2>
+          <h2 className="metallic-title">{t('AUDIO', 'ЗВУК')}</h2>
           <p>
             {t(
-              'Sound effects: wheel ticks, card shuffle, reveal sting and timer beeps. Music is reserved for a future update.',
-              'Звуковые эффекты: щелчки колеса, тасование карт, эффект раскрытия и сигналы таймера. Музыка — в будущем обновлении.',
+              'Wheel ticks, card shuffles, the reveal sting and answer sounds.',
+              'Щелчки колеса, тасование карт, раскрытие героя и звуки ответа.',
             )}
           </p>
           {range(t('Master volume', 'Общая громкость'), 'master')}
-          {range(t('Music', 'Музыка'), 'music')}
           {range(t('Sound effects', 'Эффекты'), 'effects')}
         </CinematicPanel>
       </div>

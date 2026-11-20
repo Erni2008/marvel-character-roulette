@@ -5,6 +5,7 @@ import { useGame } from '../app/Store';
 import { builtInCharacters, characterName } from '../domain/game';
 import type { Character } from '../domain/game';
 import { CharacterCard, MetallicButton } from '../components/Cinematic';
+const ru = (n: number) => (n % 10 === 1 && n % 100 !== 11 ? 'герой' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'героя' : 'героев');
 /** All hero cards on one screen; tap a card to see it big. */
 export default function Gallery() {
   const { t, navigate, motion, settings, characters } = useGame();
@@ -13,12 +14,15 @@ export default function Gallery() {
     [open, setOpen] = useState<Character | null>(null);
   return (
     <section className="utility-screen gallery-screen">
-      <header className="utility-header">
+      <header className="utility-header page-head">
         <MetallicButton tone="silver" shape="tile" className="back-control" aria-label={t('Back', 'Назад')} onClick={() => navigate('home')}>
           <ArrowLeft />
         </MetallicButton>
-        <h1 className="metallic-title">{t('HERO GALLERY', 'ГАЛЕРЕЯ ГЕРОЕВ')}</h1>
-        <span className="gallery-count">{t(`${withArt.length} cards`, `${withArt.length} карт`)}</span>
+        <div className="page-title">
+          <h1 className="metallic-title">{t('HERO GALLERY', 'ГАЛЕРЕЯ ГЕРОЕВ')}</h1>
+          <p>{t('Tap a card to see it up close', 'Нажмите на карту, чтобы рассмотреть')}</p>
+        </div>
+        <span className="gallery-count"><b>{withArt.length}</b>{t('heroes', ru(withArt.length))}</span>
       </header>
       <div className="gallery-grid">
         {withArt.map((c, i) => (
