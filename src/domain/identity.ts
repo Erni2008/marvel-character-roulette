@@ -76,6 +76,16 @@ const table: Record<string, [string, string, string, Identity['pattern']]> = {
   '067': ['#1f4a2a', '#5a5a6a', '#8dffb0', 'grid'],
   '068': ['#9a1a2a', '#3a0a10', '#ff5a7a', 'rings'],
   '069': ['#2a4a2a', '#1a2a1a', '#9aff7a', 'grid'],
+  '070': ['#1f4a2a', '#a8841a', '#8dffb0', 'diamond'],
+  '071': ['#1a3a8a', '#c8102e', '#7fc8ff', 'bolt'],
+  '072': ['#2a3a6a', '#8a8a9a', '#c08cff', 'rings'],
+  '073': ['#1a3a8a', '#c8102e', '#ffd35a', 'rings'],
+  '074': ['#3a1a4a', '#9a1a5a', '#d9a0ff', 'web'],
+  '075': ['#3a3a46', '#1a1a1a', '#c8ccd8', 'grid'],
+  '076': ['#7a4a1a', '#2a2a3a', '#ffa35a', 'grid'],
+  '077': ['#b3501a', '#1f3a1a', '#ffa33a', 'rays'],
+  '078': ['#0a1a2a', '#1a1a1a', '#5adfff', 'web'],
+  '079': ['#a8741a', '#5a3a1a', '#ffd35a', 'bolt'],
 };
 const fallback: Identity['pattern'][] = ['rays', 'rings', 'grid', 'diamond', 'bolt', 'web'];
 export function identity(c?: Character | null): Identity {

@@ -481,5 +481,75 @@
     "nameRu": "Леший",
     "imagePath": "/characters/man-thing.webp",
     "enabled": true
+  },
+  {
+    "id": "champion-070",
+    "name": "Loki",
+    "nameRu": "Локи",
+    "imagePath": "/characters/loki-king.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-071",
+    "name": "America Chavez",
+    "nameRu": "Америка Чавес",
+    "imagePath": "/characters/america-chavez.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-072",
+    "name": "Spiral",
+    "nameRu": "Спираль",
+    "imagePath": "/characters/spiral.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-073",
+    "name": "Doctor Strange",
+    "nameRu": "Доктор Стрэндж",
+    "imagePath": "/characters/doctor-strange.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-074",
+    "name": "Witch",
+    "nameRu": "Колдунья",
+    "imagePath": "/characters/mohawk-witch.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-075",
+    "name": "Absorbing Man",
+    "nameRu": "Поглотитель",
+    "imagePath": "/characters/absorbing-man.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-076",
+    "name": "Unknown",
+    "nameRu": "Толстяк на паучьих лапах",
+    "imagePath": "/characters/scorpion-rider.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-077",
+    "name": "Jack O'Lantern",
+    "nameRu": "Джек-фонарь",
+    "imagePath": "/characters/jack-o-lantern.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-078",
+    "name": "Unknown",
+    "nameRu": "Чёрный костюм",
+    "imagePath": "/characters/dark-suit.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-079",
+    "name": "Shocker",
+    "nameRu": "Шокер",
+    "imagePath": "/characters/shocker.webp",
+    "enabled": true
   }
 ]
