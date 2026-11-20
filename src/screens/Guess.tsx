@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { ArrowRight, Check, ChevronsRight, Flag, Pause, Play, Settings2, Trash2, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronsRight, EyeOff, Flag, Pause, Play, Settings2, Trash2, X } from 'lucide-react';
 import { motion as m, useMotionValue, useTransform, animate } from 'motion/react';
 import { useGame } from '../app/Store';
 import { characterName, roundKey } from '../domain/game';
@@ -8,6 +8,7 @@ import type { CSSProperties } from 'react';
 import { Burst, CharacterCard, MetallicButton } from '../components/Cinematic';
 import { identity } from '../domain/identity';
 import { sfx } from '../fx/sound';
+import { hintsFor } from '../domain/hints';
 export default function Guess() {
   const game = useGame(),
     { session: live, settings, t, settle, advance, saveElapsed, openSettings, motion } = game,
@@ -170,6 +171,24 @@ export default function Guess() {
           </m.strong>
           {settings.language === 'ru' && s.character?.nameRu && <small>{s.character.name}</small>}
         </div>
+        {hintsFor(s.character?.id).length > 0 && (
+          <div className="last-hints" key={s.character?.id}>
+            {hintsFor(s.character?.id).map((h, i) => (
+              <m.div
+                key={h}
+                className="lh-tab"
+                initial={motion ? { opacity: 0, x: 140, skewX: -12 } : false}
+                animate={{ opacity: 1, x: 0, skewX: 0 }}
+                transition={{ delay: 0.6 + i * 0.22, type: 'spring', stiffness: 240, damping: 20 }}
+              >
+                <EyeOff size={16} />
+                <span>
+                  <b>{t("DON'T SAY", 'НЕ ГОВОРИ')}</b> {h}!
+                </span>
+              </m.div>
+            ))}
+          </div>
+        )}
         <div className="guess-timer">
           <button className={`stopwatch ${timer.running ? 'is-running' : ''} ${isSettled ? 'is-settled' : ''}`} onClick={timer.toggle} disabled={isSettled} aria-label={timer.running ? t('Pause', 'Пауза') : t('Resume', 'Продолжить')}>
             <span className="sw-label">{isSettled ? t('GUESSED IN', 'УГАДАНО ЗА') : t('TIME ON THIS HERO', 'ВРЕМЯ НА ГЕРОЯ')}</span>
