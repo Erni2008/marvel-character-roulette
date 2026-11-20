@@ -407,36 +407,36 @@
   },
   {
     "id": "champion-059",
-    "name": "Shang-Chi",
-    "nameRu": "Шан-Чи",
-    "imagePath": "/characters/shang-chi.webp",
+    "name": "Mordo",
+    "nameRu": "Мордо",
+    "imagePath": "/characters/mordo.webp",
     "enabled": true
   },
   {
     "id": "champion-060",
-    "name": "Black Panther",
-    "nameRu": "Чёрная пантера",
+    "name": "Supreme Symbiote",
+    "nameRu": "Верховный симбиот",
     "imagePath": "/characters/black-panther-dark.webp",
     "enabled": true
   },
   {
     "id": "champion-061",
     "name": "Werewolf by Night",
-    "nameRu": "Человек-волк",
+    "nameRu": "Ночной оборотень",
     "imagePath": "/characters/werewolf.webp",
     "enabled": true
   },
   {
     "id": "champion-062",
-    "name": "Isophyne",
-    "nameRu": "Изофайн",
+    "name": "Sorcerer Supreme",
+    "nameRu": "Верховная колдунья",
     "imagePath": "/characters/isophyne.webp",
     "enabled": true
   },
   {
     "id": "champion-063",
-    "name": "Purple Sorceress",
-    "nameRu": "Фиолетовая колдунья",
+    "name": "Isophyne",
+    "nameRu": "Изофина",
     "imagePath": "/characters/seraphina.webp",
     "enabled": true
   },
@@ -456,8 +456,8 @@
   },
   {
     "id": "champion-066",
-    "name": "Satana",
-    "nameRu": "Сатана",
+    "name": "Limbo",
+    "nameRu": "Чистилище",
     "imagePath": "/characters/satana.webp",
     "enabled": true
   },
