@@ -30,7 +30,7 @@
   {
     "id": "champion-038",
     "name": "Rocket Raccoon",
-    "nameRu": "Ракета",
+    "nameRu": "Енот Ракета",
     "imagePath": "/characters/rocket.webp",
     "enabled": true
   },
@@ -386,15 +386,15 @@
   },
   {
     "id": "champion-091",
-    "name": "Unknown",
-    "nameRu": "Крылатая с клинком",
+    "name": "Guillotine 2099",
+    "nameRu": "Гильотина 2099",
     "imagePath": "/characters/winged-blade.webp",
     "enabled": true
   },
   {
     "id": "champion-092",
-    "name": "Unknown",
-    "nameRu": "Робот с экраном",
+    "name": "Arnim Zola",
+    "nameRu": "Арним Зола",
     "imagePath": "/characters/screen-robot.webp",
     "enabled": true
   },
@@ -415,14 +415,14 @@
   {
     "id": "champion-095",
     "name": "Guardian",
-    "nameRu": "Гардиан",
+    "nameRu": "Канадский страж",
     "imagePath": "/characters/guardian.webp",
     "enabled": true
   },
   {
     "id": "champion-096",
-    "name": "Bishop",
-    "nameRu": "Бишоп",
+    "name": "J. Jonah Jameson",
+    "nameRu": "Джей Джона Джеймисон",
     "imagePath": "/characters/bishop.webp",
     "enabled": true
   }
