@@ -1,219 +1,9 @@
 [
   {
-    "id": "champion-001",
-    "name": "Spider-Man",
-    "nameRu": "Человек-паук",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
     "id": "champion-002",
     "name": "Iron Man",
     "nameRu": "Железный человек",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-003",
-    "name": "Captain America",
-    "nameRu": "Капитан Америка",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-004",
-    "name": "Thor",
-    "nameRu": "Тор",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-005",
-    "name": "Hulk",
-    "nameRu": "Халк",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-006",
-    "name": "Black Widow",
-    "nameRu": "Чёрная вдова",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-007",
-    "name": "Hawkeye",
-    "nameRu": "Соколиный глаз",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-008",
-    "name": "Black Panther",
-    "nameRu": "Чёрная пантера",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-009",
-    "name": "Doctor Strange",
-    "nameRu": "Доктор Стрэндж",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-010",
-    "name": "Scarlet Witch",
-    "nameRu": "Алая Ведьма",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-011",
-    "name": "Vision",
-    "nameRu": "Вижен",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-012",
-    "name": "Captain Marvel",
-    "nameRu": "Капитан Марвел",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-013",
-    "name": "Wolverine",
-    "nameRu": "Росомаха",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-014",
-    "name": "Deadpool",
-    "nameRu": "Дэдпул",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-015",
-    "name": "Storm",
-    "nameRu": "Шторм",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-016",
-    "name": "Cyclops",
-    "nameRu": "Циклоп",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-017",
-    "name": "Magneto",
-    "nameRu": "Магнето",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-018",
-    "name": "Professor X",
-    "nameRu": "Профессор Икс",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-019",
-    "name": "Phoenix",
-    "nameRu": "Феникс",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-020",
-    "name": "Rogue",
-    "nameRu": "Шельма",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-021",
-    "name": "Gambit",
-    "nameRu": "Гамбит",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-022",
-    "name": "Nightcrawler",
-    "nameRu": "Ночной Змей",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-023",
-    "name": "Colossus",
-    "nameRu": "Колосс",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-024",
-    "name": "Juggernaut",
-    "nameRu": "Джаггернаут",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-025",
-    "name": "Venom",
-    "nameRu": "Веном",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-026",
-    "name": "Carnage",
-    "nameRu": "Карнаж",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-027",
-    "name": "Loki",
-    "nameRu": "Локи",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-028",
-    "name": "Ultron",
-    "nameRu": "Альтрон",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-029",
-    "name": "Thanos",
-    "nameRu": "Танос",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-030",
-    "name": "Doctor Doom",
-    "nameRu": "Доктор Дум",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-031",
-    "name": "Silver Surfer",
-    "nameRu": "Серебряный Сёрфер",
-    "imagePath": "",
+    "imagePath": "/characters/iron-man.webp",
     "enabled": true
   },
   {
@@ -224,13 +14,6 @@
     "enabled": true
   },
   {
-    "id": "champion-033",
-    "name": "Daredevil",
-    "nameRu": "Сорвиголова",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
     "id": "champion-034",
     "name": "Ant-Man",
     "nameRu": "Человек-муравей",
@@ -238,45 +21,17 @@
     "enabled": true
   },
   {
-    "id": "champion-035",
-    "name": "Wasp",
-    "nameRu": "Оса",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
     "id": "champion-036",
     "name": "Star-Lord",
     "nameRu": "Звёздный Лорд",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-037",
-    "name": "Gamora",
-    "nameRu": "Гамора",
-    "imagePath": "",
+    "imagePath": "/characters/star-lord.webp",
     "enabled": true
   },
   {
     "id": "champion-038",
     "name": "Rocket Raccoon",
     "nameRu": "Ракета",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-039",
-    "name": "Groot",
-    "nameRu": "Грут",
-    "imagePath": "",
-    "enabled": true
-  },
-  {
-    "id": "champion-040",
-    "name": "Nebula",
-    "nameRu": "Небула",
-    "imagePath": "",
+    "imagePath": "/characters/rocket.webp",
     "enabled": true
   },
   {
@@ -620,6 +375,55 @@
     "name": "Lady Deathstrike",
     "nameRu": "Леди Смертельный Удар",
     "imagePath": "/characters/lady-deathstrike.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-090",
+    "name": "Shuri",
+    "nameRu": "Шури",
+    "imagePath": "/characters/shuri.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-091",
+    "name": "Unknown",
+    "nameRu": "Крылатая с клинком",
+    "imagePath": "/characters/winged-blade.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-092",
+    "name": "Unknown",
+    "nameRu": "Робот с экраном",
+    "imagePath": "/characters/screen-robot.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-093",
+    "name": "Mysterio",
+    "nameRu": "Мистерио",
+    "imagePath": "/characters/mysterio.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-094",
+    "name": "Punisher",
+    "nameRu": "Каратель",
+    "imagePath": "/characters/punisher.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-095",
+    "name": "Guardian",
+    "nameRu": "Гардиан",
+    "imagePath": "/characters/guardian.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-096",
+    "name": "Bishop",
+    "nameRu": "Бишоп",
+    "imagePath": "/characters/bishop.webp",
     "enabled": true
   }
 ]
