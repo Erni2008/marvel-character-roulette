@@ -425,5 +425,75 @@
     "nameRu": "Джей Джона Джеймисон",
     "imagePath": "/characters/bishop.webp",
     "enabled": true
+  },
+  {
+    "id": "champion-097",
+    "name": "Doctor Octopus",
+    "nameRu": "Доктор Осьминог",
+    "imagePath": "/characters/doctor-octopus.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-098",
+    "name": "Ultron",
+    "nameRu": "Альтрон",
+    "imagePath": "/characters/ultron.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-099",
+    "name": "Hulkbuster",
+    "nameRu": "Халкбастер",
+    "imagePath": "/characters/hulkbuster.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-100",
+    "name": "Ghost",
+    "nameRu": "Призрак",
+    "imagePath": "/characters/ghost.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-101",
+    "name": "Sentinel",
+    "nameRu": "Страж-Сентинел",
+    "imagePath": "/characters/sentinel.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-102",
+    "name": "Nebula",
+    "nameRu": "Небула",
+    "imagePath": "/characters/nebula.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-103",
+    "name": "Prowler",
+    "nameRu": "Бродяга",
+    "imagePath": "/characters/prowler.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-104",
+    "name": "Howard the Duck",
+    "nameRu": "Говард-утка",
+    "imagePath": "/characters/howard-duck.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-105",
+    "name": "Mysteria",
+    "nameRu": "Мистерия",
+    "imagePath": "/characters/mysteria.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-106",
+    "name": "Malekith",
+    "nameRu": "Малекит",
+    "imagePath": "/characters/malekith.webp",
+    "enabled": true
   }
 ]

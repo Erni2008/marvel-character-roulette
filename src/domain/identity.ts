@@ -102,6 +102,16 @@ const table: Record<string, [string, string, string, Identity['pattern']]> = {
   '093': ['#1f5a2a', '#9a1a2a', '#7dffb0', 'rings'],
   '094': ['#1a1a1a', '#d8d8d8', '#ff4a5a', 'grid'],
   '095': ['#c8102e', '#e8e0d0', '#ff5a5a', 'rays'],
+  '097': ['#2f3a2a',  '#7fc241',  '#b6ff6a',  'grid'],
+  '098': ['#1c1c22',  '#8a8a94',  '#ff3030',  'rays'],
+  '099': ['#5a0f12',  '#d4a017',  '#7fdcff',  'grid'],
+  '100': ['#2a2c33',  '#c9ccd4',  '#ff4a4a',  'grid'],
+  '101': ['#2c1a4a',  '#b9bcc8',  '#c46bff',  'grid'],
+  '102': ['#4a0f12',  '#3d7fd1',  '#6fc0ff',  'rays'],
+  '103': ['#1e0f2e',  '#8a3fd1',  '#c46bff',  'grid'],
+  '104': ['#2e2a1a',  '#c9a227',  '#ffd35a',  'grid'],
+  '105': ['#4a0f2a',  '#e0306a',  '#ff6a9a',  'rays'],
+  '106': ['#14121c',  '#c21f5a',  '#5affd0',  'rays'],
   '096': ['#2a2a2e', '#d4a017', '#ffd35a', 'grid'],
 };
 const fallback: Identity['pattern'][] = ['rays', 'rings', 'grid', 'diamond', 'bolt', 'web'];
