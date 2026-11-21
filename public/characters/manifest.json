@@ -456,8 +456,8 @@
   },
   {
     "id": "champion-101",
-    "name": "Sentinel",
-    "nameRu": "Страж-Сентинел",
+    "name": "Nimrod",
+    "nameRu": "Нимрод",
     "imagePath": "/characters/sentinel.webp",
     "enabled": true
   },
@@ -484,15 +484,15 @@
   },
   {
     "id": "champion-105",
-    "name": "Mysteria",
-    "nameRu": "Мистерия",
+    "name": "Ruby Thursday",
+    "nameRu": "Руби Фесдэй",
     "imagePath": "/characters/mysteria.webp",
     "enabled": true
   },
   {
     "id": "champion-106",
-    "name": "Malekith",
-    "nameRu": "Малекит",
+    "name": "Solvarch",
+    "nameRu": "Солварх",
     "imagePath": "/characters/malekith.webp",
     "enabled": true
   }
