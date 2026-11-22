@@ -495,12 +495,5 @@
     "nameRu": "Солварх",
     "imagePath": "/characters/malekith.webp",
     "enabled": true
-  },
-  {
-    "id": "champion-107",
-    "name": "Cosmic Ghost Rider",
-    "nameRu": "Космический Призрачный гонщик",
-    "imagePath": "/characters/cosmic-ghost-rider.webp",
-    "enabled": true
   }
 ]

@@ -112,7 +112,6 @@ const table: Record<string, [string, string, string, Identity['pattern']]> = {
   '104': ['#2e2a1a',  '#c9a227',  '#ffd35a',  'grid'],
   '105': ['#4a0f2a',  '#e0306a',  '#ff6a9a',  'rays'],
   '106': ['#14121c',  '#c21f5a',  '#5affd0',  'rays'],
-  '107': ['#0f1a3a',  '#2fa8ff',  '#ffb020',  'rays'],
   '096': ['#2a2a2e', '#d4a017', '#ffd35a', 'grid'],
 };
 const fallback: Identity['pattern'][] = ['rays', 'rings', 'grid', 'diamond', 'bolt', 'web'];
