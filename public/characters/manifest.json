@@ -495,5 +495,75 @@
     "nameRu": "Солварх",
     "imagePath": "/characters/malekith.webp",
     "enabled": true
+  },
+  {
+    "id": "champion-107",
+    "name": "Ant-Man (Future)",
+    "nameRu": "Человек-муравей из будущего",
+    "imagePath": "/characters/future-ant-man.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-108",
+    "name": "Hulkling",
+    "nameRu": "Халклинг",
+    "imagePath": "/characters/hulkling.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-109",
+    "name": "She-Hulk",
+    "nameRu": "Женщина-Халк",
+    "imagePath": "/characters/she-hulk-casual.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-110",
+    "name": "Hela",
+    "nameRu": "Хела",
+    "imagePath": "/characters/hela.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-111",
+    "name": "King Groot",
+    "nameRu": "Король Грут",
+    "imagePath": "/characters/king-groot.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-112",
+    "name": "Red Goblin",
+    "nameRu": "Красный Гоблин",
+    "imagePath": "/characters/red-goblin.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-113",
+    "name": "Medusa",
+    "nameRu": "Медуза",
+    "imagePath": "/characters/medusa.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-114",
+    "name": "Cosmic Ghost Rider",
+    "nameRu": "Космический Призрачный гонщик",
+    "imagePath": "/characters/cosmic-ghost-rider.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-115",
+    "name": "Hyperion",
+    "nameRu": "Гиперион",
+    "imagePath": "/characters/hyperion.webp",
+    "enabled": true
+  },
+  {
+    "id": "champion-116",
+    "name": "Venom the Duck",
+    "nameRu": "Веном-Утка",
+    "imagePath": "/characters/venom-the-duck.webp",
+    "enabled": true
   }
 ]
