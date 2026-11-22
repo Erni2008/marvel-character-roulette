@@ -497,13 +497,6 @@
     "enabled": true
   },
   {
-    "id": "champion-107",
-    "name": "Ant-Man (Future)",
-    "nameRu": "Человек-муравей из будущего",
-    "imagePath": "/characters/future-ant-man.webp",
-    "enabled": true
-  },
-  {
     "id": "champion-108",
     "name": "Hulkling",
     "nameRu": "Халклинг",
@@ -512,9 +505,9 @@
   },
   {
     "id": "champion-109",
-    "name": "She-Hulk",
-    "nameRu": "Женщина-Халк",
-    "imagePath": "/characters/she-hulk-casual.webp",
+    "name": "Karolina Dean",
+    "nameRu": "Каролина Дин",
+    "imagePath": "/characters/karolina-dean.webp",
     "enabled": true
   },
   {

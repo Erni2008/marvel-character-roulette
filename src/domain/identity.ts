@@ -112,7 +112,6 @@ const table: Record<string, [string, string, string, Identity['pattern']]> = {
   '104': ['#2e2a1a',  '#c9a227',  '#ffd35a',  'grid'],
   '105': ['#4a0f2a',  '#e0306a',  '#ff6a9a',  'rays'],
   '106': ['#14121c',  '#c21f5a',  '#5affd0',  'rays'],
-  '107': ['#1a0f14',  '#d42a2a',  '#ffd23a',  'grid'],
   '108': ['#14240f',  '#4f9a3a',  '#e04ab0',  'rays'],
   '109': ['#2a1a0f',  '#d48a2a',  '#7fe0a0',  'rays'],
   '110': ['#0f1a14',  '#1f9a5a',  '#5affa0',  'rays'],
